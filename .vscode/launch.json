@@ -1,0 +1,18 @@
+{
+  // Lancement du jeu depuis VS Code (F5) : build du projet Releve.Game, puis exécution
+  // de l'exe produit avec pour répertoire de travail le dossier de sortie, où sont copiés
+  // les assets (police, images, audio).
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Relève — jouer",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/Releve.Game/bin/Debug/net8.0/win-x64/Releve.Game.dll",
+      "cwd": "${workspaceFolder}/src/Releve.Game/bin/Debug/net8.0/win-x64",
+      "console": "integratedTerminal",
+      "stopAtEntry": false,
+      "preLaunchTask": "build"
+    }
+  ]
+}

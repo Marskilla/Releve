@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Releve.Engine</AssemblyName>
+    <RootNamespace>Releve.Engine</RootNamespace>
+  </PropertyGroup>
+
+</Project>

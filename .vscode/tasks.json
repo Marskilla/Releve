@@ -1,0 +1,38 @@
+{
+  // Tâches utilisées par le lancement F5 : build du projet de jeu et build complet.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "detail": "Compiler le projet Releve.Game (dépendances incluses)",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/src/Releve.Game/Releve.Game.csproj"],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "build-solution",
+      "detail": "Compiler la solution complète (moteur, jeu, tests)",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "${workspaceFolder}/Releve.sln"],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "test",
+      "detail": "Exécuter les tests xUnit du moteur",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["test", "${workspaceFolder}/Releve.sln"],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    }
+  ]
+}

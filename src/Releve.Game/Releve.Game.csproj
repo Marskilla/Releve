@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Releve.Game</AssemblyName>
+    <RootNamespace>Releve.Game</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <!-- RID fixe : la bibliotheque native raylib est copiee a cote de l'exe, quel que soit le mode de build. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Les assets sont copies a cote de l'exe : le jeu les cherche la, quel que soit le repertoire de travail. -->
+    <None Include="assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Releve.Engine\Releve.Engine.csproj" />
+    <PackageReference Include="Raylib-cs" />
+  </ItemGroup>
+
+</Project>
