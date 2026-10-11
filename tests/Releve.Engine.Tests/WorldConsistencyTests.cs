@@ -22,15 +22,15 @@ public class WorldConsistencyTests
     };
 
     [Fact]
-    public void Bootstrap_World_Is_Consistent()
+    public void Game_World_Is_Consistent()
     {
-        var world = BootstrapWorld.Create();
+        var world = GameWorld.Create();
 
-        AssertConsistent(world, TestRoomIds, TestObjectIds, isBootstrapWorld: true);
+        AssertConsistent(world, TestRoomIds, TestObjectIds, isGameWorld: true);
 
-        Assert.Equal(RoomId.SandboxA, world.StartRoom);
-        Assert.Equal(2, world.Rooms.Count);
-        Assert.Equal(2, world.Objects.Count);
+        Assert.Equal(RoomId.Bedroom, world.StartRoom);
+        Assert.Equal(4, world.Rooms.Count);
+        Assert.Equal(22, world.Objects.Count);
     }
 
     [Fact]
@@ -38,14 +38,14 @@ public class WorldConsistencyTests
     {
         var world = Releve.Engine.Tests.World.TestWorldFactory.Create();
 
-        AssertConsistent(world, TestRoomIds, TestObjectIds, isBootstrapWorld: false);
+        AssertConsistent(world, TestRoomIds, TestObjectIds, isGameWorld: false);
 
         Assert.Equal(RoomId.TestRoomStart, world.StartRoom);
     }
 
-    private static void AssertConsistent(WorldModel world, RoomId[] testRooms, ObjectId[] testObjects, bool isBootstrapWorld)
+    private static void AssertConsistent(WorldModel world, RoomId[] testRooms, ObjectId[] testObjects, bool isGameWorld)
     {
-        if (isBootstrapWorld)
+        if (isGameWorld)
         {
             // Chaque piece hors monde de test a une classe de piece.
             foreach (var roomId in Enum.GetValues<RoomId>().Except(testRooms))

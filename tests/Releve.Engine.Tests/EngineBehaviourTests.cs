@@ -12,41 +12,41 @@ public class EngineBehaviourTests
     [Fact]
     public void Start_Returns_Room_Description()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
         var messages = engine.Start();
 
         Assert.Single(messages);
-        Assert.Equal("Une salle nue aux murs de béton. Deux bancs métalliques longent le mur ouest et une caisse en métal repose sur l’un d’eux. Une porte capitonnée occupe le mur est, flanquée d’un commutateur. Le mur nord est plein.", messages[0]);
+        Assert.Equal("Une salle carrée. Une armoire est posée contre le mur nord, un coffre repose au pied d’un banc. À l’est, un couloir effondré.", messages[0]);
     }
 
     [Fact]
     public void Look_Without_Target_Repeats_Description()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
         var result = engine.Execute("regarde");
 
         Assert.False(result.StateChanged);
-        Assert.Contains(result.Messages, m => m.Contains("salle nue", StringComparison.Ordinal));
+        Assert.Contains(result.Messages, m => m.Contains("salle carrée", StringComparison.Ordinal));
     }
 
     [Fact]
     public void Take_And_Drop_Move_Between_Room_And_Inventory()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
-        var taken = engine.Execute("prends caisse");
+        var taken = engine.Execute("prends clef");
         Assert.Equal(["Pris."], taken.Messages);
         Assert.True(taken.StateChanged);
-        Assert.True(engine.State.IsInInventory(ObjectId.SandboxItem));
+        Assert.True(engine.State.IsInInventory(ObjectId.TestKey));
 
         var inventory = engine.Execute("inventaire");
-        Assert.Equal(["caisse en métal"], inventory.Messages);
+        Assert.Equal(["petite clé"], inventory.Messages);
 
-        var dropped = engine.Execute("pose caisse");
+        var dropped = engine.Execute("pose clef");
         Assert.Equal(["Posé."], dropped.Messages);
-        Assert.False(engine.State.IsInInventory(ObjectId.SandboxItem));
+        Assert.False(engine.State.IsInInventory(ObjectId.TestKey));
 
         var empty = engine.Execute("inventaire");
         Assert.Equal(["Vous ne portez rien."], empty.Messages);
@@ -55,9 +55,9 @@ public class EngineBehaviourTests
     [Fact]
     public void Take_Fixed_Object_Is_Refused()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
-        var result = engine.Execute("prends commutateur");
+        var result = engine.Execute("prends armoire");
 
         Assert.Equal(["Vous ne pouvez pas prendre cela."], result.Messages);
     }
@@ -65,9 +65,9 @@ public class EngineBehaviourTests
     [Fact]
     public void Drop_Object_Not_Carried_Is_Refused()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
-        var result = engine.Execute("pose caisse");
+        var result = engine.Execute("pose clef");
 
         Assert.Equal(["Vous ne portez pas cela."], result.Messages);
     }
@@ -92,27 +92,27 @@ public class EngineBehaviourTests
     [Fact]
     public void Use_And_Talk_Fall_Back_To_Nothing_Happens()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
-        Assert.Equal(["Rien ne se passe."], engine.Execute("utilise caisse").Messages);
-        Assert.Equal(["Rien ne se passe."], engine.Execute("parle caisse").Messages);
+        Assert.Equal(["Rien ne se passe."], engine.Execute("utilise clef").Messages);
+        Assert.Equal(["Rien ne se passe."], engine.Execute("parle clef").Messages);
     }
 
     [Fact]
     public void Use_With_Instrument_Not_Carried_Is_Refused()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
-        var result = engine.Execute("utilise caisse sur commutateur");
+        var result = engine.Execute("utilise clef sur armoire");
 
         Assert.Equal(["Vous ne l’avez pas sur vous."], result.Messages);
-        Assert.Equal(ObjectState.Locked, engine.State.StateOf(ObjectId.SandboxSwitch));
+        Assert.Equal(ObjectState.Locked, engine.State.StateOf(ObjectId.TestCabinet));
     }
 
     [Fact]
     public void Move_Without_Exit_Is_Refused()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
         Assert.Equal(["Vous ne pouvez pas aller par là."], engine.Execute("sud").Messages);
         Assert.Equal(["Vous ne pouvez pas aller par là."], engine.Execute("ouest").Messages);
@@ -121,18 +121,18 @@ public class EngineBehaviourTests
     [Fact]
     public void Move_Towards_Blocked_Exit_Returns_Blocker_And_Stays()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
         var blocked = engine.Execute("nord");
-        Assert.Equal(["Le mur nord est plein, sans porte ni ouverture."], blocked.Messages);
+        Assert.Equal(["Une porte de pierre bloque le passage nord. Sa serrure est bien fermée."], blocked.Messages);
         Assert.False(blocked.StateChanged);
-        Assert.Equal(RoomId.SandboxA, engine.State.CurrentRoom);
+        Assert.Equal(RoomId.TestRoomStart, engine.State.CurrentRoom);
     }
 
     [Fact]
     public void Errors_Are_Neutral()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
         Assert.Equal(["Cette commande n’est pas comprise."], engine.Execute("saute").Messages);
         Assert.Equal(["Précisez l’objet de la commande."], engine.Execute("prends").Messages);
@@ -158,32 +158,30 @@ public class EngineBehaviourTests
 public class ExitStateTests
 {
     [Fact]
-    public void Sandbox_Starts_With_Blocked_And_Absent_Arrows()
+    public void Test_Room_Starts_With_Blocked_And_Absent_Arrows()
     {
-        var engine = TestSupport.FreshSandboxEngine();
+        var engine = TestSupport.FreshTestEngine();
 
         var view = engine.GetView();
 
-        Assert.Equal(ExitState.Blocked, view.Exits[Direction.East]);
         Assert.Equal(ExitState.Blocked, view.Exits[Direction.North]);
+        Assert.Equal(ExitState.Blocked, view.Exits[Direction.East]);
         Assert.Equal(ExitState.Absent, view.Exits[Direction.South]);
         Assert.Equal(ExitState.Absent, view.Exits[Direction.West]);
     }
 
     [Fact]
-    public void Sandbox_East_Becomes_Open_After_Unlocking_The_Switch()
+    public void Test_Room_View_Reports_Title_Image_Key_And_Inventory()
     {
-        var engine = TestSupport.FreshSandboxEngine();
-        engine.Execute("prends caisse");
-        engine.Execute("utilise caisse sur commutateur");
+        var engine = TestSupport.FreshTestEngine();
+        engine.Execute("prends clef");
 
         var view = engine.GetView();
 
-        Assert.Equal(ExitState.Open, view.Exits[Direction.East]);
-        Assert.Equal(ExitState.Blocked, view.Exits[Direction.North]);
-        Assert.Equal("Salle A — zone d’amorçage", view.Title);
-        Assert.Equal("sandbox_a", view.ImageKey);
-        Assert.Equal(["caisse en métal"], view.Inventory.Select(i => i.Name));
+        Assert.Equal(RoomId.TestRoomStart, view.Room);
+        Assert.Equal("Salle de départ", view.Title);
+        Assert.Equal("test_start", view.ImageKey);
+        Assert.Equal(["petite clé"], view.Inventory.Select(i => i.Name));
     }
 
     [Fact]

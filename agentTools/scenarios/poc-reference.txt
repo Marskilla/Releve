@@ -1,0 +1,14 @@
+regarde lit
+est
+prends badge
+ouvre armoire
+prends badge
+utilise badge sur lecteur
+est
+utilise badge sur lecteur
+utilise badge sur lecteur escalier
+nord
+ouest
+parle à l’androïde
+passe le badge sur la borne
+ouest

@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text.Json;
-using Releve.Engine.Content;
 using Releve.Engine.Core;
 using Releve.Engine.Persistence;
+using Releve.Engine.Tests.World;
 using Releve.Engine.World;
 using Xunit;
 
@@ -40,14 +40,14 @@ public class SaveTests : IDisposable
     [Fact]
     public void Save_Then_Load_Restores_The_Exact_State()
     {
-        var world = BootstrapWorld.Create();
+        var world = TestWorldFactory.Create();
         var state = world.CreateInitialState();
         var engine = new GameEngine(world, state);
         engine.Start();
 
-        engine.Execute("prends caisse");
-        engine.Execute("utilise caisse sur commutateur");
-        engine.Execute("est");
+        engine.Execute("prends clef");
+        engine.Execute("utilise clef sur armoire");
+        engine.Execute("nord");
 
         _store.Save(state);
 
@@ -57,32 +57,30 @@ public class SaveTests : IDisposable
         var loaded = _store.Load();
         Assert.NotNull(loaded);
 
-        Assert.Equal(RoomId.SandboxB, loaded!.CurrentRoom);
-        Assert.Equal(ObjectState.Unlocked, loaded.StateOf(ObjectId.SandboxSwitch));
-        Assert.True(loaded.IsInInventory(ObjectId.SandboxItem));
-        Assert.Contains(GameEvent.SandboxSwitchUnlocked, loaded.Events);
-        Assert.Contains(GameEvent.SandboxAnnouncePlayed, loaded.Events);
+        Assert.Equal(RoomId.TestRoomVault, loaded!.CurrentRoom);
+        Assert.Equal(ObjectState.Unlocked, loaded.StateOf(ObjectId.TestCabinet));
+        Assert.True(loaded.IsInInventory(ObjectId.TestKey));
 
-        // Le moteur recharge repart du meme etat, sans rejouer l'annonce.
+        // Le moteur recharge repart du meme etat.
         var restored = new GameEngine(world, loaded);
-            var messages = restored.Start();
-            Assert.DoesNotContain(messages, m => m.Contains("déclic", StringComparison.Ordinal));
-        Assert.Equal(ExitState.Open, restored.GetView().Exits[Direction.West]);
+        var messages = restored.Start();
+        Assert.Single(messages);
+        Assert.Equal(ExitState.Open, restored.GetView().Exits[Direction.South]);
     }
 
     [Fact]
     public void Serialization_Uses_Enum_Names_And_Expected_Keys()
     {
-        var world = BootstrapWorld.Create();
+        var world = TestWorldFactory.Create();
         var state = world.CreateInitialState();
         var json = JsonSerializer.Deserialize<JsonElement>(SaveSerializer.ToJson(state));
 
         Assert.Equal(1, json.GetProperty("schemaVersion").GetInt32());
-        Assert.Equal("SandboxA", json.GetProperty("currentRoom").GetString());
+        Assert.Equal("TestRoomStart", json.GetProperty("currentRoom").GetString());
         Assert.True(json.TryGetProperty("locations", out var locations));
-        Assert.Equal("Room", locations.GetProperty("SandboxItem").GetProperty("kind").GetString());
+        Assert.Equal("Room", locations.GetProperty("TestKey").GetProperty("kind").GetString());
         Assert.True(json.TryGetProperty("states", out var states));
-        Assert.Equal("Locked", states.GetProperty("SandboxSwitch").GetString());
+        Assert.Equal("Locked", states.GetProperty("TestCabinet").GetString());
         Assert.Equal(JsonValueKind.Array, json.GetProperty("events").ValueKind);
     }
 
@@ -100,7 +98,7 @@ public class SaveTests : IDisposable
     public void Unknown_Schema_Version_Is_Ignored()
     {
         Directory.CreateDirectory(_directory);
-        var data = new SaveData { SchemaVersion = 99, CurrentRoom = RoomId.SandboxB };
+        var data = new SaveData { SchemaVersion = 99, CurrentRoom = RoomId.Bedroom };
         var json = JsonSerializer.SerializeToUtf8Bytes(data, SaveSerializer.Options);
         File.WriteAllBytes(_filePath, SaveCrypto.Encrypt(json));
 

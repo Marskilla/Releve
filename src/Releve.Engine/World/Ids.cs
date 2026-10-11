@@ -5,9 +5,11 @@ namespace Releve.Engine.World;
 /// <summary>Pieces du monde. Les membres marques « test » servent uniquement aux tests (§11).</summary>
 public enum RoomId
 {
-    // Monde d'amorcage (§12.2), a supprimer a l'arrivee du contenu reel :
-    SandboxA,
-    SandboxB,
+    // Contenu reel (document PoC §2) :
+    Bedroom,
+    TechCorridor,
+    HospitalLobby,
+    Street,
 
     // Pieces utilisees uniquement par le monde de test :
     TestRoomStart,
@@ -18,9 +20,33 @@ public enum RoomId
 /// <summary>Objets du monde. Les membres marques « test » servent uniquement aux tests (§11).</summary>
 public enum ObjectId
 {
-    // Monde d'amorcage (§12.2) :
-    SandboxItem,
-    SandboxSwitch,
+    // Chambre de reveil (PoC §3.1)
+    BedroomBed,
+    BedroomMachines,
+    BedroomWardrobe,
+    ChildClothes,
+    Badge,
+    BedroomReader,
+    BedroomDoor,
+    BedroomBin,
+    GarbageBag,
+
+    // Couloir technique (PoC §3.2)
+    StairsDoor,
+    StairsReader,
+    TechDoor,
+    TechReader,
+
+    // Accueil de l'hopital (PoC §3.3)
+    Android,
+    Terminal,
+    Display,
+    Wheelchairs,
+    GlassDoor,
+    Plants,
+    Elevator,
+    ElevatorReader,
+    ElevatorButton,
 
     // Objets utilises uniquement par le monde de test :
     TestKey,
@@ -34,8 +60,9 @@ public enum ObjectId
 /// <summary>Evenements uniques (annonce deja jouee, mecanisme deja actionne...).</summary>
 public enum GameEvent
 {
-    SandboxSwitchUnlocked,
-    SandboxAnnouncePlayed,
+    // Contenu reel (PoC §2)
+    WakeAnnouncementDone,
+
     TestAnnouncePlayed,
 }
 

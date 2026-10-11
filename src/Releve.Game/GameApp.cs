@@ -28,6 +28,8 @@ public sealed class GameApp
     private RoomView _view = null!;
     private bool _playing;
     private bool _quitRequested;
+    private bool _canContinue;
+    private bool _menuEntered;
 
     public void Run()
     {
@@ -48,6 +50,9 @@ public sealed class GameApp
 
         _saveStore = new EncryptedFileSaveStore();
 
+        // La sauvegarde est lue une seule fois au demarrage : le menu la relit a chaque image sinon (§15).
+        _canContinue = _saveStore.Exists() && _saveStore.Load() is not null;
+
         while (!Raylib.WindowShouldClose() && !_quitRequested)
         {
             if (_playing)
@@ -56,11 +61,17 @@ public sealed class GameApp
             }
             else
             {
-                _menu.Reset(CanContinue());
-                UpdateMenu();
+                // Reset uniquement a l'entree dans le menu : la navigation est neutralisee sinon (§15).
+                if (!_menuEntered)
+                {
+                    _menu.Reset(_canContinue);
+                    _menuEntered = true;
+                }
+
+                UpdateMenu(_canContinue);
             }
 
-            Draw();
+            Draw(_canContinue);
         }
 
         // Sauvegarde automatique à la fermeture (note d'intention §10).
@@ -75,15 +86,16 @@ public sealed class GameApp
         Raylib.CloseWindow();
     }
 
-    private void UpdateMenu()
+    private void UpdateMenu(bool canContinue)
     {
-        var choice = _menu.Update(CanContinue());
+        var choice = _menu.Update(canContinue);
         if (choice is null)
         {
             return;
         }
 
         _music.Play(MusicPlayer.GameTrack);
+        _menuEntered = false;
 
         if (choice.Value == 0)
         {
@@ -125,7 +137,7 @@ public sealed class GameApp
 
     private void StartNewGame()
     {
-        var world = BootstrapWorld.Create();
+        var world = GameWorld.Create();
         _engine = new GameEngine(world, world.CreateInitialState());
         _view = _engine.GetView();
         _console.Clear();
@@ -142,7 +154,7 @@ public sealed class GameApp
             return;
         }
 
-        var world = BootstrapWorld.Create();
+        var world = GameWorld.Create();
         _engine = new GameEngine(world, saved);
         _view = _engine.GetView();
         _console.Clear();
@@ -150,9 +162,7 @@ public sealed class GameApp
         _inventory.ResetScroll();
     }
 
-    private bool CanContinue() => _saveStore.Exists() && _saveStore.Load() is not null;
-
-    private void Draw()
+    private void Draw(bool canContinue)
     {
         Raylib.BeginDrawing();
 
@@ -166,7 +176,7 @@ public sealed class GameApp
         }
         else
         {
-            _menu.Draw(CanContinue());
+            _menu.Draw(canContinue);
         }
 
         Raylib.EndDrawing();
