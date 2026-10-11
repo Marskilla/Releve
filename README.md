@@ -37,4 +37,6 @@ La sauvegarde unique est écrite automatiquement à la fermeture du jeu dans `Do
 
 ## Développement
 
-Voir `Docs/ArchitectureTechniqueV0.1.md` pour l'architecture et `Docs/NoteIntentionJeuAventureV5.md` pour l'intention de jeu.
+- `Docs/ArchitectureTechniqueV0.2.md` — architecture technique, reflet du code livré (V0.2) : structure, modèle de domaine, analyseur, sauvegarde, couche raylib, tests.
+- `Docs/NoteIntentionJeuAventureV5.md` — intention de jeu (interface et comportement) ; elle prévaut sur le document d'architecture en cas de désaccord.
+- `AGENTS.md` — consignes de travail pour les sessions de développement assisté.

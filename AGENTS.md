@@ -7,7 +7,7 @@ Repo-specific notes for working in **Relève** (C# text/graphic adventure). Read
 - `src/Releve.Engine/` — pure game engine: world, parser, state, save. **Must never reference raylib or any display/audio library.** Tests only cover this project.
 - `src/Releve.Game/` — raylib UI. Entry point: `src/Releve.Game/Program.cs` → `GameApp.Run()` (loop in `GameApp.cs`, panels in `Ui/`).
 - `tests/Releve.Engine.Tests/` — the only test project. Includes its own world (`TestWorld/TestWorld.cs`) independent of the real content.
-- Docs: `ArchitectureTechniqueV0.1.md` is the spec; `NoteIntentionJeuAventureV5.md` governs UI/behaviour and **wins on conflicts** there. `ImplementationPOCV0.1.md` and `UniversScenarioLoreJeuAventureV0.7.md` describe later phases — do not implement from them yet.
+- Docs: `ArchitectureTechniqueV0.2.md` is the spec and mirrors the shipped code; `NoteIntentionJeuAventureV5.md` governs UI/behaviour and **wins on conflicts** there. `ImplementationPOCV0.1.md` and `UniversScenarioLoreJeuAventureV0.7.md` describe later phases — do not implement from them yet.
 
 ## Commands
 
