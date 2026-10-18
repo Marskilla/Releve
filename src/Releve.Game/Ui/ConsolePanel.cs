@@ -129,12 +129,12 @@ public sealed class ConsolePanel
         var offset = caretX > x + maxWidth ? x + maxWidth - caretX : 0f;
 
         _fonts.Draw(Prompt, new Vector2(x + offset, y), Palette.Prompt);
-        _fonts.Draw(_current, new Vector2(x + offset + promptWidth, y), Palette.Text);
+        _fonts.Draw(_current, new Vector2(x + offset + promptWidth, y), Palette.ConsoleInput);
 
         // Curseur clignotant.
         if ((int)(Raylib.GetTime() * 2.0) % 2 == 0)
         {
-            Raylib.DrawRectangle((int)(caretX + offset), (int)y + 2, 2, Fonts.Size, Palette.Text);
+            Raylib.DrawRectangle((int)(caretX + offset), (int)y + 2, 2, Fonts.Size, Palette.ConsoleInput);
         }
     }
 
@@ -144,14 +144,14 @@ public sealed class ConsolePanel
         var buttonYTop = bounds.Y + Layout.Padding;
         var buttonYBottom = inputY - Layout.Padding - Fonts.LineHeight;
 
-        var canScrollUp = _scroll > 0;
-        var canScrollDown = _scroll < Math.Max(0, _lines.Count - 1);
+        var canScrollUp = _scroll < Math.Max(0, _lines.Count - 1);
+        var canScrollDown = _scroll > 0;
 
-        // Bouton haut : triangle pointe vers le haut.
+        // Bouton haut : defilement vers le haut = plus ancien (possible si _scroll < max).
         DrawScrollButton(buttonX, buttonYTop, ScrollButtonWidth, ScrollButtonWidth,
             direction: -1, canScroll: canScrollUp, ref _scrollUpHover, ref _scrollUpPressed);
 
-        // Bouton bas : triangle pointe vers le bas.
+        // Bouton bas : defilement vers le bas = plus recent (possible si _scroll > 0).
         DrawScrollButton(buttonX, buttonYBottom, ScrollButtonWidth, ScrollButtonWidth,
             direction: 1, canScroll: canScrollDown, ref _scrollDownHover, ref _scrollDownPressed);
     }
@@ -160,40 +160,41 @@ public sealed class ConsolePanel
         bool canScroll, ref bool hover, ref bool pressed)
     {
         var mouse = Raylib.GetMousePosition();
-        hover = canScroll && Raylib.CheckCollisionPointRec(mouse, new Rectangle(x, y, width, height));
+        var rect = new Rectangle(x, y, width, height);
+        hover = canScroll && Raylib.CheckCollisionPointRec(mouse, rect);
 
         var background = canScroll
-            ? (pressed ? Palette.Panel : (hover ? new Color(60, 75, 100, 255) : Palette.Panel))
-            : new Color(40, 50, 68, 255);
+            ? (pressed ? new Color(80, 95, 125, 255) : (hover ? new Color(70, 85, 115, 255) : Palette.Panel))
+            : new Color(35, 42, 56, 255);
 
         var arrowColour = canScroll
             ? (hover ? Palette.Text : Palette.DimText)
-            : new Color(80, 95, 125, 255);
+            : new Color(120, 130, 150, 255);
 
-        Raylib.DrawRectangleRec(new Rectangle(x, y, width, height), background);
-        Raylib.DrawRectangleLinesEx(new Rectangle(x, y, width, height), 1, Palette.Border);
+        Raylib.DrawRectangleRec(rect, background);
+        Raylib.DrawRectangleLinesEx(rect, 1, Palette.Border);
 
-        // Triangle de defilement (forme geometrique, pas de glyphe).
-        var half = width / 2f;
-        var centerY = y + height / 2f;
-        var arrowSize = height * 0.5f;
-        var offsetY = direction * arrowSize * 0.3f;
+        var cx = x + width / 2f;
+        var left = x + width * 0.2f;
+        var right = x + width * 0.8f;
+        var top = y + height * 0.2f;
+        var bottom = y + height * 0.8f;
 
         if (direction < 0)
         {
-            // Pointe vers le haut.
+            // Flèche HAUT : comme ArrowsPanel North (cx, top), (left, bottom), (right, bottom)
             Raylib.DrawTriangle(
-                new Vector2(x + half, y + height * 0.3f + offsetY),
-                new Vector2(x + width * 0.2f, y + height * 0.7f + offsetY),
-                new Vector2(x + width * 0.8f, y + height * 0.7f + offsetY), arrowColour);
+                new Vector2(cx, top),
+                new Vector2(left, bottom),
+                new Vector2(right, bottom), arrowColour);
         }
         else
         {
-            // Pointe vers le bas.
+            // Flèche BAS : comme ArrowsPanel South (cx, bottom), (right, top), (left, top)
             Raylib.DrawTriangle(
-                new Vector2(x + half, y + height * 0.7f + offsetY),
-                new Vector2(x + width * 0.2f, y + height * 0.3f + offsetY),
-                new Vector2(x + width * 0.8f, y + height * 0.3f + offsetY), arrowColour);
+                new Vector2(cx, bottom),
+                new Vector2(right, top),
+                new Vector2(left, top), arrowColour);
         }
     }
 
@@ -211,8 +212,8 @@ public sealed class ConsolePanel
         var rectTop = new Rectangle(buttonX, buttonYTop, ScrollButtonWidth, ScrollButtonWidth);
         var rectBottom = new Rectangle(buttonX, buttonYBottom, ScrollButtonWidth, ScrollButtonWidth);
 
-        var canScrollUp = _scroll > 0;
-        var canScrollDown = _scroll < Math.Max(0, _lines.Count - 1);
+        var canScrollUp = _scroll < Math.Max(0, _lines.Count - 1);
+        var canScrollDown = _scroll > 0;
 
         var overTop = canScrollUp && Raylib.CheckCollisionPointRec(mouse, rectTop);
         var overBottom = canScrollDown && Raylib.CheckCollisionPointRec(mouse, rectBottom);
@@ -221,12 +222,12 @@ public sealed class ConsolePanel
         {
             if (overTop)
             {
-                _scroll = Math.Max(0, _scroll - ScrollLines);
+                _scroll = Math.Min(Math.Max(0, _lines.Count - 1), _scroll + ScrollLines);
                 _scrollUpPressed = true;
             }
             else if (overBottom)
             {
-                _scroll = Math.Min(Math.Max(0, _lines.Count - 1), _scroll + ScrollLines);
+                _scroll = Math.Max(0, _scroll - ScrollLines);
                 _scrollDownPressed = true;
             }
         }
@@ -237,35 +238,7 @@ public sealed class ConsolePanel
             _scrollDownPressed = false;
         }
 
-        // Repetition quand maintenu.
-        if (_scrollUpPressed && canScrollUp)
-        {
-            _scrollHoldTimer++;
-            if (_scrollHoldTimer > 10) // ~10 images avant repetition, puis toutes les 4 images
-            {
-                _scroll = Math.Max(0, _scroll - ScrollLines);
-                if (_scrollHoldTimer % 4 == 0)
-                {
-                    _scrollHoldTimer = 10;
-                }
-            }
-        }
-        else if (_scrollDownPressed && canScrollDown)
-        {
-            _scrollHoldTimer++;
-            if (_scrollHoldTimer > 10)
-            {
-                _scroll = Math.Min(Math.Max(0, _lines.Count - 1), _scroll + ScrollLines);
-                if (_scrollHoldTimer % 4 == 0)
-                {
-                    _scrollHoldTimer = 10;
-                }
-            }
-        }
-        else
-        {
-            _scrollHoldTimer = 0;
-        }
+        // Pas de repetition auto sur maintien : un clic = un defilement.
     }
 
     private void ScrollWithKeyboard()

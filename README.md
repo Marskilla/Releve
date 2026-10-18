@@ -33,14 +33,18 @@ La police fournie dans `assets/fonts` est **DejaVu Sans 2.37**, libre de droits 
 
 ## Sauvegarde
 
-La sauvegarde unique est écrite automatiquement à la fermeture du jeu dans `Documents/Releve/save.dat`, chiffrée (AES-256-GCM). Il s'agit d'une obfuscation contre l'édition manuelle, pas d'une protection.
+La sauvegarde unique est écrite :
+1. **À la fermeture du jeu** (bloc `finally`, couvre aussi les sorties sur exception) ;
+2. **Après toute commande modifiant l'état** (déplacement inclus) via `StateChanged`.
+
+Le fichier est `Documents/Releve/save.dat`, chiffré (AES-256-GCM). Il s'agit d'une obfuscation contre l'édition manuelle, pas d'une protection.
 
 ## Développement
 
-- `Docs/ArchitectureTechniqueV0.3.md` — architecture technique (V0.3, à mettre à jour en V0.4 après le PoC V2) : structure, modèle de domaine, analyseur, sauvegarde, couche raylib, tests, automatisation.
+- `Docs/ArchitectureTechniqueV0.3.md` — architecture technique (V0.4, reflète le code livré après PoC V2) : structure, modèle de domaine, analyseur, sauvegarde, couche raylib, tests, automatisation.
 - `Docs/NoteIntentionJeuAventureV5.md` — intention de jeu (interface et comportement) ; elle prévaut sur le document d'architecture en cas de désaccord.
 - `Docs/POC_V1/ImplementationPOCV0.1.md` — plan du PoC V1 (implémenté).
 - `Docs/POC_V1/CompteRenduPOCV0.1.md` — compte rendu du PoC V1.
 - `Docs/POC_V2/ImplementationPOC2V1.0.md` — plan d'implémentation du PoC V2.
-- `Docs/POC_V2/CompteRenduPOC2V0.1.md` — compte rendu du PoC V2 (à rédiger).
+- `Docs/POC_V2/CompteRenduPOC2V0.1.md` — compte rendu du PoC V2 (livré, jouable de bout en bout).
 - `AGENTS.md` — consignes de travail pour les sessions de développement assisté.

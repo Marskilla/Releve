@@ -224,6 +224,7 @@ public sealed class GameApp
         _console.Clear();
         _console.Append(_engine.Start());
         _inventory.ResetScroll();
+        _music.Play(MusicPlayer.GameTrack);
     }
 
     private void ContinueGame()
@@ -241,6 +242,7 @@ public sealed class GameApp
         _console.Clear();
         _console.Append(_engine.Start());
         _inventory.ResetScroll();
+        _music.Play(MusicPlayer.GameTrack);
     }
 
     private void Draw(bool canContinue)

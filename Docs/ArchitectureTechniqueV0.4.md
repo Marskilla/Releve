@@ -564,7 +564,7 @@ La console calcule à chaque image le nombre de lignes visibles et ancre l’his
 ### 9.3 Composants
 
 - **Vue du lieu** : texture chargée depuis `assets/rooms/<ImageKey>.png`, mise en cache par clé, **étirée pour remplir exactement `ViewBounds`** avec `DrawTexturePro` (proportions non conservées). Le cadre est redessiné après l’image. Si l’image est introuvable, rectangle de remplacement.
-- **Flèches** : disposition en **croix** centrée horizontalement (nord en haut, sud en bas, ouest à gauche avec libellé à sa gauche, est à droite avec libellé à sa droite) avec titre « Déplacements possibles : », dessinées avec des formes simples (triangle + fût). `Absent` : rien ; `Blocked` : flèche **creuse** (contour seul), gris sombre, libellé atténué ; `Open` : flèche **pleine**, couleur vive, libellé normal. La distinction ne repose pas que sur la couleur. Ce sont des **indicateurs**, pas des boutons : aucune interaction à la souris. La grille de dessin (constantes de `ArrowsPanel.cs`) est reproduite par la mesure pixelique de `agentTools/` (§16).
+- **Flèches** : disposition en **croix** centrée horizontalement (nord en haut, sud en bas, ouest à gauche avec libellé à sa gauche, est à droite avec libellé à sa droite) avec titre « Déplacements possibles : », dessinées avec **têtes de flèches seules** (plus de fûts). `Absent` : rien ; `Blocked` : flèche **creuse** (contour seul), gris sombre, libellé atténué ; `Open` : flèche **pleine**, couleur vive, libellé normal. La distinction ne repose pas que sur la couleur. Ce sont des **indicateurs**, pas des boutons : aucune interaction à la souris. La grille de dessin (constantes de `ArrowsPanel.cs`) est reproduite par la mesure pixelique de `agentTools/` (§16).
 - **Inventaire** : liste verticale de libellés précédés d’une icône de remplacement (carré de 16 px), titre « Inventaire : », défilement au clavier.
 - **Console** : historique avec retour à la ligne automatique (largeur mesurée avec la police, réduite de la colonne des boutons de défilement), ancré en bas, défilement vertical. **Deux types de ligne** : saisie du joueur (écho `> commande`, couleur `ConsoleInput`) et réponse du jeu (couleur `ConsoleResponse`). Ligne de saisie avec invite `> ` et curseur clignotant (2 clignotements par seconde), décalée vers la gauche quand le curseur dépasse le bord droit. Édition : **retour arrière et suppression en répétition quand la touche est maintenue** (`IsKeyPressedRepeat`), flèches gauche/droite, début/fin. Flèches haut/bas : rappel de l’historique des commandes saisies. **Deux boutons cliquables** (haut, bas) dessinés comme formes géométriques dans une colonne à l’extrémité droite de l’aire de l’historique : un clic fait défiler de 3 lignes, le maintien répète ; un bouton est grisé quand le défilement est impossible dans son sens. Page↑ / Page↓ restent actifs.
 - **Police** : `Ui/Fonts.cs`, taille 20 (corps) et 64 (titre du menu), interligne 26, chargée depuis `assets/fonts/DejaVuSans.ttf` avec une liste explicite de codepoints. Repli sur la police par défaut de raylib si le fichier est absent ou invalide.
@@ -590,14 +590,14 @@ Police retenue : **DejaVu Sans 2.37**, licence incluse dans `assets/fonts/DejaVu
 
 ### 9.6 Audio
 
-Deux bandes son, conformément à la note d’intention §10 (la V0.1 n’en prévoyait qu’une : la contradiction est tranchée en faveur de la note) :
+Deux bandes son, conformément à la note d'intention §10 (la V0.1 n'en prévoyait qu'une : la contradiction est tranchée en faveur de la note) :
 
 | Piste | Fichiers cherchés | Moment de lecture |
 |---|---|---|
-| `menu` | `assets/audio/menu.ogg` puis `menu.mp3` | à l’écran du menu |
+| `menu` | `assets/audio/menu.ogg` puis `menu.mp3` | à l'écran du menu |
 | `game` | `assets/audio/game.ogg` puis `game.mp3` | pendant la partie |
 
-Chaque flux est chargé si présent, mis en boucle (`Looping = true`) et mis à jour à chaque image (`UpdateMusicStream`). Changer de piste arrête la précédente. Si le périphérique audio est indisponible (`InitAudioDevice` échoue) ou si les fichiers sont absents, le jeu continue **sans son**, sans erreur bloquante. Les flux sont arrêtés et déchargés à la fermeture.
+Chaque flux est chargé si présent, mis en boucle (`Looping = true`) et mis à jour à chaque image (`UpdateMusicStream`). Changer de piste arrête la précédente. **La bascule vers `game.ogg` se fait dès la sortie du menu** (choix « Continuer » ou « Nouvelle partie ») via `MusicPlayer.Play(MusicPlayer.GameTrack)` dans `GameApp.StartNewGame` et `ContinueGame`. Si le périphérique audio est indisponible (`InitAudioDevice` échoue) ou si les fichiers sont absents, le jeu continue **sans son**, sans erreur bloquante. Les flux sont arrêtés et déchargés à la fermeture.
 
 ### 9.7 Menu
 
@@ -710,14 +710,21 @@ Critères propres au PoC, vérifiés dans le jeu réel (détail dans « CompteRe
 
 Défauts recensés dans le code, corrections attendues et écarts acceptés.
 
-1. **Navigation du menu neutralisée — corrigé.** `GameApp.Run` appelait `MenuScreen.Reset(...)` à chaque image, ce qui ramenait la sélection sur sa valeur par défaut et neutralisait les flèches Haut/Bas. `Reset` n’est plus appelé qu’à l’entrée dans l’état menu (drapeau `_menuEntered`).
-2. **Fichier de sauvegarde relu en permanence — corrigé.** `CanContinue()` était évalué plusieurs fois par image, avec lecture et déchiffrement complets du fichier à chaque fois. Le résultat est mémorisé au démarrage (`_canContinue`) et rafraîchi à la sortie d’une partie.
+1. **Navigation du menu neutralisée — corrigé.** `GameApp.Run` appelait `MenuScreen.Reset(...)` à chaque image, ce qui ramenait la sélection sur sa valeur par défaut et neutralisait les flèches Haut/Bas. `Reset` n'est plus appelé qu'à l'entrée dans l'état menu (drapeau `_menuEntered`).
+2. **Fichier de sauvegarde relu en permanence — corrigé.** `CanContinue()` était évalué plusieurs fois par image, avec lecture et déchiffrement complets du fichier à chaque fois. Le résultat est mémorisé au démarrage (`_canContinue`) et rafraîchi à la sortie d'une partie.
 3. **Images de lieux non référencées — résolu.** Les trois images de `assets/rooms/` sont désormais des images vivantes du monde du PoC (clés `Bedroom`, `HospitalLobby`, `TechCorridor`). Seule la rue est sans image, par conception (lieu provisoire).
-4. **Page d’aide** — implémentée dans le PoC V2 (lot C4) : entrée « Aide » du menu ouvre le visualiseur de texte en plein écran avec `assets/texts/help.txt`.
-5. **Rendu des flèches et icônes d’inventaire** : formes et carrés de remplacement, en attente des assets définitifs. Ordre de sommets des triangles corrigé (anti-horaire) dans le PoC V2 (lot B3).
+4. **Page d'aide** — implémentée dans le PoC V2 (lot C4) : entrée « Aide » du menu ouvre le visualiseur de texte en plein écran avec `assets/texts/help.txt`.
+5. **Rendu des flèches et icônes d'inventaire** : formes et carrés de remplacement, en attente des assets définitifs. Ordre de sommets des triangles corrigé (anti-horaire) dans le PoC V2 (lot B3).
 6. **Résolution partielle des objets invisibles — écart connu, accepté (décision A1 PoC V2).** Un objet caché par `VisibleWhen` reste partiellement identifiable par ses alias (§6.6) : « prends badge » avant « ouvre armoire » refuse la prise au lieu de signaler un objet inconnu. Comportement documenté par un test (`Badge_Is_Reachable_Only_After_Opening_The_Wardrobe`). Aucune correction moteur : cela ne révèle rien sur les objets cachés.
-7. **Touche Retour arrière** — corrigée (lot B1) : `KeyboardKey.Backspace` au lieu de `KeyboardKey.Back`, avec répétition en maintien (`IsKeyPressedRepeat`). La validation de la répétition avec un vrai clavier n’est pas automatisable par `agentTools/` : classification « validation humaine » (§7.3 du document PoC V2).
+7. **Touche Retour arrière** — corrigée (lot B1) : `KeyboardKey.Backspace` au lieu de `KeyboardKey.Back`, avec répétition en maintien (`IsKeyPressedRepeat`). La validation de la répétition avec un vrai clavier n'est pas automatisable par `agentTools/` : classification « validation humaine » (§7.3 du document PoC V2).
 8. **Sauvegarde automatique** (lot C1) : sauvegarde après chaque commande à `StateChanged` (déplacement inclus), plus sauvegarde de fermeture dans un bloc `finally`.
+
+**Points PoC V2 supplémentaires :**
+
+9. **Boutons de défilement console** : un clic = 3 lignes, **pas de répétition en maintien** (supprimée pour éviter le défilement trop rapide). Les boutons sont grisés quand le défilement est impossible.
+10. **Flèches déplacements** : **têtes de flèches seules** (triangles pleins/creux), **plus de fûts** (rectangles). Ordre de sommets anti-horaire validé.
+11. **Visualiseur de texte (TextViewer)** : normalisation CRLF → LF avant wrapping (plus de `?` en fin de ligne) ; indicateur de défilement bas repositionné au-dessus du bouton « Fermer » pour ne pas chevaucher.
+12. **Bascule musique menu/jeu** : correction d'une régression — `game.ogg` est maintenant joué en quittant le menu (ajout de `MusicPlayer.Play(GameTrack)` dans `StartNewGame` et `ContinueGame`).
 
 ## 16. Outillage d’automatisation (hors build)
 

@@ -107,57 +107,51 @@ public sealed class ArrowsPanel
         }
     }
 
-    /// <summary>Fleche pleine : triangle + fust, ordre de sommets anti-horaire.</summary>
+    /// <summary>Fleche pleine : triangle seul (tete), ordre de sommets anti-horaire.</summary>
     private static void DrawArrowFilled(Direction direction, float x, float y, Color colour)
     {
         var half = ArrowSize / 2f;
-        var shaft = ArrowSize / 4f;
 
         switch (direction)
         {
             case Direction.North:
+                // Tete vers le haut : (centre-haut) -> (bas-gauche) -> (bas-droite)
                 Raylib.DrawTriangle(
                     new Vector2(x + half, y),
                     new Vector2(x, y + ArrowSize),
                     new Vector2(x + ArrowSize, y + ArrowSize), colour);
-                Raylib.DrawRectangle((int)(x + half - shaft / 2), (int)(y + ArrowSize),
-                    (int)shaft, (int)half, colour);
                 break;
 
             case Direction.South:
+                // Tete vers le bas : (centre-bas) -> (haut-droite) -> (haut-gauche)
                 Raylib.DrawTriangle(
                     new Vector2(x + half, y + ArrowSize),
                     new Vector2(x + ArrowSize, y),
                     new Vector2(x, y), colour);
-                Raylib.DrawRectangle((int)(x + half - shaft / 2), (int)y,
-                    (int)shaft, (int)half, colour);
                 break;
 
             case Direction.East:
+                // Tete vers la droite : (milieu-droit) -> (haut-gauche) -> (bas-gauche)
                 Raylib.DrawTriangle(
                     new Vector2(x + ArrowSize, y + half),
-                    new Vector2(x, y + ArrowSize),
-                    new Vector2(x, y), colour);
-                Raylib.DrawRectangle((int)x, (int)(y + half - shaft / 2),
-                    (int)half, (int)shaft, colour);
+                    new Vector2(x, y),
+                    new Vector2(x, y + ArrowSize), colour);
                 break;
 
             case Direction.West:
+                // Tete vers la gauche : (milieu-gauche) -> (bas-droite) -> (haut-droite)
                 Raylib.DrawTriangle(
                     new Vector2(x, y + half),
-                    new Vector2(x + ArrowSize, y),
-                    new Vector2(x + ArrowSize, y + ArrowSize), colour);
-                Raylib.DrawRectangle((int)(x + half), (int)(y + half - shaft / 2),
-                    (int)half, (int)shaft, colour);
+                    new Vector2(x + ArrowSize, y + ArrowSize),
+                    new Vector2(x + ArrowSize, y), colour);
                 break;
         }
     }
 
-    /// <summary>Fleche creuse : contour seulement (triangle + fust en trait).</summary>
+    /// <summary>Fleche creuse : contour du triangle seulement.</summary>
     private static void DrawArrowHollow(Direction direction, float x, float y, Color colour)
     {
         var half = ArrowSize / 2f;
-        var shaft = ArrowSize / 4f;
 
         switch (direction)
         {
@@ -166,8 +160,6 @@ public sealed class ArrowsPanel
                     new Vector2(x + half, y),
                     new Vector2(x, y + ArrowSize),
                     new Vector2(x + ArrowSize, y + ArrowSize), colour);
-                Raylib.DrawRectangleLinesEx(
-                    new Rectangle(x + half - shaft / 2, y + ArrowSize, shaft, half), 1, colour);
                 break;
 
             case Direction.South:
@@ -175,26 +167,20 @@ public sealed class ArrowsPanel
                     new Vector2(x + half, y + ArrowSize),
                     new Vector2(x + ArrowSize, y),
                     new Vector2(x, y), colour);
-                Raylib.DrawRectangleLinesEx(
-                    new Rectangle(x + half - shaft / 2, y, shaft, half), 1, colour);
                 break;
 
             case Direction.East:
                 Raylib.DrawTriangleLines(
                     new Vector2(x + ArrowSize, y + half),
-                    new Vector2(x, y + ArrowSize),
-                    new Vector2(x, y), colour);
-                Raylib.DrawRectangleLinesEx(
-                    new Rectangle(x, y + half - shaft / 2, half, shaft), 1, colour);
+                    new Vector2(x, y),
+                    new Vector2(x, y + ArrowSize), colour);
                 break;
 
             case Direction.West:
                 Raylib.DrawTriangleLines(
                     new Vector2(x, y + half),
-                    new Vector2(x + ArrowSize, y),
-                    new Vector2(x + ArrowSize, y + ArrowSize), colour);
-                Raylib.DrawRectangleLinesEx(
-                    new Rectangle(x + half, y + half - shaft / 2, half, shaft), 1, colour);
+                    new Vector2(x + ArrowSize, y + ArrowSize),
+                    new Vector2(x + ArrowSize, y), colour);
                 break;
         }
     }

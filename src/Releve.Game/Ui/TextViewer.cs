@@ -130,11 +130,11 @@ public sealed class TextViewer
             y += Fonts.LineHeight;
         }
 
-        // Indicateurs de défilement (formes géométriques).
-        DrawScrollIndicators();
-
         // Bouton « Fermer ».
         DrawCloseButton();
+
+        // Indicateurs de défilement (formes géométriques) - APRÈS le bouton pour ne pas être couverts.
+        DrawScrollIndicators();
     }
 
     private void Close()
@@ -147,7 +147,10 @@ public sealed class TextViewer
 
     private void WrapText(string text, float maxWidth)
     {
-        foreach (var paragraph in text.Split('\n'))
+        // Normaliser les fins de ligne Windows \r\n -> \n
+        var normalized = text.Replace("\r\n", "\n").Replace('\r', '\n');
+
+        foreach (var paragraph in normalized.Split('\n'))
         {
             if (paragraph.Length == 0)
             {
@@ -206,11 +209,13 @@ public sealed class TextViewer
         var lastVisible = _scroll + VisibleLines() - 1;
         if (lastVisible < _wrappedLines.Count - 1)
         {
-            var bottomY = _rectangle.Y + _rectangle.Height - Layout.Padding - IndicatorSize * 2f;
+            // Laisser de l'espace au-dessus du bouton "Fermer" (CloseButtonHeight + padding).
+            var bottomY = _rectangle.Y + _rectangle.Height - Layout.Padding - CloseButtonHeight - Layout.Padding - IndicatorSize;
+            // Comme ArrowsPanel South : (centre-bas) -> (haut-droite) -> (haut-gauche)
             Raylib.DrawTriangle(
                 new Vector2(indicatorX + IndicatorSize / 2f, bottomY),
-                new Vector2(indicatorX, bottomY - IndicatorSize),
                 new Vector2(indicatorX + IndicatorSize, bottomY - IndicatorSize),
+                new Vector2(indicatorX, bottomY - IndicatorSize),
                 Palette.Text);
         }
     }
