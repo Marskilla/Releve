@@ -24,7 +24,7 @@ public sealed class GameEngine
 
     public CommandResult Execute(string input)
     {
-        var parse = CommandParser.Parse(input, Scope());
+        var parse = CommandParser.Parse(input, Scope(), ExitWords());
         if (parse.Error == ParseError.Empty)
         {
             return CommandResult.Say(); // la saisie vide est ignoree
@@ -39,7 +39,11 @@ public sealed class GameEngine
 
         if (command.Action == GameAction.Go)
         {
-            return Move(command.Direction!.Value);
+            if (command.Direction is null)
+            {
+                return CommandResult.Say(Messages.CannotGo);
+            }
+            return Move(command.Direction.Value);
         }
 
         // L'instrument doit etre dans l'inventaire.
@@ -89,6 +93,7 @@ public sealed class GameEngine
             return command.Action switch
             {
                 GameAction.Look => CommandResult.Say(_world.Rooms[State.CurrentRoom].Description(State)),
+                GameAction.Read => CommandResult.Say(Messages.NothingToRead),
                 GameAction.Inventory => InventoryResult(),
                 _ => CommandResult.Say(Messages.MissingObject),
             };
@@ -100,6 +105,13 @@ public sealed class GameEngine
         {
             case GameAction.Look:
                 return CommandResult.Say(def.Describe(State));
+
+            case GameAction.Read:
+                if (target == ObjectId.Display || target == ObjectId.BedroomMachines)
+                {
+                    return CommandResult.Say(def.Describe(State));
+                }
+                return CommandResult.Say(Messages.NothingToRead);
 
             case GameAction.Take:
                 if (def.Portable && IsHere(target))
@@ -126,6 +138,10 @@ public sealed class GameEngine
                 return SetOpenClosed(target, def, ObjectState.Closed);
 
             case GameAction.Use:
+                return command.Instrument is null
+                    ? CommandResult.Say(Messages.UseWithoutInstrument)
+                    : CommandResult.Say(Messages.NothingHappens);
+
             case GameAction.Talk:
                 return CommandResult.Say(Messages.NothingHappens);
 
@@ -208,4 +224,23 @@ public sealed class GameEngine
             return accessible && (def.VisibleWhen is null || def.VisibleWhen(State));
         })
         .ToList();
+
+    /// <summary>Mots de sortie de la piece courante, associes a leur direction.</summary>
+    private IReadOnlyDictionary<string, Direction> ExitWords()
+    {
+        var words = new Dictionary<string, Direction>(StringComparer.Ordinal);
+        var room = _world.Rooms[State.CurrentRoom];
+        foreach (var exit in room.Exits)
+        {
+            if (exit.Words is not null)
+            {
+                foreach (var word in exit.Words)
+                {
+                    words[word] = exit.Dir;
+                }
+            }
+        }
+
+        return words;
+    }
 }

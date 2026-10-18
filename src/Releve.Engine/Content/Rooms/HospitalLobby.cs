@@ -17,6 +17,10 @@ public sealed class HospitalLobby : RoomBase
     private const string TerminalUnlockedMessage = "La porte vitrée de l’entrée se déverrouille.";
     private const string ElevatorReaderRefuses = "Le lecteur refuse le badge.";
     private const string ButtonDoesNothing = "Le bouton ne produit aucun effet.";
+    private const string OpenGlassDoorLocked = "La porte vitrée de l'entrée reste fermée.";
+    private const string OpenGlassDoorUnlocked = "La porte vitrée est déverrouillée. Le passage est libre vers l'ouest.";
+    private const string OpenElevator =
+        "Les portes de l'ascenseur restent closes. Le lecteur de badge affiche un rouge fixe.";
 
     // Fiche patient : texte du lore, repris a l'identique (PoC §3.3).
     private static readonly string[] PatientRecord =
@@ -40,10 +44,12 @@ public sealed class HospitalLobby : RoomBase
 
     public override IReadOnlyList<Exit> Exits { get; } = new[]
     {
-        new Exit(Direction.South, RoomId.TechCorridor),
-        new Exit(Direction.West, RoomId.Street, IsOpen: IsWestOpen, BlockedMessage: WestBlockedMessage),
+        new Exit(Direction.South, RoomId.TechCorridor, Words: new[] { "descends", "descendre" }),
+        new Exit(Direction.West, RoomId.Street, IsOpen: IsWestOpen, BlockedMessage: WestBlockedMessage,
+            Words: new[] { "sors", "sortir", "rue" }),
         // Fausse piste : l'ascenseur n'ouvre sur aucune zone de jeu.
-        new Exit(Direction.North, null, BlockedMessage: NorthBlockedMessage),
+        new Exit(Direction.North, null, BlockedMessage: NorthBlockedMessage,
+            Words: new[] { "monte", "monter", "ascenseur" }),
     };
 
     public override CommandResult? Handle(Command c, GameState s)
@@ -76,6 +82,22 @@ public sealed class HospitalLobby : RoomBase
             {
                 return CommandResult.Say(ButtonDoesNothing);
             }
+        }
+
+        // « ouvre porte vitree ».
+        if (c.Action == GameAction.Open && c.Target == ObjectId.GlassDoor)
+        {
+            if (s.StateOf(ObjectId.Terminal) != ObjectState.Activated)
+            {
+                return CommandResult.Say(OpenGlassDoorLocked);
+            }
+            return CommandResult.Say(OpenGlassDoorUnlocked);
+        }
+
+        // « ouvre ascenseur ».
+        if (c.Action == GameAction.Open && c.Target == ObjectId.Elevator)
+        {
+            return CommandResult.Say(OpenElevator);
         }
 
         return null;

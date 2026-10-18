@@ -39,7 +39,8 @@ public sealed class Bedroom : RoomBase
 
     public override IReadOnlyList<Exit> Exits { get; } = new[]
     {
-        new Exit(Direction.East, RoomId.TechCorridor, IsOpen: IsEastOpen, BlockedMessage: EastBlockedMessage),
+        new Exit(Direction.East, RoomId.TechCorridor, IsOpen: IsEastOpen, BlockedMessage: EastBlockedMessage,
+            Words: new[] { "sors", "sortir" }),
     };
 
     public override CommandResult? Handle(Command c, GameState s)

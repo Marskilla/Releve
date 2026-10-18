@@ -4,8 +4,8 @@ using Raylib_cs;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Menu minimal de lancement (§9.7) : « Continuer » (grisé si aucune sauvegarde valide)
-/// et « Nouvelle partie ». Navigation au clavier (haut/bas, Entrée).
+/// Menu de lancement a trois entrees (lot C2) : « Continuer », « Nouvelle partie », « Aide ».
+/// Retourne un choix typé. « Continuer » est grisé sans sauvegarde valide.
 /// </summary>
 public sealed class MenuScreen
 {
@@ -14,10 +14,17 @@ public sealed class MenuScreen
     private readonly Fonts _fonts;
 
     private int _selected;
+    private Texture2D? _background;
 
     public MenuScreen(Fonts fonts)
     {
         _fonts = fonts;
+    }
+
+    /// <summary>Définit l'image de fond du menu (null = fond uni).</summary>
+    public void SetBackground(Texture2D? background)
+    {
+        _background = background;
     }
 
     /// <summary>Place la selection sur la reprise si une sauvegarde existe, sinon sur une nouvelle partie.</summary>
@@ -26,29 +33,35 @@ public sealed class MenuScreen
         _selected = canContinue ? 0 : 1;
     }
 
-    /// <summary>-1 : nouvelle partie, 0 : continuer.</summary>
-    public int Selected => _selected;
+    /// <summary>Choix retourne par le menu.</summary>
+    public enum MenuChoice { Continue, NewGame, Help }
 
-    /// <summary>Renvoie -1 pour une nouvelle partie, 0 pour reprendre, null si rien n'est choisi.</summary>
-    public int? Update(bool canContinue)
+    /// <summary>Renvoie le choix lorsque le joueur valide, null sinon.</summary>
+    public MenuChoice? Update(bool canContinue)
     {
         if (Raylib.IsKeyPressed(KeyboardKey.Up))
         {
-            _selected = Math.Abs(_selected - 1);
+            _selected = (_selected - 1 + 3) % 3;
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Down))
         {
-            _selected = Math.Abs(_selected - 1);
+            _selected = (_selected + 1) % 3;
         }
+
         if (Raylib.IsKeyPressed(KeyboardKey.Enter) || Raylib.IsKeyPressed(KeyboardKey.KpEnter))
         {
             if (_selected == 0 && !canContinue)
             {
-                return null; // entrée inexistante : grisée, rien à faire
+                return null; // entree inexistante : grisee, rien à faire
             }
 
-            return _selected == 0 ? 0 : -1;
+            return _selected switch
+            {
+                0 => MenuChoice.Continue,
+                1 => MenuChoice.NewGame,
+                _ => MenuChoice.Help,
+            };
         }
 
         return null;
@@ -56,33 +69,60 @@ public sealed class MenuScreen
 
     public void Draw(bool canContinue)
     {
-        Raylib.ClearBackground(Palette.Background);
-
         var width = (float)Raylib.GetScreenWidth();
+        var height = (float)Raylib.GetScreenHeight();
         var centre = width / 2f;
 
-        var titleWidth = _fonts.MeasureWidth(TitleText);
-        _fonts.Draw(TitleText, new Vector2(centre - titleWidth / 2f, 180), Palette.Text);
+        // Fond : image etiree si disponible, sinon couleur unie.
+        if (_background is { } bg && Raylib.IsTextureValid(bg))
+        {
+            Raylib.DrawTexturePro(bg,
+                new Rectangle(0, 0, bg.Width, bg.Height),
+                new Rectangle(0, 0, width, height),
+                Vector2.Zero, 0f, Color.White);
+        }
+        else
+        {
+            Raylib.ClearBackground(Palette.Background);
+        }
 
-        DrawEntry(0, "Continuer", canContinue ? Palette.Text : Palette.DimText, centre);
-        DrawEntry(1, "Nouvelle partie", Palette.Text, centre);
+        // Titre en grand, centré en haut (police secondaire, lot C2).
+        var titleWidth = _fonts.MeasureTitleWidth(TitleText);
+        var titleX = centre - titleWidth / 2f;
+        var titleY = 100f;
+        DrawTextWithShadow(TitleText, new Vector2(titleX, titleY), Palette.Text);
+
+        var entryY = 300f;
+        var entrySpacing = 60f;
+
+        DrawEntry(0, "Continuer", canContinue ? Palette.Text : Palette.DimText, centre, entryY);
+        DrawEntry(1, "Nouvelle partie", Palette.Text, centre, entryY + entrySpacing);
+        DrawEntry(2, "Aide", Palette.Text, centre, entryY + entrySpacing * 2);
     }
 
-    private void DrawEntry(int index, string label, Color colour, float centre)
+    private void DrawEntry(int index, string label, Color colour, float centre, float y)
     {
-        var y = 300f + index * 60f;
         var textWidth = _fonts.MeasureWidth(label);
+        var x = centre - textWidth / 2f;
 
         if (index == _selected)
         {
             Raylib.DrawRectangle(
-                (int)(centre - textWidth / 2f) - Layout.Padding,
+                (int)(x - Layout.Padding),
                 (int)(y - Layout.Padding / 2),
                 (int)textWidth + Layout.Padding * 2,
                 Fonts.Size + Layout.Padding,
                 Palette.Replacement);
         }
 
-        _fonts.Draw(label, new Vector2(centre - textWidth / 2f, y), colour);
+        _fonts.Draw(label, new Vector2(x, y), colour);
+    }
+
+    /// <summary>Dessine le texte avec une ombre portée pour la lisibilité sur l'image de fond.</summary>
+    private void DrawTextWithShadow(string text, Vector2 position, Color colour)
+    {
+        var shadowOffset = new Vector2(2, 2);
+        _fonts.DrawTitle(text, position + shadowOffset, new Color(0, 0, 0, 180));
+        _fonts.DrawTitle(text, position, colour);
     }
 }

@@ -6,39 +6,50 @@ namespace Releve.Game.Ui;
 
 /// <summary>
 /// Console d'interaction : historique, retour a la ligne automatique, ancrage en bas,
-/// ligne de saisie editable et defilement vertical (§9.3).
+/// ligne de saisie editable, defilement vertical et boutons de defilement cliquables (§9.3, lot B2).
 /// </summary>
 public sealed class ConsolePanel
 {
     private const string Prompt = "> ";
 
+    private const int ScrollButtonWidth = 28;
+    private const int ScrollLines = 3;
+
     private readonly Fonts _fonts;
-    private readonly List<string> _lines = new();
+    private readonly List<LineEntry> _lines = new();
     private readonly List<string> _sent = new();
     private string _current = string.Empty;
     private int _cursor;
     private int _scroll;
     private int _recallIndex = -1;
     private int _visibleLines = 1;
+    private bool _scrollUpHover;
+    private bool _scrollDownHover;
+    private bool _scrollUpPressed;
+    private bool _scrollDownPressed;
+    private int _scrollHoldTimer;
 
     public ConsolePanel(Fonts fonts)
     {
         _fonts = fonts;
     }
 
-    public void Append(IEnumerable<string> messages)
+    /// <summary>Une ligne d'historique avec son type (saisie du joueur ou reponse du jeu).</summary>
+    private sealed record LineEntry(string Text, bool IsInput);
+
+    public void Append(IEnumerable<string> messages, bool isInput = false)
     {
         foreach (var message in messages)
         {
-            Append(message);
+            Append(message, isInput);
         }
     }
 
-    public void Append(string message)
+    public void Append(string message, bool isInput = false)
     {
         foreach (var line in Wrap(message ?? string.Empty))
         {
-            _lines.Add(line);
+            _lines.Add(new LineEntry(line, isInput));
         }
 
         _scroll = 0;
@@ -58,6 +69,7 @@ public sealed class ConsolePanel
     public bool TryReadCommand(out string command)
     {
         ScrollWithKeyboard();
+        HandleMouseScroll();
         ReadCharacters();
 
         command = string.Empty;
@@ -83,7 +95,8 @@ public sealed class ConsolePanel
     {
         var bounds = Layout.ConsoleBounds;
         var textX = bounds.X + Layout.Padding;
-        var maxWidth = bounds.Width - 2 * Layout.Padding;
+        var historyWidth = bounds.Width - 2 * Layout.Padding - ScrollButtonWidth;
+        var maxWidth = historyWidth;
 
         Raylib.DrawRectangleRec(bounds, Palette.Panel);
         Raylib.DrawRectangleLinesEx(bounds, 1, Palette.Border);
@@ -98,11 +111,13 @@ public sealed class ConsolePanel
 
         for (var i = first; i <= last; i++)
         {
-            _fonts.Draw(_lines[i], new Vector2(textX, y), Palette.Text);
+            var entry = _lines[i];
+            _fonts.Draw(entry.Text, new Vector2(textX, y), entry.IsInput ? Palette.ConsoleInput : Palette.ConsoleResponse);
             y += Fonts.LineHeight;
         }
 
         DrawInputLine(textX, inputY, maxWidth);
+        DrawScrollButtons(bounds, inputY, historyWidth);
     }
 
     private void DrawInputLine(float x, float y, float maxWidth)
@@ -120,6 +135,136 @@ public sealed class ConsolePanel
         if ((int)(Raylib.GetTime() * 2.0) % 2 == 0)
         {
             Raylib.DrawRectangle((int)(caretX + offset), (int)y + 2, 2, Fonts.Size, Palette.Text);
+        }
+    }
+
+    private void DrawScrollButtons(Rectangle bounds, float inputY, float historyWidth)
+    {
+        var buttonX = bounds.X + bounds.Width - ScrollButtonWidth;
+        var buttonYTop = bounds.Y + Layout.Padding;
+        var buttonYBottom = inputY - Layout.Padding - Fonts.LineHeight;
+
+        var canScrollUp = _scroll > 0;
+        var canScrollDown = _scroll < Math.Max(0, _lines.Count - 1);
+
+        // Bouton haut : triangle pointe vers le haut.
+        DrawScrollButton(buttonX, buttonYTop, ScrollButtonWidth, ScrollButtonWidth,
+            direction: -1, canScroll: canScrollUp, ref _scrollUpHover, ref _scrollUpPressed);
+
+        // Bouton bas : triangle pointe vers le bas.
+        DrawScrollButton(buttonX, buttonYBottom, ScrollButtonWidth, ScrollButtonWidth,
+            direction: 1, canScroll: canScrollDown, ref _scrollDownHover, ref _scrollDownPressed);
+    }
+
+    private void DrawScrollButton(float x, float y, float width, float height, int direction,
+        bool canScroll, ref bool hover, ref bool pressed)
+    {
+        var mouse = Raylib.GetMousePosition();
+        hover = canScroll && Raylib.CheckCollisionPointRec(mouse, new Rectangle(x, y, width, height));
+
+        var background = canScroll
+            ? (pressed ? Palette.Panel : (hover ? new Color(60, 75, 100, 255) : Palette.Panel))
+            : new Color(40, 50, 68, 255);
+
+        var arrowColour = canScroll
+            ? (hover ? Palette.Text : Palette.DimText)
+            : new Color(80, 95, 125, 255);
+
+        Raylib.DrawRectangleRec(new Rectangle(x, y, width, height), background);
+        Raylib.DrawRectangleLinesEx(new Rectangle(x, y, width, height), 1, Palette.Border);
+
+        // Triangle de defilement (forme geometrique, pas de glyphe).
+        var half = width / 2f;
+        var centerY = y + height / 2f;
+        var arrowSize = height * 0.5f;
+        var offsetY = direction * arrowSize * 0.3f;
+
+        if (direction < 0)
+        {
+            // Pointe vers le haut.
+            Raylib.DrawTriangle(
+                new Vector2(x + half, y + height * 0.3f + offsetY),
+                new Vector2(x + width * 0.2f, y + height * 0.7f + offsetY),
+                new Vector2(x + width * 0.8f, y + height * 0.7f + offsetY), arrowColour);
+        }
+        else
+        {
+            // Pointe vers le bas.
+            Raylib.DrawTriangle(
+                new Vector2(x + half, y + height * 0.7f + offsetY),
+                new Vector2(x + width * 0.2f, y + height * 0.3f + offsetY),
+                new Vector2(x + width * 0.8f, y + height * 0.3f + offsetY), arrowColour);
+        }
+    }
+
+    private void HandleMouseScroll()
+    {
+        var mouse = Raylib.GetMousePosition();
+        var bounds = Layout.ConsoleBounds;
+        var inputY = bounds.Y + bounds.Height - Layout.Padding - Fonts.LineHeight;
+        var historyWidth = bounds.Width - 2 * Layout.Padding - ScrollButtonWidth;
+
+        var buttonX = bounds.X + bounds.Width - ScrollButtonWidth;
+        var buttonYTop = bounds.Y + Layout.Padding;
+        var buttonYBottom = inputY - Layout.Padding - Fonts.LineHeight;
+
+        var rectTop = new Rectangle(buttonX, buttonYTop, ScrollButtonWidth, ScrollButtonWidth);
+        var rectBottom = new Rectangle(buttonX, buttonYBottom, ScrollButtonWidth, ScrollButtonWidth);
+
+        var canScrollUp = _scroll > 0;
+        var canScrollDown = _scroll < Math.Max(0, _lines.Count - 1);
+
+        var overTop = canScrollUp && Raylib.CheckCollisionPointRec(mouse, rectTop);
+        var overBottom = canScrollDown && Raylib.CheckCollisionPointRec(mouse, rectBottom);
+
+        if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            if (overTop)
+            {
+                _scroll = Math.Max(0, _scroll - ScrollLines);
+                _scrollUpPressed = true;
+            }
+            else if (overBottom)
+            {
+                _scroll = Math.Min(Math.Max(0, _lines.Count - 1), _scroll + ScrollLines);
+                _scrollDownPressed = true;
+            }
+        }
+
+        if (Raylib.IsMouseButtonReleased(MouseButton.Left))
+        {
+            _scrollUpPressed = false;
+            _scrollDownPressed = false;
+        }
+
+        // Repetition quand maintenu.
+        if (_scrollUpPressed && canScrollUp)
+        {
+            _scrollHoldTimer++;
+            if (_scrollHoldTimer > 10) // ~10 images avant repetition, puis toutes les 4 images
+            {
+                _scroll = Math.Max(0, _scroll - ScrollLines);
+                if (_scrollHoldTimer % 4 == 0)
+                {
+                    _scrollHoldTimer = 10;
+                }
+            }
+        }
+        else if (_scrollDownPressed && canScrollDown)
+        {
+            _scrollHoldTimer++;
+            if (_scrollHoldTimer > 10)
+            {
+                _scroll = Math.Min(Math.Max(0, _lines.Count - 1), _scroll + ScrollLines);
+                if (_scrollHoldTimer % 4 == 0)
+                {
+                    _scrollHoldTimer = 10;
+                }
+            }
+        }
+        else
+        {
+            _scrollHoldTimer = 0;
         }
     }
 
@@ -171,7 +316,7 @@ public sealed class ConsolePanel
             _cursor = Math.Min(_current.Length, _cursor + 1);
         }
 
-        if (Raylib.IsKeyPressed(KeyboardKey.Back))
+        if (Raylib.IsKeyPressed(KeyboardKey.Backspace) || Raylib.IsKeyPressedRepeat(KeyboardKey.Backspace))
         {
             if (_cursor > 0)
             {
@@ -180,7 +325,7 @@ public sealed class ConsolePanel
             }
         }
 
-        if (Raylib.IsKeyPressed(KeyboardKey.Delete))
+        if (Raylib.IsKeyPressed(KeyboardKey.Delete) || Raylib.IsKeyPressedRepeat(KeyboardKey.Delete))
         {
             if (_cursor < _current.Length)
             {
@@ -251,7 +396,7 @@ public sealed class ConsolePanel
 
     private List<string> Wrap(string text)
     {
-        var maxWidth = Layout.ConsoleWidth - 2 * Layout.Padding;
+        var maxWidth = Layout.ConsoleWidth - 2 * Layout.Padding - ScrollButtonWidth;
         var lines = new List<string>();
 
         foreach (var paragraph in text.Split('\n'))

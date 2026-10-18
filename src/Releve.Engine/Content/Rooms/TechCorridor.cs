@@ -17,6 +17,11 @@ public sealed class TechCorridor : RoomBase
         "Le voyant passe au vert : la porte de l’escalier se déverrouille.";
     private const string BadgeUsedOnTechReader =
         "Le lecteur refuse le badge. Son voyant clignote en rouge.";
+    private const string OpenStairsDoorLocked =
+        "La porte de l'escalier est fermée. Le lecteur de badge affiche un rouge fixe.";
+    private const string OpenStairsDoorUnlocked = "La porte de l'escalier est déverrouillée.";
+    private const string OpenTechDoor =
+        "La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe.";
 
     public override RoomId Id => RoomId.TechCorridor;
 
@@ -28,8 +33,9 @@ public sealed class TechCorridor : RoomBase
 
     public override IReadOnlyList<Exit> Exits { get; } = new[]
     {
-        new Exit(Direction.West, RoomId.Bedroom),
-        new Exit(Direction.North, RoomId.HospitalLobby, IsOpen: IsNorthOpen, BlockedMessage: NorthBlockedMessage),
+        new Exit(Direction.West, RoomId.Bedroom, Words: new[] { "retourne", "retourner", "chambre" }),
+        new Exit(Direction.North, RoomId.HospitalLobby, IsOpen: IsNorthOpen, BlockedMessage: NorthBlockedMessage,
+            Words: new[] { "monte", "monter", "escalier" }),
         // Fausse piste : le local technique n'ouvre sur aucune zone de jeu.
         new Exit(Direction.East, null, BlockedMessage: EastBlockedMessage),
     };
@@ -51,6 +57,22 @@ public sealed class TechCorridor : RoomBase
         if (c.Action == GameAction.Use && c.Target == ObjectId.TechReader && c.Instrument == ObjectId.Badge)
         {
             return CommandResult.Say(BadgeUsedOnTechReader);
+        }
+
+        // « ouvre porte de l'escalier ».
+        if (c.Action == GameAction.Open && c.Target == ObjectId.StairsDoor)
+        {
+            if (s.StateOf(ObjectId.StairsReader) == ObjectState.Locked)
+            {
+                return CommandResult.Say(OpenStairsDoorLocked);
+            }
+            return CommandResult.Say(OpenStairsDoorUnlocked);
+        }
+
+        // « ouvre porte du local technique ».
+        if (c.Action == GameAction.Open && c.Target == ObjectId.TechDoor)
+        {
+            return CommandResult.Say(OpenTechDoor);
         }
 
         return null;

@@ -12,4 +12,8 @@ public static class Palette
     public static readonly Color DimText = new(130, 146, 168, 255);
     public static readonly Color Prompt = new(126, 170, 216, 255);
     public static readonly Color Replacement = new(34, 42, 58, 255);
+    public static readonly Color ConsoleInput = new(110, 160, 220, 255);
+    public static readonly Color ConsoleResponse = new(210, 220, 235, 255);
+    public static readonly Color ArrowOpen = new(120, 180, 240, 255);
+    public static readonly Color ArrowBlocked = new(80, 90, 110, 255);
 }

@@ -23,28 +23,23 @@ public sealed class RoomViewPanel
 
         Raylib.DrawRectangle((int)bounds.X - Layout.Padding, (int)bounds.Y - Layout.Padding,
             (int)bounds.Width + 2 * Layout.Padding, (int)bounds.Height + 2 * Layout.Padding, Palette.Panel);
-        Raylib.DrawRectangleLinesEx(bounds, 1, Palette.Border);
 
         if (TryGetTexture(imageKey, out var texture))
         {
-            DrawScaledCentered(texture, bounds);
-            return;
+            DrawStretched(texture, bounds);
+        }
+        else
+        {
+            DrawReplacement(title, bounds);
         }
 
-        DrawReplacement(title, bounds);
+        Raylib.DrawRectangleLinesEx(bounds, 1, Palette.Border);
     }
 
-    private void DrawScaledCentered(Texture2D texture, Rectangle bounds)
+    private void DrawStretched(Texture2D texture, Rectangle bounds)
     {
-        var scale = MathF.Min(bounds.Width / texture.Width, bounds.Height / texture.Height);
-        var width = texture.Width * scale;
-        var height = texture.Height * scale;
-        var origin = new Vector2((bounds.Width - width) / 2f, (bounds.Height - height) / 2f);
-
         var source = new Rectangle(0, 0, texture.Width, texture.Height);
-        var destination = new Rectangle(bounds.X + origin.X, bounds.Y + origin.Y, width, height);
-
-        Raylib.DrawTexturePro(texture, source, destination, Vector2.Zero, 0f, Color.White);
+        Raylib.DrawTexturePro(texture, source, bounds, Vector2.Zero, 0f, Color.White);
     }
 
     private void DrawReplacement(string title, Rectangle bounds)

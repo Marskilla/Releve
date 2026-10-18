@@ -1,6 +1,6 @@
 # Jeu "Relève" — Architecture technique
 
-> Document de référence — version 0.3
+> Document de référence — version 0.4
 > Valable pour toute la durée du projet. Il décrit la structure du code, pas le contenu du jeu.
 > À fournir à l’agent de développement avec la note d’intention (V5) et le mockup bitmap de l’interface. Le document univers/scénario n’est pas nécessaire à ce stade.
 
@@ -407,7 +407,7 @@ Les objets accessibles pour une commande sont ceux dont l’emplacement est la p
 
 **Conséquence pour l’écriture du contenu** : la correspondance partielle teste si *tous les mots du groupe* figurent dans l’alias (et non l’inverse). Deux objets de la même pièce partageant un mot d’alias (« lecteur de l’escalier » et « lecteur du local technique ») deviennent ambigus dès que le joueur tape « lecteur ». Les tests de cohérence du §11 détectent ces collisions.
 
-> **Écart connu de la résolution partielle** (relevé pendant le PoC, non corrigé, à trancher — §15, point 6) : un objet **invisible** reste partiellement identifiable par ses alias. Dans la chambre, « prends badge » avant « ouvre armoire » résout « badge » vers « le lecteur de badge » et refuse la prise (« Vous ne pouvez pas prendre cela. ») au lieu de signaler un objet inconnu. Comportement documenté par un test.
+> **Écart connu de la résolution partielle** (relevé pendant le PoC, documenté, non corrigé — §15, point 6) : un objet **invisible** reste partiellement identifiable par ses alias. Dans la chambre, « prends badge » avant « ouvre armoire » résout « badge » vers « le lecteur de badge » et refuse la prise (« Vous ne pouvez pas prendre cela. ») au lieu de signaler un objet inconnu. Comportement documenté par un test (`Badge_Is_Reachable_Only_After_Opening_The_Wardrobe`). Décision PoC V2 (A1) : accepter le comportement, ne rien révéler sur les objets cachés. Toute correction silencieuse serait sans effet sur l'expérience joueur.
 
 ### 6.7 Erreurs et messages
 
@@ -466,13 +466,16 @@ Messages exacts, tels qu’implémentés dans `Core/Messages.cs` :
 |---|---|
 | Look sans cible | Réaffiche la description de la pièce. |
 | Look avec cible | Affiche `Describe(état)` de l’objet. |
+| Read sans cible | « Il n’y a rien à lire ici. » (`Messages.NothingToRead`). |
+| Read avec cible | Sur `Display` et `BedroomMachines`, même texte que `Look` (`Describe`). Sur tout autre objet : « Il n’y a rien à lire ici. » |
 | Take | Si l’objet est portable et présent dans la pièce courante : il passe dans l’inventaire (« Pris. »). Sinon : « Vous ne pouvez pas prendre cela. » |
 | Drop | Si l’objet est dans l’inventaire : il passe dans la pièce courante (« Posé. »). Sinon : « Vous ne portez pas cela. » |
 | Open | Si l’état courant est exactement `Closed`, passe à `Open` (« Vous ouvrez <nom>. ») ; sinon « Rien ne se passe. » |
 | Close | Si l’état courant est exactement `Open`, passe à `Closed` (« Vous fermez <nom>. ») ; sinon « Rien ne se passe. » |
-| Use | « Rien ne se passe. » (sans instrument ni gestion par la pièce) |
+| Use | Sans instrument : « Précisez sur quoi l’utiliser. » (`Messages.UseWithoutInstrument`). Avec instrument non géré : « Rien ne se passe. » |
 | Talk | « Rien ne se passe. » |
 | Inventory | Liste les noms des objets de l’inventaire, ou « Vous ne portez rien. » Un complément éventuel est ignoré. |
+| Go sans direction | « Vous ne pouvez pas aller par là. » (`Messages.CannotGo`) — aucune exception n’est levée. |
 
 Points de détail à connaître :
 
@@ -486,7 +489,7 @@ Points de détail à connaître :
 
 ## 8. Sauvegarde
 
-- **Déclenchement** : à la fermeture de la fenêtre uniquement, et seulement si une partie est en cours (nouvelle ou chargée). Une seule sauvegarde. **La sauvegarde après chaque changement de pièce décrite en V0.1 n’est pas implémentée** : l’écriture a lieu une fois, dans `GameApp.Run`, à la sortie de la boucle. Le chemin « quitter » → écriture du fichier a été vérifié dans le jeu réel pendant le PoC.
+- **Déclenchement** : **(1)** à la fermeture de la fenêtre uniquement, et seulement si une partie est en cours (nouvelle ou chargée), écrit dans un bloc `finally` pour couvrir aussi une sortie sur exception ; **(2)** après toute commande dont le résultat signale `StateChanged` (donc aussi tout déplacement), via `GameApp.Submit`, uniquement si une partie est en cours. Une seule sauvegarde. Le chemin « quitter » → écriture du fichier a été vérifié dans le jeu réel pendant le PoC V1 et le PoC V2.
 - **Contenu** : pièce courante, emplacements des objets, états des objets, événements. **Aucune définition** (textes, images, sorties) n’est sauvegardée.
 - **Version de schéma** : `SchemaVersion`, valeur courante **1**. Si la version est inconnue ou le fichier illisible, la sauvegarde est ignorée proprement (« Continuer » grisé).
 - **Format avant chiffrement** (enums écrits par nom, `System.Text.Json` avec `JsonStringEnumConverter`, JSON compact sans indentation) :
@@ -554,19 +557,19 @@ Détails vérifiés :
 | Inventaire | `InventoryBounds` | x=960, y=132, 320 × 348 |
 | Console | `ConsoleBounds` | x=0, y=480, 1280 × 240 (un tiers, toute la largeur) |
 
-L’image est mise à l’échelle en conservant ses proportions et centrée dans ses marges. Si l’image d’un lieu est introuvable, un **rectangle de remplacement** porte le titre de la pièce : le jeu fonctionne sans aucune illustration.
+L’image est **étirée pour remplir exactement `ViewBounds`** (proportions non conservées, déformation horizontale acceptée). Le cadre (`DrawRectangleLinesEx`) est redessiné après l’image. Si l’image d’un lieu est introuvable, un **rectangle de remplacement** porte le titre de la pièce : le jeu fonctionne sans aucune illustration.
 
-La console calcule à chaque image le nombre de lignes visibles et ancre l’historique en bas, juste au-dessus de la ligne de saisie.
+La console calcule à chaque image le nombre de lignes visibles et ancre l’historique en bas, juste au-dessus de la ligne de saisie. Une colonne de boutons de défilement (~28 px) à l’extrémité droite de l’aire de l’historique réduit d’autant la largeur de retour à la ligne.
 
 ### 9.3 Composants
 
-- **Vue du lieu** : texture chargée depuis `assets/rooms/<ImageKey>.png`, mise en cache par clé, redessinée avec `DrawTexturePro` (proportions conservées).
-- **Flèches** : croix de quatre flèches (nord en haut, ouest à gauche, est à droite, sud en bas) avec libellé Nord/Sud/Est/Ouest et titre « Déplacements possibles : », dessinées avec des formes simples (triangle + fût). `Absent` : rien ; `Blocked` : grisée ; `Open` : couleur active. Ce sont des **indicateurs**, pas des boutons : aucune interaction à la souris. La grille de dessin (constantes de `ArrowsPanel.cs`) est reproduite par la mesure pixelique de `agentTools/` (§16).
+- **Vue du lieu** : texture chargée depuis `assets/rooms/<ImageKey>.png`, mise en cache par clé, **étirée pour remplir exactement `ViewBounds`** avec `DrawTexturePro` (proportions non conservées). Le cadre est redessiné après l’image. Si l’image est introuvable, rectangle de remplacement.
+- **Flèches** : disposition en **croix** centrée horizontalement (nord en haut, sud en bas, ouest à gauche avec libellé à sa gauche, est à droite avec libellé à sa droite) avec titre « Déplacements possibles : », dessinées avec des formes simples (triangle + fût). `Absent` : rien ; `Blocked` : flèche **creuse** (contour seul), gris sombre, libellé atténué ; `Open` : flèche **pleine**, couleur vive, libellé normal. La distinction ne repose pas que sur la couleur. Ce sont des **indicateurs**, pas des boutons : aucune interaction à la souris. La grille de dessin (constantes de `ArrowsPanel.cs`) est reproduite par la mesure pixelique de `agentTools/` (§16).
 - **Inventaire** : liste verticale de libellés précédés d’une icône de remplacement (carré de 16 px), titre « Inventaire : », défilement au clavier.
-- **Console** : historique avec retour à la ligne automatique (largeur mesurée avec la police), ancré en bas, défilement vertical. Ligne de saisie avec invite `> ` et curseur clignotant (2 clignotements par seconde), décalée vers la gauche quand le curseur dépasse le bord droit. Édition : retour arrière, suppression, flèches gauche/droite, début/fin. Flèches haut/bas : rappel de l’historique des commandes saisies.
-- **Police** : `Ui/Fonts.cs`, taille 20, interligne 26, chargée depuis `assets/fonts/DejaVuSans.ttf` avec une liste explicite de codepoints. Repli sur la police par défaut de raylib si le fichier est absent ou invalide.
-- **Assets** : `Ui/Assets.cs` résout le dossier `assets` à côté de l’exe, sinon en remontant depuis le répertoire courant (lancement depuis les sources).
-- **Palette** : `Ui/Palette.cs`, fond bleu-gris sombre, panneaux, bordures, texte, texte atténué, invite, rectangle de remplacement.
+- **Console** : historique avec retour à la ligne automatique (largeur mesurée avec la police, réduite de la colonne des boutons de défilement), ancré en bas, défilement vertical. **Deux types de ligne** : saisie du joueur (écho `> commande`, couleur `ConsoleInput`) et réponse du jeu (couleur `ConsoleResponse`). Ligne de saisie avec invite `> ` et curseur clignotant (2 clignotements par seconde), décalée vers la gauche quand le curseur dépasse le bord droit. Édition : **retour arrière et suppression en répétition quand la touche est maintenue** (`IsKeyPressedRepeat`), flèches gauche/droite, début/fin. Flèches haut/bas : rappel de l’historique des commandes saisies. **Deux boutons cliquables** (haut, bas) dessinés comme formes géométriques dans une colonne à l’extrémité droite de l’aire de l’historique : un clic fait défiler de 3 lignes, le maintien répète ; un bouton est grisé quand le défilement est impossible dans son sens. Page↑ / Page↓ restent actifs.
+- **Police** : `Ui/Fonts.cs`, taille 20 (corps) et 64 (titre du menu), interligne 26, chargée depuis `assets/fonts/DejaVuSans.ttf` avec une liste explicite de codepoints. Repli sur la police par défaut de raylib si le fichier est absent ou invalide.
+- **Assets** : `Ui/Assets.cs` résout le dossier `assets` à côté de l’exe, sinon en remontant depuis le répertoire courant (lancement depuis les sources). Ajoute `MenuBackground` et `HelpText`.
+- **Palette** : `Ui/Palette.cs`, fond bleu-gris sombre, panneaux, bordures, texte, texte atténué, invite, rectangle de remplacement, couleurs des flèches et des lignes de console.
 
 ### 9.4 Touches de défilement
 
@@ -598,11 +601,15 @@ Chaque flux est chargé si présent, mis en boucle (`Looping = true`) et mis à 
 
 ### 9.7 Menu
 
-Au lancement : « Continuer » (grisé si aucune sauvegarde valide) et « Nouvelle partie ». Navigation au clavier (haut/bas, Entrée). La sélection est placée par défaut sur « Continuer » quand une sauvegarde existe, sinon sur « Nouvelle partie ». Valider une entrée grisée ne fait rien.
+Au lancement : **trois entrées** — « Continuer » (grisé si aucune sauvegarde valide), « Nouvelle partie », « Aide ». Navigation cyclique au clavier (haut/bas, Entrée). La sélection est placée par défaut sur « Continuer » quand une sauvegarde existe, sinon sur « Nouvelle partie ». Valider une entrée grisée ne fait rien. Retour typé : `Continue`, `NewGame`, `Help`.
 
-Implémentation (corrigée pendant le PoC, voir §15) : l’existence et la validité de la sauvegarde sont évaluées **une seule fois au démarrage** (`_canContinue` dans `GameApp`), et `MenuScreen.Reset` n’est appelé qu’à l’entrée dans l’état menu. La lecture du fichier ne se répète donc pas à chaque image et la navigation fonctionne.
+- **Fond d'écran** : `assets/menu/menuBackground.png` étiré pour remplir toute la fenêtre, dessiné avant le titre et les entrées. Fichier absent : fond uni (`Palette.Background`), sans erreur.
+- **Titre** : « Relève » en grand (police secondaire ~64 px, `Fonts.Title`), centré en haut, avec ombre portée pour la lisibilité.
+- « Aide » ouvre le **visualiseur de texte** en plein écran avec le contenu de `assets/texts/help.txt` (Échap ou Entrée pour fermer, retour au menu avec la même sélection).
 
-Une page d’aide pleine page défilante est prévue par la note d’intention mais n’entre pas dans l’initialisation : elle n’est pas implémentée (§15).
+Implémentation (corrigée pendant le PoC, voir §15) : l'existence et la validité de la sauvegarde sont évaluées **une seule fois au démarrage** (`_canContinue` dans `GameApp`), et `MenuScreen.Reset` n'est appelé qu'à l'entrée dans l'état menu. `GameApp.UpdateMenu` n'appelle plus `StartNewGame` par défaut : « Aide » n'entre pas en jeu, ne change pas la musique et ne modifie pas `_playing`.
+
+Une sauvegarde est également effectuée après chaque commande modifiant l'état (déplacement inclus) — voir §8 et §15.
 
 ## 10. Étendre le jeu
 
@@ -706,9 +713,11 @@ Défauts recensés dans le code, corrections attendues et écarts acceptés.
 1. **Navigation du menu neutralisée — corrigé.** `GameApp.Run` appelait `MenuScreen.Reset(...)` à chaque image, ce qui ramenait la sélection sur sa valeur par défaut et neutralisait les flèches Haut/Bas. `Reset` n’est plus appelé qu’à l’entrée dans l’état menu (drapeau `_menuEntered`).
 2. **Fichier de sauvegarde relu en permanence — corrigé.** `CanContinue()` était évalué plusieurs fois par image, avec lecture et déchiffrement complets du fichier à chaque fois. Le résultat est mémorisé au démarrage (`_canContinue`) et rafraîchi à la sortie d’une partie.
 3. **Images de lieux non référencées — résolu.** Les trois images de `assets/rooms/` sont désormais des images vivantes du monde du PoC (clés `Bedroom`, `HospitalLobby`, `TechCorridor`). Seule la rue est sans image, par conception (lieu provisoire).
-4. **Page d’aide** non implémentée (§14, point 7).
-5. **Rendu des flèches et icônes d’inventaire** : formes et carrés de remplacement, en attente des assets définitifs.
-6. **Résolution partielle des objets invisibles — écart connu, à trancher.** Un objet caché par `VisibleWhen` reste partiellement identifiable par ses alias (§6.6) : « prends badge » avant « ouvre armoire » refuse la prise au lieu de signaler un objet inconnu. Comportement documenté par un test (§11). Corrections possibles : exclure les objets invisibles des candidats de la résolution partielle, ou accepter le comportement. Le choix appartient à l’utilisateur.
+4. **Page d’aide** — implémentée dans le PoC V2 (lot C4) : entrée « Aide » du menu ouvre le visualiseur de texte en plein écran avec `assets/texts/help.txt`.
+5. **Rendu des flèches et icônes d’inventaire** : formes et carrés de remplacement, en attente des assets définitifs. Ordre de sommets des triangles corrigé (anti-horaire) dans le PoC V2 (lot B3).
+6. **Résolution partielle des objets invisibles — écart connu, accepté (décision A1 PoC V2).** Un objet caché par `VisibleWhen` reste partiellement identifiable par ses alias (§6.6) : « prends badge » avant « ouvre armoire » refuse la prise au lieu de signaler un objet inconnu. Comportement documenté par un test (`Badge_Is_Reachable_Only_After_Opening_The_Wardrobe`). Aucune correction moteur : cela ne révèle rien sur les objets cachés.
+7. **Touche Retour arrière** — corrigée (lot B1) : `KeyboardKey.Backspace` au lieu de `KeyboardKey.Back`, avec répétition en maintien (`IsKeyPressedRepeat`). La validation de la répétition avec un vrai clavier n’est pas automatisable par `agentTools/` : classification « validation humaine » (§7.3 du document PoC V2).
+8. **Sauvegarde automatique** (lot C1) : sauvegarde après chaque commande à `StateChanged` (déplacement inclus), plus sauvegarde de fermeture dans un bloc `finally`.
 
 ## 16. Outillage d’automatisation (hors build)
 
@@ -728,7 +737,8 @@ Contraintes vérifiées, à respecter pour toute évolution :
 2. **Les caractères passent par `SendKeys`** : `SendInput` (`wVk` ou `KEYEVENTF_UNICODE`) et `PostMessage(WM_CHAR)` n’atteignent pas la saisie du jeu. Un caractère à la fois : la file de raylib est limitée à 16 codepoints par image (`MAX_CHAR_PRESSED_QUEUE`).
 3. **Les touches d’état (Entrée, Retour arrière) doivent être maintenues** avec `keybd_event` (~60-80 ms). `IsKeyPressed` détecte un front : un appui-relâché instantané qui tombe entre deux images 60 Hz est silencieusement perdu, et deux commandes se retrouvent collées sur la même ligne.
 4. **Les fichiers de commandes sont lus en UTF-8** : `Get-Content` lit en ANSI par défaut sous PowerShell 5.1, ce qui corrompt les accents.
-5. **La capture `PrintWindow` sert de référence** pour les mesures pixeliques (client 1280×720, décalage de +8 en x et +39 en y par la bordure). Les zones de `Get-ReleveArrowStates` sont déduites des constantes de `Ui/ArrowsPanel.cs` et `Ui/Layout.cs` : recalibrer si la mise en page du panneau change.
+5. **La capture `PrintWindow` sert de référence** pour les mesures pixeliques (client 1280×720, décalage de +8 en x et +39 en y par la bordure). Les zones de `Get-ReleveArrowStates` sont déduites des constantes de `Ui/ArrowsPanel.cs` et `Ui/Layout.cs` ; elles ont été recalibrées pour la nouvelle disposition en croix (lot B3) et doivent être recalibrées si la mise en page du panneau change.
+6. **La répétition de Retour arrière et Suppr** est impliquée dans le moteur (`IsKeyPressedRepeat`) mais **ne peut être validée par `agentTools/` comme par un vrai clavier** : voir §7.3 du document PoC V2 (classification « validation humaine »).
 
 ## Références
 

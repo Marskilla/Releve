@@ -86,13 +86,246 @@ public class PocContentTests
     {
         var engine = CreateEngine();
 
-        // Ecart signale par rapport au PoC §4.1 (etape 3) : avant l'ouverture de l'armoire, le badge est
-        // invisible mais « badge » reste resolu partiellement vers « le lecteur de badge » de la meme piece.
-        // Le moteur refuse donc la prise au lieu de signaler un objet inconnu.
+        // Comportement accepte (A1) : le badge est invisible tant que l'armoire est fermee, mais
+        // « badge » resout partiellement vers « le lecteur de badge » de la meme piece. Le moteur
+        // refuse donc la prise au lieu de signaler un objet inconnu.
         Assert.Equal(["Vous ne pouvez pas prendre cela."], engine.Execute("prends badge").Messages);
 
         Assert.Equal(["Vous ouvrez l’armoire."], engine.Execute("ouvre armoire").Messages);
         Assert.Equal(["Pris."], engine.Execute("prends badge").Messages);
+    }
+
+    [Fact]
+    public void Corbeille_Selon_Emplacement_Sac()
+    {
+        var engine = CreateEngine();
+
+        // Sac dans la chambre : la corbeille le contient.
+        Assert.Equal(
+            ["Une corbeille. Elle ne contient qu'un sac poubelle vide."],
+            engine.Execute("regarde corbeille").Messages);
+
+        // Le sac passe dans l'inventaire : la corbeille est vide.
+        engine.Execute("prends sac");
+        Assert.Equal(["Une corbeille, vide."], engine.Execute("regarde corbeille").Messages);
+    }
+
+    [Fact]
+    public void Nouveaux_Verbes_De_Deplacement()
+    {
+        var engine = CreateEngine();
+
+        // « sors » depuis la chambre = Est (mot de sortie, verbe compte lui-meme).
+        var sors = engine.Execute("sors");
+        Assert.Equal(
+            ["La porte est solidement fermée et le lecteur de badge affiche un rouge fixe."],
+            sors.Messages);
+        Assert.Equal(ExitState.Blocked, engine.GetView().Exits[Direction.East]);
+
+        // Debloquer, puis « sortir » fonctionne.
+        engine.Execute("ouvre armoire");
+        engine.Execute("prends badge");
+        engine.Execute("utilise badge sur lecteur");
+        var sortir = engine.Execute("sortir");
+        Assert.Contains("couloir", sortir.Messages[0], StringComparison.Ordinal);
+        Assert.Equal(RoomId.TechCorridor, engine.State.CurrentRoom);
+    }
+
+    [Fact]
+    public void Mots_De_Sortie_Prioritaires_Sur_Alias_Pour_Go()
+    {
+        var lobby = EngineInLobby();
+        lobby.Execute("passe le badge sur la borne"); // Ouest desormais ouvert
+
+        // « va rue » depuis l'accueil : « rue » est un mot de sortie (Ouest), prioritaire sur
+        // l'alias « rue » de la porte vitree.
+        Assert.Equal(ExitState.Open, lobby.GetView().Exits[Direction.West]);
+        var ouest = lobby.Execute("va rue");
+        Assert.Contains("rue vide", ouest.Messages[0], StringComparison.Ordinal);
+        Assert.Equal(RoomId.Street, lobby.State.CurrentRoom);
+    }
+
+    [Fact]
+    public void Regarde_Escalier_Reste_Look_Pas_Deplacement()
+    {
+        var corridor = EngineInCorridor();
+
+        // « regarde escalier » n'est pas un deplacement : l'alias remporte pour les non-Go.
+        var look = corridor.Execute("regarde escalier");
+        Assert.Contains("vitrage", look.Messages[0], StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Go_Sans_Mot_De_Sortie_Correspondant_Repond_CannotGo()
+    {
+        var corridor = EngineInCorridor();
+
+        // « sors » dans le couloir : pas de mot de sortie correspondant.
+        var sors = corridor.Execute("sors");
+        Assert.Equal(["Vous ne pouvez pas aller par là."], sors.Messages);
+        Assert.False(sors.StateChanged);
+        Assert.Equal(RoomId.TechCorridor, corridor.State.CurrentRoom);
+    }
+
+    [Fact]
+    public void Go_Sans_Direction_Ne_Leve_Pas_Exception()
+    {
+        var engine = CreateEngine();
+
+        // « va porte » dans la chambre : « porte » n'est pas un mot de sortie.
+        var r1 = engine.Execute("va porte");
+        Assert.Equal(["Vous ne pouvez pas aller par là."], r1.Messages);
+        Assert.False(r1.StateChanged);
+
+        // « aller lit » : « lit » n'est pas un mot de sortie.
+        var r2 = engine.Execute("aller lit");
+        Assert.Equal(["Vous ne pouvez pas aller par là."], r2.Messages);
+
+        // « va ascenseur » depuis l'accueil : « ascenseur » est un mot de sortie (Nord), mais
+        // la sortie est bloquee -> message de blocage, pas d'exception.
+        var lobby = EngineInLobby();
+        var r3 = lobby.Execute("va ascenseur");
+        Assert.Contains("ascenseur", r3.Messages[0], StringComparison.Ordinal);
+        Assert.False(r3.StateChanged);
+    }
+
+    [Fact]
+    public void Read_Sans_Cible_Rien_A_Lire()
+    {
+        var engine = CreateEngine();
+
+        var result = engine.Execute("lis");
+        Assert.Equal(["Il n’y a rien à lire ici."], result.Messages);
+        Assert.False(result.StateChanged);
+    }
+
+    [Fact]
+    public void Read_Afficheur_Et_Machines_Pareil_Que_Look()
+    {
+        var engine = CreateEngine();
+
+        // Machines dans la chambre.
+        var machines = engine.Execute("lis machines");
+        Assert.Contains("Dossier partiel", machines.Messages[0]);
+        Assert.False(machines.StateChanged);
+
+        // Aller a l'accueil pour l'afficheur.
+        var lobby = EngineInLobby();
+        var afficheur = lobby.Execute("lis afficheur");
+        Assert.Contains("9 octobre 2173", afficheur.Messages[0]);
+        Assert.False(afficheur.StateChanged);
+    }
+
+    [Fact]
+    public void Use_Sans_Instrument_Precisez_Cible()
+    {
+        var engine = CreateEngine();
+        engine.Execute("ouvre armoire");
+        engine.Execute("prends badge");
+
+        // Badge dans l'inventaire, mais « utilise badge » n'a pas d'instrument.
+        var result = engine.Execute("utilise badge");
+        Assert.Equal(["Précisez sur quoi l'utiliser."], result.Messages);
+        Assert.False(result.StateChanged);
+    }
+
+    [Fact]
+    public void Ouvre_Portes_Selon_Etat()
+    {
+        // Chambre : porte pleine (non dans la table A3, comportement inchangé).
+        var bedroom = CreateEngine();
+        var porteVerrouillee = bedroom.Execute("ouvre porte");
+        Assert.Equal(
+            ["La porte est solidement fermée et le lecteur de badge affiche un rouge fixe."],
+            porteVerrouillee.Messages);
+
+        // Couloir : porte de l'escalier verrouillee.
+        var corridor = EngineInCorridor();
+        var escalierVerrouille = corridor.Execute("ouvre porte de l'escalier");
+        Assert.Equal(
+            ["La porte de l'escalier est fermée. Le lecteur de badge affiche un rouge fixe."],
+            escalierVerrouille.Messages);
+
+        // Couloir : apres deverrouillage, porte de l'escalier ouverte.
+        corridor.Execute("utilise badge sur lecteur escalier");
+        var escalierOuvert = corridor.Execute("ouvre porte de l'escalier");
+        Assert.Equal(["La porte de l'escalier est déverrouillée."], escalierOuvert.Messages);
+
+        // Couloir : porte du local technique, toujours refusee.
+        var localTechnique = corridor.Execute("ouvre porte technique");
+        Assert.Equal(
+            ["La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe."],
+            localTechnique.Messages);
+
+        // Accueil : porte vitree verrouillee.
+        var lobby = EngineInLobby();
+        var vitreeFermee = lobby.Execute("ouvre porte vitree");
+        Assert.Equal(["La porte vitrée de l'entrée reste fermée."], vitreeFermee.Messages);
+
+        // Accueil : apres activation du borne, porte vitree ouverte.
+        lobby.Execute("passe le badge sur la borne");
+        var vitreeOuverte = lobby.Execute("ouvre porte vitree");
+        Assert.Equal(
+            ["La porte vitrée est déverrouillée. Le passage est libre vers l'ouest."],
+            vitreeOuverte.Messages);
+
+        // Accueil : ascenseur, toujours refuse.
+        var ascenseur = lobby.Execute("ouvre ascenseur");
+        Assert.Equal(
+            ["Les portes de l'ascenseur restent closes. Le lecteur de badge affiche un rouge fixe."],
+            ascenseur.Messages);
+    }
+
+    [Fact]
+    public void Verbes_Talk_Ajoutes()
+    {
+        var lobby = EngineInLobby();
+
+        var interroge = lobby.Execute("interroge androide");
+        Assert.Equal(
+            ["L’androïde s’anime : « Veuillez passer votre badge sur la borne pour sortir. »"],
+            interroge.Messages);
+
+        var demande = lobby.Execute("demande androide");
+        Assert.Equal(
+            ["L’androïde s’anime : « Veuillez passer votre badge sur la borne pour sortir. »"],
+            demande.Messages);
+    }
+
+    [Fact]
+    public void Verbes_Use_Ajoutes()
+    {
+        var corridor = EngineInCorridor();
+
+        // « pousse » et « actionne » sont des verbes Use.
+        var pousse = corridor.Execute("pousse lecteur escalier");
+        Assert.Contains("Précisez", pousse.Messages[0]); // pas d'instrument -> UseWithoutInstrument
+
+        // « utilise badge sur lecteur escalier » fonctionne deja (instrument present).
+        var actionne = corridor.Execute("actionne badge sur lecteur escalier");
+        Assert.Equal(["Le voyant passe au vert : la porte de l’escalier se déverrouille."], actionne.Messages);
+    }
+
+    [Fact]
+    public void Verbes_Go_Ajoutes()
+    {
+        var engine = CreateEngine();
+        engine.Execute("ouvre armoire");
+        engine.Execute("prends badge");
+        engine.Execute("utilise badge sur lecteur");
+        engine.Execute("est"); // maintenant dans le couloir
+
+        // « monte » depuis le couloir (bloque, lecteur de l'escalier encore verrouille).
+        var monte = engine.Execute("monte");
+        Assert.Equal(
+            ["La porte de l’escalier est fermée. Le lecteur de badge affiche un rouge fixe."],
+            monte.Messages);
+
+        // « descendre » depuis l'accueil (vers le couloir, ouvert).
+        var lobby = EngineInLobby();
+        var descends = lobby.Execute("descendre");
+        Assert.Contains("couloir", descends.Messages[0], StringComparison.Ordinal);
+        Assert.Equal(RoomId.TechCorridor, lobby.State.CurrentRoom);
     }
 
     [Fact]

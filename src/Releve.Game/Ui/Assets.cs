@@ -12,6 +12,12 @@ public static class Assets
 
     public static string Font => Path.Combine(Root, "fonts", "DejaVuSans.ttf");
 
+    /// <summary>Image de fond du menu (lot C2).</summary>
+    public static string MenuBackground => Combine("menu", "menuBackground.png");
+
+    /// <summary>Texte d'aide (lot C4).</summary>
+    public static string HelpText => Combine("texts", "help.txt");
+
     private static string ResolveRoot()
     {
         // Les assets sont copies a cote de l'exe.

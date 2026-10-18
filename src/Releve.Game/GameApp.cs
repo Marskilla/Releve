@@ -1,3 +1,4 @@
+using System.IO;
 using Raylib_cs;
 using Releve.Engine;
 using Releve.Engine.Content;
@@ -21,9 +22,11 @@ public sealed class GameApp
     private ArrowsPanel _arrows = null!;
     private InventoryPanel _inventory = null!;
     private MenuScreen _menu = null!;
+    private TextViewer _textViewer = null!;
     private MusicPlayer _music = null!;
     private ISaveStore _saveStore = null!;
 
+    private Texture2D? _menuBackground;
     private GameEngine _engine = null!;
     private RoomView _view = null!;
     private bool _playing;
@@ -47,66 +50,138 @@ public sealed class GameApp
         _arrows = new ArrowsPanel(_fonts);
         _inventory = new InventoryPanel(_fonts);
         _menu = new MenuScreen(_fonts);
+        _textViewer = new TextViewer(_fonts);
 
         _saveStore = new EncryptedFileSaveStore();
+
+        // Image de fond du menu (lot C2) : chargee après InitWindow, absente = fond uni sans erreur.
+        var menuBackgroundPath = Assets.MenuBackground;
+        if (File.Exists(menuBackgroundPath))
+        {
+            _menuBackground = Raylib.LoadTexture(menuBackgroundPath);
+            if (!Raylib.IsTextureValid(_menuBackground.Value))
+            {
+                _menuBackground = null;
+            }
+            else
+            {
+                _menu.SetBackground(_menuBackground.Value);
+            }
+        }
 
         // La sauvegarde est lue une seule fois au demarrage : le menu la relit a chaque image sinon (§15).
         _canContinue = _saveStore.Exists() && _saveStore.Load() is not null;
 
-        while (!Raylib.WindowShouldClose() && !_quitRequested)
+        try
         {
-            if (_playing)
+            while (!Raylib.WindowShouldClose() && !_quitRequested)
             {
-                UpdateGame();
-            }
-            else
-            {
-                // Reset uniquement a l'entree dans le menu : la navigation est neutralisee sinon (§15).
-                if (!_menuEntered)
+                // Le visualiseur est modal : il est mis à jour en priorité, que l'on soit
+                // dans le menu ou en partie (lot C3). Il bloque UpdateMenu et UpdateGame.
+                if (_textViewer.IsOpen)
                 {
-                    _menu.Reset(_canContinue);
-                    _menuEntered = true;
+                    // Vider la file de caractères pour qu'aucune saisie ne fuie dans la console à la fermeture.
+                    while (Raylib.GetCharPressed() > 0)
+                    {
+                    }
+
+                    if (_textViewer.Update())
+                    {
+                        // Fraîchement fermé : si on était dans le menu, repositionner la sélection.
+                        _menuEntered = true;
+                    }
+                }
+                else if (_playing)
+                {
+                    UpdateGame();
+                }
+                else
+                {
+                    // Reset uniquement à l'entrée dans le menu : la navigation est neutralisée sinon (§15).
+                    if (!_menuEntered)
+                    {
+                        _menu.Reset(_canContinue);
+                        _menuEntered = true;
+                    }
+
+                    UpdateMenu(_canContinue);
                 }
 
-                UpdateMenu(_canContinue);
+                Draw(_canContinue);
+            }
+        }
+        finally
+        {
+            // Sauvegarde de securite a la sortie, y compris sur exception (C1). Les exceptions
+            // ne sont pas avalees : elles se propagent apres la sauvegarde.
+            if (_playing)
+            {
+                _saveStore.Save(_engine.State);
             }
 
-            Draw(_canContinue);
-        }
+            if (_menuBackground is { } bg && Raylib.IsTextureValid(bg))
+            {
+                Raylib.UnloadTexture(bg);
+            }
 
-        // Sauvegarde automatique à la fermeture (note d'intention §10).
-        if (_playing)
-        {
-            _saveStore.Save(_engine.State);
+            _roomView.Dispose();
+            _fonts.Dispose();
+            _music.Dispose();
+            Raylib.CloseWindow();
         }
-
-        _roomView.Dispose();
-        _fonts.Dispose();
-        _music.Dispose();
-        Raylib.CloseWindow();
     }
 
     private void UpdateMenu(bool canContinue)
     {
+        // Tant que le visualiseur est ouvert, le menu ne progresse pas (modal, lot C3).
+        if (_textViewer.IsOpen)
+        {
+            return;
+        }
+
         var choice = _menu.Update(canContinue);
         if (choice is null)
         {
             return;
         }
 
-        _music.Play(MusicPlayer.GameTrack);
         _menuEntered = false;
 
-        if (choice.Value == 0)
+        switch (choice)
         {
-            ContinueGame();
+            case MenuScreen.MenuChoice.Continue:
+                ContinueGame();
+                _playing = true;
+                break;
+
+            case MenuScreen.MenuChoice.NewGame:
+                StartNewGame();
+                _playing = true;
+                break;
+
+            case MenuScreen.MenuChoice.Help:
+                OpenHelp();
+                break;
         }
-        else
+    }
+
+    private void OpenHelp()
+    {
+        // Lot C4 : texte d'aide depuis assets/texts/help.txt.
+        string helpText;
+        try
         {
-            StartNewGame();
+            helpText = File.Exists(Assets.HelpText)
+                ? File.ReadAllText(Assets.HelpText)
+                : "Texte d'aide introuvable.";
+        }
+        catch
+        {
+            helpText = "Texte d'aide introuvable.";
         }
 
-        _playing = true;
+        // Plein ecran : le visualiseur recouvre toute la fenêtre.
+        _textViewer.Open(new Rectangle(0, 0, Layout.ScreenWidth, Layout.ScreenHeight), "Aide", helpText);
     }
 
     private void UpdateGame()
@@ -129,10 +204,16 @@ public sealed class GameApp
             return;
         }
 
-        _console.Append("> " + command);
+        _console.Append("> " + command, true);
         var result = _engine.Execute(command);
         _console.Append(result.Messages);
         _view = _engine.GetView();
+
+        // Sauvegarde automatique après tout changement d'etat (deplacement inclus) (C1).
+        if (_playing && result.StateChanged)
+        {
+            _saveStore.Save(_engine.State);
+        }
     }
 
     private void StartNewGame()
@@ -177,6 +258,12 @@ public sealed class GameApp
         else
         {
             _menu.Draw(canContinue);
+        }
+
+        // Le visualiseur est dessiné par-dessus la scène courante (lot C3).
+        if (_textViewer.IsOpen)
+        {
+            _textViewer.Draw();
         }
 
         Raylib.EndDrawing();

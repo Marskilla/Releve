@@ -562,18 +562,18 @@ function Get-ReleveArrowStates
     $bitmap = [System.Drawing.Image]::FromFile((Resolve-Path -LiteralPath $PngFile))
     try
     {
-        # Zones cote client, deduites des constantes de ArrowsPanel.cs et
-        # Layout.cs (textX = 970, rowY = 36, CellWidth = 100, RowHeight = 34,
-        # ArrowSize = 18, Fonts.LineHeight = 26) :
-        #   Nord : glyphe x 1120..1138, y 36..54 (libelle « Nord » a x 1148)
-        #   Ouest/Sud/Est : glyphes y 70..88, x 970 / 1070 / 1170
-        # Chaque zone couvre glyphe + libelle, sans chevaucher la bordure
-        # basse du panneau (y ~123) qui serait comptee comme « bloquee ».
+        # Zones cote client, deduites des constantes de ArrowsPanel.cs et Layout.cs (nouvelle disposition en croise, lot B3) :
+        #   Panel : x=960, y=0, w=320, h=132 ; texte a x=970 ; centre = 1120
+        #   Rang 1 (y=36) : fleche Nord au centre (x~1111), libelle « Nord » a droite
+        #   Rang 2 (y=70) : libelle « Ouest » a gauche (x=970), fleche Ouest a droite ; fleche Est a droite (x~1240), libelle « Est » plus a droite
+        #   Rang 3 (y=104) : fleche Sud au centre (x~1111), libelle « Sud » a droite
+        # Chaque zone couvre glyphe + libelle, sans chevaucher la bordure basse du panneau (y ~123).
+        # Capture PrintWindow : client + bordure (+8 en x, +39 en y).
         $cells = [ordered]@{
-            'North' = @(1100, 34, 1220, 64)
-            'West'  = @(965, 68, 1060, 96)
-            'South' = @(1065, 68, 1160, 96)
-            'East'  = @(1165, 68, 1275, 96)
+            'North' = @(1100, 34, 1240, 64)
+            'West'  = @(965, 68, 1100, 96)
+            'South' = @(1100, 102, 1240, 132)
+            'East'  = @(1140, 68, 1280, 96)
         }
 
         foreach ($name in $cells.Keys)

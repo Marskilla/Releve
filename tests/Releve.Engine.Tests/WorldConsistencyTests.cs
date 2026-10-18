@@ -117,5 +117,29 @@ public class WorldConsistencyTests
 
             Assert.Equal(aliases.Distinct(StringComparer.Ordinal).Count(), aliases.Count);
         }
+
+        // Mots de sortie : listes non vides, uniques dans la piece, sans direction cardinale.
+        foreach (var (roomId, room) in world.Rooms)
+        {
+            var seenExitWords = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var exit in room.Exits)
+            {
+                if (exit.Words is null)
+                {
+                    continue;
+                }
+
+                Assert.False(exit.Words.Count == 0,
+                    $"La sortie {exit.Dir} de {roomId} a une liste de mots de sortie vide.");
+
+                foreach (var word in exit.Words)
+                {
+                    Assert.False(Vocabulary.Directions.ContainsKey(word),
+                        $"Le mot de sortie '{word}' de {roomId} vers {exit.Dir} est une direction cardinale.");
+                    Assert.True(seenExitWords.Add(word),
+                        $"Le mot de sortie '{word}' est deja utilisé dans {roomId}.");
+                }
+            }
+        }
     }
 }

@@ -8,7 +8,13 @@ namespace Releve.Engine.Parsing;
 /// </summary>
 public static class CommandParser
 {
-    public static ParseResult Parse(string input, IReadOnlyCollection<ObjectDef> scope)
+    /// <summary>
+    /// Analyse une saisie. <paramref name="exitWords"/> associe, optionnellement, chaque mot de
+    /// sortie de la piece courante a sa direction (les appels existants sans ce parametre restent
+    /// valides).
+    /// </summary>
+    public static ParseResult Parse(string input, IReadOnlyCollection<ObjectDef> scope,
+        IReadOnlyDictionary<string, Direction>? exitWords = null)
     {
         var words = TextNormalizer.Normalize(input);
         if (words.Count == 0)
@@ -30,30 +36,15 @@ public static class CommandParser
 
         var rest = words.Skip(1).ToList();
 
-        // « va vers est », « aller a est »...
+        // Verbes de deplacement : direction exprimee, puis mots de sortie, puis rejet.
         if (action == GameAction.Go)
         {
-            var afterVerb = rest;
-            if (afterVerb.Count > 0 && TextNormalizer.IsPreposition(afterVerb[0]))
-            {
-                afterVerb = afterVerb.Skip(1).ToList();
-            }
-
-            var direction = DirectionAt(afterVerb, 0);
-            if (direction is not null && afterVerb.Count == 1)
-            {
-                return ParseResult.Ok(new Command(GameAction.Go, Direction: direction));
-            }
-
-            if (afterVerb.Count == 0)
-            {
-                return ParseResult.Fail(ParseError.MissingObject);
-            }
+            return ParseGo(rest, words[0], exitWords);
         }
 
         if (rest.Count == 0)
         {
-            return action is GameAction.Look or GameAction.Inventory
+            return action is GameAction.Look or GameAction.Inventory or GameAction.Read
                 ? ParseResult.Ok(new Command(action))
                 : ParseResult.Fail(ParseError.MissingObject);
         }
@@ -100,6 +91,67 @@ public static class CommandParser
 
         // Le premier nom est l'instrument, le second est la cible.
         return ParseResult.Ok(new Command(action, Target: secondTarget.Id, Instrument: firstTarget.Id));
+    }
+
+    private static ParseResult ParseGo(IReadOnlyList<string> rest, string verb,
+        IReadOnlyDictionary<string, Direction>? exitWords)
+    {
+        // « va vers est », « aller a est » : la direction doit etre le seul mot restant.
+        var afterVerb = rest;
+        if (afterVerb.Count > 0 && TextNormalizer.IsPreposition(afterVerb[0]))
+        {
+            afterVerb = afterVerb.Skip(1).ToList();
+        }
+
+        var direction = DirectionAt(afterVerb, 0);
+        if (direction is not null && afterVerb.Count == 1)
+        {
+            return ParseResult.Ok(new Command(GameAction.Go, Direction: direction));
+        }
+
+        // Mots de sortie : le verbe lui-meme compte s'il figure dans la liste,
+        // puis les mots restants (prepositions ignorees).
+        var exitWordCandidates = new List<string>();
+        if (exitWords is not null && exitWords.TryGetValue(verb, out var _))
+        {
+            exitWordCandidates.Add(verb);
+        }
+
+        foreach (var w in rest)
+        {
+            if (!TextNormalizer.IsPreposition(w))
+            {
+                exitWordCandidates.Add(w);
+            }
+        }
+
+        if (exitWordCandidates.Count > 0)
+        {
+            if (exitWordCandidates.All(w => exitWords is not null && exitWords.TryGetValue(w, out var _)))
+            {
+                var dirs = exitWordCandidates.Select(w => exitWords![w]).Distinct().ToList();
+                if (dirs.Count == 1)
+                {
+                    return ParseResult.Ok(new Command(GameAction.Go, Direction: dirs[0]));
+                }
+            }
+        }
+
+        if (rest.Count == 0)
+        {
+            // « va » et « aller » seuls gardent leur comportement actuel.
+            if (verb == "va" || verb == "aller")
+            {
+                return ParseResult.Fail(ParseError.MissingObject);
+            }
+
+            // Nouveau verbe de deplacement sans mot de sortie correspondant.
+            return ParseResult.Ok(new Command(GameAction.Go, Direction: null));
+        }
+
+        // Verbe de deplacement avec des mots qui ne sont pas tous des mots de sortie :
+        // le moteur repondra « Vous ne pouvez pas aller par là. »
+        return ParseResult.Ok(new Command(GameAction.Go, Direction: null));
     }
 
     private static Direction? DirectionAt(IReadOnlyList<string> words, int index) =>

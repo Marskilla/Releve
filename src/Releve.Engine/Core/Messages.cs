@@ -15,5 +15,7 @@ public static class Messages
     public const string CannotDrop = "Vous ne portez pas cela.";
     public const string NothingHappens = "Rien ne se passe.";
     public const string EmptyInventory = "Vous ne portez rien.";
+    public const string UseWithoutInstrument = "Précisez sur quoi l'utiliser.";
+    public const string NothingToRead = "Il n’y a rien à lire ici.";
 }
 

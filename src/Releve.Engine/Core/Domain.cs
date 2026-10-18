@@ -3,7 +3,7 @@ using Releve.Engine.World;
 namespace Releve.Engine.Core;
 
 /// <summary>Actions reconnues par le moteur.</summary>
-public enum GameAction { Look, Take, Drop, Open, Close, Use, Talk, Go, Inventory }
+public enum GameAction { Look, Take, Drop, Open, Close, Use, Talk, Read, Go, Inventory }
 
 /// <summary>Directions cardinales des sorties.</summary>
 public enum Direction { North, South, East, West }
@@ -48,13 +48,15 @@ public sealed record ObjectDef(
 
 /// <summary>
 /// Sortie appartenant a la piece de depart. <see cref="To"/> nul = fausse piste (toujours bloquee).
+/// <see cref="Words"/> liste optionnelle de mots de sortie (normalisés) franchissant cette sortie.
 /// </summary>
 public sealed record Exit(
     Direction Dir,
     RoomId? To,
     Func<GameState, bool>? IsOpen = null,
     string? BlockedMessage = null,
-    bool OneWay = false);
+    bool OneWay = false,
+    IReadOnlyList<string>? Words = null);
 
 /// <summary>Resultat d'une commande : messages a afficher, avec indication de changement d'etat.</summary>
 public sealed record CommandResult(IReadOnlyList<string> Messages, bool StateChanged = false)

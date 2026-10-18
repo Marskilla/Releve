@@ -6,12 +6,13 @@ using Releve.Engine.World;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Croix des déplacements (§9.3) : indicateurs d'état, sans interaction souris.
-/// Absent : rien. Bloquée : flèche grise. Ouverte : flèche active.
+/// Croix des déplacements (§9.3, lot B3) : indicateurs d'etat, sans interaction souris.
+/// Disposition en croise, centred horizontalement.
+/// Absent : rien. Ouverte : fleche pleine, couleur vive. Bloquee : fleche creuse, gris sombre.
 /// </summary>
 public sealed class ArrowsPanel
 {
-    private const string TitleText = "Déplacements possibles :";
+    private const string TitleText = "Deplacements possibles :";
     private const float CellWidth = 100f;
     private const float RowHeight = 34f;
     private const float ArrowSize = 18f;
@@ -32,33 +33,82 @@ public sealed class ArrowsPanel
         var textX = bounds.X + Layout.Padding;
         _fonts.Draw(TitleText, new Vector2(textX, bounds.Y + Layout.Padding), Palette.DimText);
 
-        var rowY = bounds.Y + Layout.Padding + Fonts.LineHeight;
+        var centreX = bounds.X + bounds.Width / 2f;
+        var rowY1 = bounds.Y + Layout.Padding + Fonts.LineHeight;      // ligne 1 : Nord
+        var rowY2 = rowY1 + RowHeight;                                   // ligne 2 : Ouest / Est
+        var rowY3 = rowY2 + RowHeight;                                   // ligne 3 : Sud
 
-        // Nord au-dessus, ouest / sud / est sur la ligne du dessous.
-        DrawArrowCell(exits[Direction.North], textX + CellWidth * 1.5f, rowY, Direction.North, centred: true);
-        DrawArrowCell(exits[Direction.West], textX, rowY + RowHeight, Direction.West, centred: false);
-        DrawArrowCell(exits[Direction.South], textX + CellWidth, rowY + RowHeight, Direction.South, centred: false);
-        DrawArrowCell(exits[Direction.East], textX + CellWidth * 2f, rowY + RowHeight, Direction.East, centred: false);
+        // Rang 1 : fleche Nord puis libellé, ensemble centre.
+        DrawArrowRowCentered(exits[Direction.North], Direction.North, centreX, rowY1, centred: true);
+
+        // Rang 2 : libellé Ouest + fleche (gauche), espace libre au centre, fleche Est + libellé (droite).
+        DrawArrowRowSplit(exits[Direction.West], Direction.West, exits[Direction.East], Direction.East,
+            textX, bounds.X + bounds.Width - Layout.Padding, rowY2);
+
+        // Rang 3 : fleche Sud puis libellé, ensemble centre.
+        DrawArrowRowCentered(exits[Direction.South], Direction.South, centreX, rowY3, centred: true);
     }
 
-    /// <summary>Dessine la flèche et son libellé, si la sortie existe.</summary>
-    private void DrawArrowCell(ExitState state, float x, float y, Direction direction, bool centred)
+    /// <summary>Dessine une ligne centree : fleche puis libellé.</summary>
+    private void DrawArrowRowCentered(ExitState state, Direction direction, float centreX, float y,
+        bool centred)
     {
         if (state == ExitState.Absent)
         {
-            return; // sortie absente : rien n'est dessiné
+            return;
         }
 
-        var colour = state == ExitState.Open ? Palette.Prompt : Palette.DimText;
-        var label = DirectionLabel(direction);
-        var labelX = centred ? x + ArrowSize + Layout.Padding : x + ArrowSize + Layout.Padding * 0.5f;
+        var arrowX = centred ? centreX - ArrowSize / 2f : 0f;
+        DrawArrow(state, direction, arrowX, y);
 
-        DrawArrowShape(x, y, direction, colour);
-        _fonts.Draw(label, new Vector2(labelX, y), colour);
+        if (centred)
+        {
+            DrawLabel(direction, arrowX + ArrowSize + Layout.Padding, y, state);
+        }
     }
 
-    /// <summary>Triangle et fût : formes simples, sans image (§9.3).</summary>
-    private static void DrawArrowShape(float x, float y, Direction direction, Color colour)
+    /// <summary>Dessine une ligne divisee : Ouest a gauche, Est a droite.</summary>
+    private void DrawArrowRowSplit(ExitState westState, Direction westDir, ExitState eastState,
+        Direction eastDir, float leftX, float rightX, float y)
+    {
+        if (westState != ExitState.Absent)
+        {
+            DrawLabel(westDir, leftX, y, westState);
+            var labelWidth = _fonts.MeasureWidth(DirectionLabel(westDir));
+            DrawArrow(westState, westDir, leftX + labelWidth + Layout.Padding, y);
+        }
+
+        if (eastState != ExitState.Absent)
+        {
+            var labelWidth = _fonts.MeasureWidth(DirectionLabel(eastDir));
+            var arrowX = rightX - ArrowSize - labelWidth - Layout.Padding;
+            DrawArrow(eastState, eastDir, arrowX, y);
+            DrawLabel(eastDir, arrowX + ArrowSize + Layout.Padding, y, eastState);
+        }
+    }
+
+    /// <summary>Dessine la fleche (pleine ou creuse) selon l'etat.</summary>
+    private void DrawArrow(ExitState state, Direction direction, float x, float y)
+    {
+        if (state == ExitState.Absent)
+        {
+            return;
+        }
+
+        var colour = state == ExitState.Open ? Palette.ArrowOpen : Palette.ArrowBlocked;
+
+        if (state == ExitState.Open)
+        {
+            DrawArrowFilled(direction, x, y, colour);
+        }
+        else
+        {
+            DrawArrowHollow(direction, x, y, colour);
+        }
+    }
+
+    /// <summary>Fleche pleine : triangle + fust, ordre de sommets anti-horaire.</summary>
+    private static void DrawArrowFilled(Direction direction, float x, float y, Color colour)
     {
         var half = ArrowSize / 2f;
         var shaft = ArrowSize / 4f;
@@ -68,25 +118,28 @@ public sealed class ArrowsPanel
             case Direction.North:
                 Raylib.DrawTriangle(
                     new Vector2(x + half, y),
-                    new Vector2(x + ArrowSize, y + ArrowSize),
-                    new Vector2(x, y + ArrowSize), colour);
-                Raylib.DrawRectangle((int)(x + half - shaft / 2), (int)(y + ArrowSize), (int)shaft, (int)half, colour);
+                    new Vector2(x, y + ArrowSize),
+                    new Vector2(x + ArrowSize, y + ArrowSize), colour);
+                Raylib.DrawRectangle((int)(x + half - shaft / 2), (int)(y + ArrowSize),
+                    (int)shaft, (int)half, colour);
                 break;
 
             case Direction.South:
                 Raylib.DrawTriangle(
-                    new Vector2(x, y),
+                    new Vector2(x + half, y + ArrowSize),
                     new Vector2(x + ArrowSize, y),
-                    new Vector2(x + half, y + ArrowSize), colour);
-                Raylib.DrawRectangle((int)(x + half - shaft / 2), (int)y, (int)shaft, (int)half, colour);
+                    new Vector2(x, y), colour);
+                Raylib.DrawRectangle((int)(x + half - shaft / 2), (int)y,
+                    (int)shaft, (int)half, colour);
                 break;
 
             case Direction.East:
                 Raylib.DrawTriangle(
                     new Vector2(x + ArrowSize, y + half),
-                    new Vector2(x, y),
-                    new Vector2(x, y + ArrowSize), colour);
-                Raylib.DrawRectangle((int)x, (int)(y + half - shaft / 2), (int)half, (int)shaft, colour);
+                    new Vector2(x, y + ArrowSize),
+                    new Vector2(x, y), colour);
+                Raylib.DrawRectangle((int)x, (int)(y + half - shaft / 2),
+                    (int)half, (int)shaft, colour);
                 break;
 
             case Direction.West:
@@ -94,9 +147,63 @@ public sealed class ArrowsPanel
                     new Vector2(x, y + half),
                     new Vector2(x + ArrowSize, y),
                     new Vector2(x + ArrowSize, y + ArrowSize), colour);
-                Raylib.DrawRectangle((int)(x + half), (int)(y + half - shaft / 2), (int)half, (int)shaft, colour);
+                Raylib.DrawRectangle((int)(x + half), (int)(y + half - shaft / 2),
+                    (int)half, (int)shaft, colour);
                 break;
         }
+    }
+
+    /// <summary>Fleche creuse : contour seulement (triangle + fust en trait).</summary>
+    private static void DrawArrowHollow(Direction direction, float x, float y, Color colour)
+    {
+        var half = ArrowSize / 2f;
+        var shaft = ArrowSize / 4f;
+
+        switch (direction)
+        {
+            case Direction.North:
+                Raylib.DrawTriangleLines(
+                    new Vector2(x + half, y),
+                    new Vector2(x, y + ArrowSize),
+                    new Vector2(x + ArrowSize, y + ArrowSize), colour);
+                Raylib.DrawRectangleLinesEx(
+                    new Rectangle(x + half - shaft / 2, y + ArrowSize, shaft, half), 1, colour);
+                break;
+
+            case Direction.South:
+                Raylib.DrawTriangleLines(
+                    new Vector2(x + half, y + ArrowSize),
+                    new Vector2(x + ArrowSize, y),
+                    new Vector2(x, y), colour);
+                Raylib.DrawRectangleLinesEx(
+                    new Rectangle(x + half - shaft / 2, y, shaft, half), 1, colour);
+                break;
+
+            case Direction.East:
+                Raylib.DrawTriangleLines(
+                    new Vector2(x + ArrowSize, y + half),
+                    new Vector2(x, y + ArrowSize),
+                    new Vector2(x, y), colour);
+                Raylib.DrawRectangleLinesEx(
+                    new Rectangle(x, y + half - shaft / 2, half, shaft), 1, colour);
+                break;
+
+            case Direction.West:
+                Raylib.DrawTriangleLines(
+                    new Vector2(x, y + half),
+                    new Vector2(x + ArrowSize, y),
+                    new Vector2(x + ArrowSize, y + ArrowSize), colour);
+                Raylib.DrawRectangleLinesEx(
+                    new Rectangle(x + half, y + half - shaft / 2, half, shaft), 1, colour);
+                break;
+        }
+    }
+
+    private void DrawLabel(Direction direction, float x, float y, ExitState state)
+    {
+        var label = DirectionLabel(direction);
+        var colour = state == ExitState.Open ? Palette.Text : Palette.DimText;
+        _fonts.Draw(label, new Vector2(x, y), colour);
     }
 
     private static string DirectionLabel(Direction direction) => direction switch

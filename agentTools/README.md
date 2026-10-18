@@ -78,6 +78,12 @@ Pour repartir d'un menu sans sauvegarde, supprimer `Documents/Releve/save.dat`.
    caractères, eux, passent par la file `WM_CHAR` de raylib, les touches d'état par
    l'état clavier.
 
+   **Limite d'automatisation (validation humaine requise)** : ni `SendKeys` ni
+   `keybd_event` ne peuvent simuler un appui sur la touche `Retour arrière` d'un vrai
+   clavier de manière indiscernable d'une frappe humaine. La répétition de touche
+   (touche maintenue) pour `Retour arrière` et `Suppr` ne peut être validée
+   automatiquement : voir §7.3 du document d'implémentation PoC V2.
+
 4. **Les fichiers de commandes doivent être en UTF-8.** `Get-Content` lit en ANSI par
    défaut sous PowerShell 5.1 : « parle à l'androïde » arrive alors corrompu et le
    moteur répond « Vous ne voyez pas cela ici. ». Le module force `-Encoding UTF8`.
@@ -92,15 +98,16 @@ Pour repartir d'un menu sans sauvegarde, supprimer `Documents/Releve/save.dat`.
 - Le client raylib fait 1280×720 ; la bordure `WS_CAPTION` décale la capture de +8 en x
   et +39 en y. `Get-ReleveArrowStates` compense ce décalage ; si la fenêtre change de
   style (plein écran, bordure différente), recalibrer `$script:WindowBorderX/Y`.
-- Les couleurs attendues viennent de `src/Releve.Game/Ui/Palette.cs`, en écart
-  bleu−vert : flèche ouverte = `Prompt` 46 (> 38), flèche bloquée = `DimText` 22. La
-  `Border` des panneaux (66,88,120 → 32) tombe dans la bande « bloquée » : les zones
-  excluent la bordure basse du panneau « Déplacements possibles » (y ~ 123).
+- Les couleurs attendues viennent de `src/Releve.Game/Ui/Palette.cs` : flèche ouverte =
+  `ArrowOpen` (écart bleu-vert vif), flèche bloquée = `ArrowBlocked` (gris sombre,
+  luminance nettement inférieure). La `Border` des panneaux (66,88,120 → écart 32)
+  tombe dans la bande « bloquée » : les zones excluent la bordure basse du panneau
+  « Déplacements possibles » (y ~ 123).
 - Les zones de `Get-ReleveArrowStates` sont déduites des constantes de
-  `Ui/ArrowsPanel.cs` / `Ui/Layout.cs` (textX = 970, rowY = 36, CellWidth = 100,
-  RowHeight = 34, ArrowSize = 18, `Fonts.LineHeight` = 26) : Nord sur la première
-  ligne (glyphe y 36..54), Ouest/Sud/Est sur la seconde (y 70..88). Si la mise en page
-  du panneau change, recalibrer ces zones — sinon une flèche « Est » seule se lit
-  « Nord » (les lignes sont décalées d'une rangée).
+  `Ui/ArrowsPanel.cs` / `Ui/Layout.cs` (nouvelle disposition en croix, lot B3) :
+  textX = 970, ligne 1 (Nord) y = 36, ligne 2 (Ouest/Est) y = 70, ligne 3 (Sud)
+  y = 104, `Fonts.LineHeight` = 26. Nord et Sud sur la ligne centrale (x ~ 1111 +
+  libelle), Ouest sur la gauche (libelle + fleche), Est sur la droite (fleche +
+  libelle). Si la mise en page du panneau change, recalibrer ces zones.
 - Attendre ~700 ms entre deux commandes (`-DelayMs`) : la file de caractères de raylib
   est limitée à 16 codes par image.

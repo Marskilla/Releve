@@ -94,7 +94,7 @@ public class EngineBehaviourTests
     {
         var engine = TestSupport.FreshTestEngine();
 
-        Assert.Equal(["Rien ne se passe."], engine.Execute("utilise clef").Messages);
+        Assert.Equal(["Précisez sur quoi l'utiliser."], engine.Execute("utilise clef").Messages);
         Assert.Equal(["Rien ne se passe."], engine.Execute("parle clef").Messages);
     }
 

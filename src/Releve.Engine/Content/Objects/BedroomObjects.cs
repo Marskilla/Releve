@@ -82,7 +82,7 @@ public static class BedroomObjects
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
             InitialState: ObjectState.None,
-            Describe: _ => "Une corbeille. Elle ne contient qu’un sac poubelle vide."),
+            Describe: DescribeBin),
 
         [ObjectId.GarbageBag] = new ObjectDef(
             Id: ObjectId.GarbageBag,
@@ -103,4 +103,11 @@ public static class BedroomObjects
         state.StateOf(ObjectId.BedroomReader) == ObjectState.Unlocked
             ? "Un lecteur de badge est fixé près de la porte. Son voyant est vert."
             : "Un lecteur de badge est fixé près de la porte. Son voyant est rouge.";
+
+    private static string DescribeBin(GameState state) =>
+        state.Locations.TryGetValue(ObjectId.GarbageBag, out var location)
+        && location.Kind == LocationKind.Room
+        && location.Room == RoomId.Bedroom
+            ? "Une corbeille. Elle ne contient qu'un sac poubelle vide."
+            : "Une corbeille, vide.";
 }

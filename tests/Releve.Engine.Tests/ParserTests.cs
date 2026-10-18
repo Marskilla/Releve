@@ -117,6 +117,82 @@ public class ParserTests
         Assert.Equal(ParseError.MissingObject, missing.Error);
         Assert.Equal("Précisez l’objet de la commande.", missing.ErrorMessage);
     }
+
+    /// <summary>Mots de sortie : passages directs et rejet quand aucun mot ne correspond.</summary>
+    public class ExitWordsTests
+    {
+        private static ParseResult ParseWithExits(string input, IReadOnlyDictionary<string, Direction> exitWords) =>
+            CommandParser.Parse(input, Array.Empty<ObjectDef>(), exitWords);
+
+        [Fact]
+        public void Verbe_Go_Seul_Est_Mot_De_Sortie()
+        {
+            var exits = new Dictionary<string, Direction> { ["sors"] = Direction.East };
+            var result = ParseWithExits("sors", exits);
+
+            Assert.Equal(ParseError.None, result.Error);
+            Assert.Equal(Direction.East, result.Command!.Direction);
+        }
+
+        [Fact]
+        public void Mot_De_Sortie_Apres_Verbe_Go()
+        {
+            var exits = new Dictionary<string, Direction> { ["rue"] = Direction.West };
+            var result = ParseWithExits("va rue", exits);
+
+            Assert.Equal(ParseError.None, result.Error);
+            Assert.Equal(Direction.West, result.Command!.Direction);
+        }
+
+        [Fact]
+        public void Mot_De_Sortie_Avec_Preposition()
+        {
+            var exits = new Dictionary<string, Direction> { ["escalier"] = Direction.North };
+            var result = ParseWithExits("monte vers escalier", exits);
+
+            Assert.Equal(ParseError.None, result.Error);
+            Assert.Equal(Direction.North, result.Command!.Direction);
+        }
+
+        [Fact]
+        public void Verbe_Go_Sans_Mot_De_Sortie_Retourne_MissingObject()
+        {
+            var exits = new Dictionary<string, Direction> { ["sors"] = Direction.East };
+            var result = ParseWithExits("va", exits);
+
+            Assert.Equal(ParseError.MissingObject, result.Error);
+        }
+
+        [Fact]
+        public void Nouveau_Verbe_Go_Sans_Mot_De_Sortie_Retourne_Direction_Nulle()
+        {
+            var exits = new Dictionary<string, Direction> { ["sors"] = Direction.East };
+            var result = ParseWithExits("sortir", exits);
+
+            // "sortir" n'est pas dans la liste : verbe inconnu comme mot de sortie => direction nulle.
+            Assert.Equal(ParseError.None, result.Error);
+            Assert.Null(result.Command!.Direction);
+        }
+
+        [Fact]
+        public void Mots_Melanges_Sortie_et_Non_Sortie_Retourne_Direction_Nulle()
+        {
+            var exits = new Dictionary<string, Direction> { ["rue"] = Direction.West };
+            var result = ParseWithExits("va porte", exits);
+
+            Assert.Equal(ParseError.None, result.Error);
+            Assert.Null(result.Command!.Direction);
+        }
+
+        [Fact]
+        public void Verbe_Non_Go_Ignore_Les_Mots_De_Sortie()
+        {
+            var exits = new Dictionary<string, Direction> { ["rue"] = Direction.West };
+            var result = ParseWithExits("regarde rue", exits);
+
+            Assert.Equal(ParseError.UnknownObject, result.Error);
+        }
+    }
 }
 
 /// <summary>Portee de test, calculee comme celle du moteur (§6.6).</summary>
