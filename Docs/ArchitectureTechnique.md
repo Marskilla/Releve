@@ -1,4 +1,4 @@
-# Jeu "Relève" — Architecture technique
+﻿# Jeu "Relève" — Architecture technique
 
 > Document de référence — version 0.6
 > Valable pour toute la durée du projet. Il décrit la structure du code, pas le contenu du jeu.
@@ -649,7 +649,7 @@ La console calcule à chaque image le nombre de lignes visibles et ancre l’his
 
 - **Vue du lieu** : texture chargée depuis `assets/rooms/<ImageKey>.png`, mise en cache par clé, **étirée pour remplir exactement `ViewBounds`** avec `DrawTexturePro`. Le cadre est redessiné après l’image. Si l’image est introuvable, rectangle de remplacement.
 - **Flèches** (`ArrowsPanel`) : disposition en **croix** centrée horizontalement sous le titre « Déplacements possibles : », sur trois rangées de 34 px (`RowHeight`) : Nord en haut, Ouest à gauche (libellé puis flèche) et Est à droite (flèche puis libellé) au milieu, Sud en bas. Les flèches (18 px, `ArrowSize`) sont des **têtes de flèche seules, sans queue** : l’utilisateur a demandé cette simplification après que l’agent de code n’arrivait pas à dessiner correctement fût et pointe ensemble. `Absent` : rien ; `Blocked` : pointe **creuse** (`DrawTriangleLines`), gris sombre (`Palette.ArrowBlocked`), libellé atténué ; `Open` : pointe **pleine** (`DrawTriangle`), couleur vive (`Palette.ArrowOpen`), libellé normal. La distinction ne repose pas que sur la couleur. Ce sont des **indicateurs**, pas des boutons : aucune interaction à la souris. **Règle raylib** : `DrawTriangle` exige des sommets en ordre **anti-horaire à l’écran** ; dans l’autre sens, le triangle n’est pas dessiné (cause du défaut du PoC V1, où seul le fût et la pointe Est apparaissaient). La grille de dessin (constantes de `ArrowsPanel.cs`) est reproduite par la mesure pixelique de `agentTools/` (§16).
-- **Inventaire** : liste verticale de libellés précédés d’une icône de remplacement (carré de 16 px), titre « Inventaire : », défilement au clavier (Ctrl+↑/↓).
+- **Inventaire** : liste verticale de libellés précédés d’une icône de remplacement (carré de 16 px), titre « Inventaire : », défilement visuel **PageHaut / PageBas**.
 - **Console** (`ConsolePanel`) : historique avec retour à la ligne automatique (largeur mesurée avec la police, réduite de la colonne des boutons de défilement), ancré en bas, défilement vertical. **Deux types de ligne**, mémorisés par ligne d’historique : *saisie du joueur* (écho « > commande », couleur `Palette.ConsoleInput`) et *réponse du jeu* (couleur `Palette.ConsoleResponse`) ; les lignes issues du retour à la ligne d’un même message gardent son type (`Append(message, isInput)`). Ligne de saisie avec invite `> ` (couleur `Palette.Prompt`) et texte saisi en couleur de saisie, curseur clignotant (2 clignotements par seconde), décalée vers la gauche quand le curseur dépasse le bord droit. Édition : Retour arrière et Suppr avec répétition à touche maintenue (`IsKeyPressedRepeat`), flèches gauche/droite, début/fin. Flèches haut/bas : rappel de l’historique des commandes saisies. **Deux boutons cliquables** (haut, bas), dessinés comme formes géométriques dans une colonne de 28 px à l’extrémité droite de l’aire de l’historique : un clic fait défiler de **3 lignes** ; **pas de répétition à clic maintenu** (supprimée à la demande de l’utilisateur : défilement trop rapide) ; un bouton est grisé quand le défilement est impossible dans son sens. Page↑ / Page↓ restent actifs. Tout nouveau message ramène l’historique en bas. Les boutons ne réagissent pas quand le visualiseur de texte est ouvert.
 - **Police** : `Ui/Fonts.cs`, taille 20 (corps, interligne 26) et seconde taille (~64) pour le titre du menu (`MeasureTitleWidth`, `DrawTitle`), chargée depuis `assets/fonts/DejaVuSans.ttf` avec une liste explicite de codepoints. Repli sur la police par défaut de raylib si le fichier est absent ou invalide. **Le jeu de codepoints ne contient pas ▲ ▼ ◄ ►** : tout symbole d’interface est dessiné en géométrie.
 - **Assets** : `Ui/Assets.cs` résout le dossier `assets` à côté de l’exe, sinon en remontant depuis le répertoire courant (lancement depuis les sources). Fournit aussi les chemins `MenuBackground` et `HelpText`.
@@ -657,10 +657,10 @@ La console calcule à chaque image le nombre de lignes visibles et ancre l’his
 
 ### 9.4 Touches de défilement
 
-- Page précédente / Page suivante : défilement de l’historique de la console (et du visualiseur de texte, §9.8).
-- Ctrl + Haut / Ctrl + Bas : défilement de l’inventaire.
-
-Le Ctrl est testé avec `IsKeyDown`, les flèches avec `IsKeyPressed`. Un conflit possible avec le rappel de l’historique de la console (la flèche Haut y rappelle l’historique) est signalé au §15.
+- **Flèches Haut/Bas/Gauche/Droite** (seules) : déplacement dans le jeu (Nord/Sud/Ouest/Est), gérées par `GameApp.UpdateGame` via `IsKeyPressed` / `IsKeyPressedRepeat`. **Ne se déclenchent que si NI Shift NI Ctrl n'est enfoncé**.
+- **Shift + Haut / Shift + Bas** : rappel de la commande précédente/suivante dans la ligne de saisie (insère sans valider). Historique LIFO : toutes les commandes (saisie + raccourcis) mémorisées ; validation ajoute en tête et replace pointeur.
+- **Ctrl + Haut / Ctrl + Bas** (sans Shift) : défilement ligne par ligne de l'inventaire.
+- **PageHaut / PageBas** : défilement visuel par page de l'historique de la console (et du visualiseur de texte, §9.8) **et** de l'inventaire.
 
 ### 9.5 Police et accents (point critique)
 

@@ -228,4 +228,173 @@ Rappel : **le couloir (`TechCorridor`) et l'accueil (`HospitalLobby`) n'ont aucu
 
 ---
 
-**Note** : La section « vérifié dans le jeu réel » **n'est pas présente** car l'agent n'a **pas** observé le jeu visuellement. Tous les éléments visuels/interactifs sont **non vérifiés visuellement par l'agent**.
+## 10. Corrections post-livraison (après J8)
+
+Ces corrections ont été apportées après la validation initiale des 128 tests, suite à des observations utilisateur.
+
+### 10.1 Version affichée dans le menu (J6, révision)
+
+**Problème** : la version `v0.3` était dessinée avec la police titre (64 px) au lieu de la police standard (20 px), ce qui la tronquait (seul le début « v0 » visible).
+
+**Correction** (`src/Releve.Game/Ui/MenuScreen.cs`) :
+- Nouvelle méthode `DrawVersionText` utilisant `_fonts.Draw` (police 20 px) au lieu de `DrawTextWithShadow` (police titre 64 px).
+- Ombre plus discrète : décalage 1 px, alpha 120 (au lieu de 2 px, alpha 180).
+- Alignement à droite robuste : `width - Layout.Padding - versionWidth` — fonctionne pour toute longueur (ex. « v beta 5 »).
+
+**Fichiers** : `MenuScreen.cs` (méthode `Draw` + nouvelle `DrawVersionText`).
+
+### 10.2 Fondu nouvelle partie (J7, correction)
+
+**Problème** : après la sélection « Nouvelle partie », le fondu de sortie (0,6 s) se jouait mais la transition vers le fondu d'entrée (0,8 s) ne se déclenchait pas — retour au menu au lieu de démarrer la partie.
+
+**Cause** : `UpdateFadeTransition()` n'était appelé que depuis `UpdateMenu()`, qui n'est **pas** exécuté pendant le fondu (branche `else` de la boucle principale).
+
+**Correction** (`src/Releve.Game/GameApp.cs`) :
+- Logique de transition déplacée dans la boucle principale, là où `_fade.Update(dt)` est appelé.
+- Sur événement `OutFinished` : `StartNewGame()`, `_playing = true`, `_fade.StartIn()`.
+- `UpdateFadeTransition()` et son appel supprimés de `UpdateMenu()`.
+
+**Fichiers** : `GameApp.cs` (boucle `Run`, `UpdateMenu` simplifiée, `UpdateFadeTransition` supprimée).
+
+### 10.3 Nettoyage ConsolePanel (J6, point 3)
+
+**Problème** : champ privé `_scrollHoldTimer` inutilisé (avertissement CS0169).
+
+**Correction** : suppression du champ.
+
+**Fichiers** : `ConsolePanel.cs`.
+
+### 10.4 Résultats après corrections
+
+| Élément | Statut |
+|---|---|
+| Build | ✅ 0 avertissements, 0 erreurs |
+| Tests | ✅ 128 tests verts |
+| Version menu | Visible, entière, alignée à droite, police 20 px |
+| Fondu nouvelle partie | Sortie 0,6 s → musique jeu → entrée 0,8 s → jeu |
+
+### 10.5 Menu cliquable à la souris (J7)
+
+**Problème** : les entrées du menu (« Continuer », « Nouvelle partie », « Aide ») n'étaient pas cliquables à la souris, alors que J7 le prévoyait (survol = sélection, clic gauche = validation).
+
+**Correction** (`src/Releve.Game/Ui/MenuScreen.cs`) :
+- Nouveau champ `_lastMousePosition` pour détecter le mouvement de la souris.
+- Méthode `EntryRect(index)` factorisée : calcule le rectangle exact de chaque entrée (identique à la surbrillance).
+- Dans `Update` : pour chaque entrée activée (ignorant « Continuer » si `canContinue == false`) :
+  - Si la souris est dans le rectangle et a bougé (`GetMouseDelta` non nul) → sélection = cette entrée.
+  - Si clic gauche (`IsMouseButtonPressed`) dans le rectangle → renvoie le `MenuChoice` correspondant.
+- `Reset` réinitialise `_lastMousePosition` pour éviter un faux survol au premier affichage.
+
+**Fichiers** : `MenuScreen.cs` (`Update`, nouvelle méthode `EntryRect`, champ `_lastMousePosition`, constructeur, `Reset`).
+
+### 10.6 Conflit touches fléchées : mouvement vs scroll console (J6/J7)
+
+**Problème** : dans le couloir technique, appuyer sur la flèche « Haut » (mouvement « nord ») ne montrait pas la réponse du jeu (« la porte de l'escalier est fermée... »). La réponse n'apparaissait qu'après la commande suivante.
+
+**Cause** : `ConsolePanel.ScrollWithKeyboard()` gérait les flèches Haut/Bas pour le défilement de la vue console (incrémentant `_scroll`), ce qui masquait le nouveau message ajouté par `Submit("nord")`. En parallèle, `GameApp.UpdateGame()` utilisait les mêmes touches pour le déplacement.
+
+**Correction** (`src/Releve.Game/Ui/ConsolePanel.cs`) :
+- `ScrollWithKeyboard()` : suppression de la gestion Haut/Bas (ligne 270-281). Le défilement de la vue console se fait maintenant uniquement via PageUp/PageDown/Home/End + boutons souris.
+- `RecallHistory()` : suppression des tests `canScrollUp`/`canScrollDown` qui renvoyaient vers `ScrollWithKeyboard`. Haut/Bas rappellent maintenant toujours l'historique des commandes (si historique dispo).
+
+**Fichiers** : `ConsolePanel.cs` (`ScrollWithKeyboard`, `RecallHistory`).
+
+### 10.7 Coordonnées zone armoire chambre (J5) — correction par vérification visuelle utilisateur
+
+**Contexte** : la spec J5 indiquait des coordonnées provisoires (705, 140, 1065, 565) pour la zone d'armoire. L'utilisateur a effectué une **vérification visuelle** et corrigé manuellement les coordonnées vers une zone plus large couvrant mieux l'ouverture de l'armoire.
+
+**Correction** (`src/Releve.Engine/Content/Rooms/Bedroom.cs` + `tests/Releve.Engine.Tests/ImagePatchTests.cs`) :
+- Nouvelles coordonnées validées visuellement : `WardrobeX1=679, WardrobeY1=115, WardrobeX2=1108, WardrobeY2=635`
+- Tests mis à jour pour correspondre à ces valeurs.
+
+**Note** : cette correction remplace les valeurs de la spec J5 par des valeurs vérifiées en conditions réelles (validation humaine requise selon §7/§8).
+
+### 10.8 Raccourcis flèches : séparation déplacement / historique (décision utilisateur post-tests)
+
+**Problème** : les flèches Haut/Bas avaient une double utilité conflictuelle — déplacement Nord/Sud dans le jeu **et** rappel de l'historique des commandes dans la console. Ce n'était pas pratique (conflit signalé §10.6).
+
+**Décision utilisateur** (après retour de tests) :
+- **Flèches Haut/Bas/Gauche/Droite** → déplacement uniquement (Nord/Sud/Ouest/Est), gérées par `GameApp.UpdateGame`.
+- **Shift + Haut / Shift + Bas** → rappel de l'historique des commandes (console).
+- **Ctrl + Haut / Ctrl + Bas** → défilement inventaire (inchangé).
+
+**Correction** (`src/Releve.Game/Ui/ConsolePanel.cs`) :
+- `RecallHistory()` : test `IsKeyDown(LeftShift/RightShift)` + `IsKeyPressed(Up/Down)` au lieu de `IsKeyPressed(Up/Down)` seul.
+
+**Documentation** (`Docs/ArchitectureTechnique.md` §9.3, §9.4) :
+- Console : « Rappel de l'historique des commandes : `Shift + Haut` / `Shift + Bas` ».
+- §9.4 : ajout ligne « **Flèches Haut/Bas/Gauche/Droite** : déplacement dans le jeu... » ; ligne Ctrl+Haut/Bas pour inventaire ; nouvelle ligne Shift+Haut/Bas pour historique console.
+
+**Fichiers** : `ConsolePanel.cs` (`RecallHistory`), `ArchitectureTechnique.md` (§9.3, §9.4).
+
+### 10.9 Détection exclusive des modificateurs (correction post-tests)
+
+**Problème** : la détection des touches fléchées n'excluait pas les modificateurs, causant des déclenchements simultanés :
+- `Shift+↑` déclenchait **à la fois** le déplacement Nord (GameApp) **et** le rappel historique (ConsolePanel)
+- `Ctrl+↑` déclenchait **à la fois** le déplacement Nord **et** le scroll inventaire (InventoryPanel)
+
+**Correction** (décision utilisateur post-tests) : détection **exclusive** des modificateurs dans les trois composants :
+
+| Composant | Touches | Condition requise |
+|---|---|---|
+| `GameApp.UpdateGame` (déplacement) | `↑↓←→` | **NI Shift NI Ctrl** enfoncé |
+| `ConsolePanel.RecallHistory` (historique) | `Shift+↑/↓` | **Shift OUI, Ctrl NON** |
+| `InventoryPanel.Update` (scroll inventaire) | `Ctrl+↑/↓` | **Ctrl OUI, Shift NON** |
+
+**Fichiers modifiés** :
+- `src/Releve.Game/GameApp.cs` (`UpdateGame`) : ajout `modifierFree = !shiftDown && !ctrlDown`
+- `src/Releve.Game/Ui/ConsolePanel.cs` (`RecallHistory`) : test `shiftDown && !ctrlDown`
+- `src/Releve.Game/Ui/InventoryPanel.cs` (`Update`) : test `ctrlDown && !shiftDown`
+
+**Documentation** (`Docs/ArchitectureTechnique.md` §9.3, §9.4) :
+- Console : « Rappel : `Shift + Haut/Bas` **(sans Ctrl)** »
+- Inventaire : « défilement `Ctrl+↑/↓` **(sans Shift)** »
+- §9.4 : règles d'exclusion explicites pour chaque action.
+
+**Fichiers** : `GameApp.cs`, `ConsolePanel.cs`, `InventoryPanel.cs`, `ArchitectureTechnique.md`.
+
+### 10.10 Refonte raccourcis clavier (décision utilisateur finale)
+
+**Problème** : la gestion précédente (Ctrl+flèches inventaire, Shift+flèches historique) restait perfectible. L'utilisateur souhaite une séparation nette :
+
+| Touches | Action |
+|---|---|
+| `↑ ↓ ← →` (seules) | Direction envoyée dans le prompt (nord/sud/est/ouest) |
+| `Shift + ↑ / Shift + ↓` | Rappel commande précédente/suivante dans la ligne de saisie (insère **sans valider**) |
+| `PageHaut / PageBas` | Défilement **visuel** de l'historique (console) **et** de l'inventaire |
+
+**Abandon** : `Ctrl + ↑ / Ctrl + ↓` pour l'inventaire (remplacés par PageHaut/PageBas).
+
+**Notes** :
+- L'historique des commandes rappelables contient **toutes les commandes envoyées au jeu**.
+- L'historique (commandes + résultats) **n'est PAS inclus dans la sauvegarde** (comportement inchangé).
+
+**Corrections** :
+- `GameApp.UpdateGame` : directions seulement si `!shiftDown && !ctrlDown`
+- `ConsolePanel.RecallHistory` : `Shift+↑/↓` sans test Ctrl
+- `InventoryPanel.Update` : `PageHaut/PageBas` au lieu de `Ctrl+↑/↓`
+
+**Fichiers** : `GameApp.cs`, `ConsolePanel.cs`, `InventoryPanel.cs`, `ArchitectureTechnique.md` (§9.3, §9.4, §14, §15.3).
+
+### 10.11 Historique commandes type terminal + retour Ctrl+flèches inventaire (décision utilisateur)
+
+**Problème** : l'utilisateur souhaite un comportement d'historique identique aux terminaux Windows/Linux (cmd, bash) :
+- **Toutes les commandes** envoyées au moteur (saisie clavier + raccourcis flèches) sont mémorisées dans une pile LIFO.
+- `Shift + ↑` : remonte dans l'historique (commandes plus anciennes).
+- `Shift + ↓` : descend dans l'historique (commandes plus récentes, jusqu'à ligne vide).
+- Validation (Entrée) : ajoute la commande en tête de pile (si non vide et pas doublon consécutif) et replace le pointeur à la fin.
+
+Parallèlement, **retour de `Ctrl + ↑ / Ctrl + ↓` pour le scroll inventaire** (ligne par ligne), en plus de `PageHaut / PageBas` (par page). `Ctrl+flèches` ne fonctionne que si Shift n'est pas enfoncé.
+
+**Corrections** :
+- `GameApp.Submit` : appelle `_console.RecordCommand(command)` pour **toutes** les commandes (saisie + flèches).
+- `ConsolePanel.RecordCommand(command)` : nouvelle méthode — ajoute à `_sent` (pile LIFO), évite doublons consécutifs, reset `_recallIndex = -1`.
+- `ConsolePanel.TryReadCommand` : n'ajoute plus à `_sent` (délégation à `RecordCommand`).
+- `ConsolePanel.RecallHistory` : `Shift+↑/↓` sans test Ctrl ; logique LIFO (index -1 = fin, Count-1 = dernière commande, 0 = plus ancienne).
+- `InventoryPanel.Update` : `Ctrl+Haut/Ctrl+Bas` (sans Shift) **et** `PageHaut/PageBas`.
+
+**Notes** : l'historique des commandes **n'est pas sauvegardé** (inchangé).
+
+**Fichiers** : `GameApp.cs`, `ConsolePanel.cs` (`RecordCommand`, `TryReadCommand`, `RecallHistory`), `InventoryPanel.cs` (`Update`), `ArchitectureTechnique.md` (§9.3, §9.4, §14, §15.3).
+
+Toutes les corrections futures du POC V3 seront documentées dans ce chapitre.

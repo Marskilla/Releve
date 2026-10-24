@@ -29,7 +29,7 @@ public sealed class Bedroom : RoomBase
     private const string ReaderAlreadyUnlocked = "Le lecteur est déjà déverrouillé.";
 
     // Coordonnées zones d'image (J5) - image 1774x887
-    private const int WardrobeX1 = 705, WardrobeY1 = 140, WardrobeX2 = 1065, WardrobeY2 = 565;
+    private const int WardrobeX1 = 679, WardrobeY1 = 115, WardrobeX2 = 1108, WardrobeY2 = 635;
     private const int BinX1 = 1215, BinY1 = 405, BinX2 = 1340, BinY2 = 540;
     private const int ReaderX1 = 1670, ReaderY1 = 232, ReaderX2 = 1730, ReaderY2 = 325;
 

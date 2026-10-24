@@ -211,57 +211,64 @@ private void OpenHelp()
             _textViewer.Open(new Rectangle(0, 0, Layout.ScreenWidth, Layout.ScreenHeight), "Aide", helpText);
         }
 
-    private void UpdateGame()
-    {
-        _inventory.Update(_view.Inventory.Count);
+private void UpdateGame()
+        {
+            _inventory.Update(_view.Inventory.Count);
 
-        // Raccourcis clavier pour les deplacements (J6.4) : fleches directionnelles
-        // Up = nord, Down = sud, Right = est, Left = ouest
-        // Utilise IsKeyPressedRepeat pour permettre le maintien (repetition)
-        if (Raylib.IsKeyPressed(KeyboardKey.Up) || Raylib.IsKeyPressedRepeat(KeyboardKey.Up))
-        {
-            Submit("nord");
-        }
-        else if (Raylib.IsKeyPressed(KeyboardKey.Down) || Raylib.IsKeyPressedRepeat(KeyboardKey.Down))
-        {
-            Submit("sud");
-        }
-        else if (Raylib.IsKeyPressed(KeyboardKey.Right) || Raylib.IsKeyPressedRepeat(KeyboardKey.Right))
-        {
-            Submit("est");
-        }
-        else if (Raylib.IsKeyPressed(KeyboardKey.Left) || Raylib.IsKeyPressedRepeat(KeyboardKey.Left))
-        {
-            Submit("ouest");
-        }
+            // Raccourcis clavier pour les deplacements : fleches directionnelles
+            // Up = nord, Down = sud, Right = est, Left = ouest
+            // Utilise IsKeyPressedRepeat pour permettre le maintien (repetition)
+            // NE se declenche que si NI Shift NI Ctrl n'est enfonce (pour eviter les conflits
+            // avec le rappel historique Shift+fleches).
+            bool shiftDown = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
+            bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
+            bool modifierFree = !shiftDown && !ctrlDown;
 
-        if (_console.TryReadCommand(out var command))
-        {
-            Submit(command);
-        }
-    }
+            if (modifierFree && (Raylib.IsKeyPressed(KeyboardKey.Up) || Raylib.IsKeyPressedRepeat(KeyboardKey.Up)))
+            {
+                Submit("nord");
+            }
+            else if (modifierFree && (Raylib.IsKeyPressed(KeyboardKey.Down) || Raylib.IsKeyPressedRepeat(KeyboardKey.Down)))
+            {
+                Submit("sud");
+            }
+            else if (modifierFree && (Raylib.IsKeyPressed(KeyboardKey.Right) || Raylib.IsKeyPressedRepeat(KeyboardKey.Right)))
+            {
+                Submit("est");
+            }
+            else if (modifierFree && (Raylib.IsKeyPressed(KeyboardKey.Left) || Raylib.IsKeyPressedRepeat(KeyboardKey.Left)))
+            {
+                Submit("ouest");
+            }
 
-    private void Submit(string command)
-    {
-        // « quitter » est intercepte par la couche Game avant d'appeler le moteur (§6.3).
-        var words = TextNormalizer.Normalize(command);
-        if (words.Count > 0 && Vocabulary.QuitWords.Contains(words[0]))
-        {
-            _quitRequested = true;
-            return;
+            if (_console.TryReadCommand(out var command))
+            {
+                Submit(command);
+            }
         }
 
-        _console.Append("> " + command, true);
-        var result = _engine.Execute(command);
-        _console.Append(result.Messages);
-        _view = _engine.GetView();
-
-        // Sauvegarde automatique après tout changement d'etat (deplacement inclus) (C1).
-        if (_playing && result.StateChanged)
+private void Submit(string command)
         {
-            _saveStore.Save(_engine.State);
+            // « quitter » est intercepte par la couche Game avant d'appeler le moteur (§6.3).
+            var words = TextNormalizer.Normalize(command);
+            if (words.Count > 0 && Vocabulary.QuitWords.Contains(words[0]))
+            {
+                _quitRequested = true;
+                return;
+            }
+
+            _console.Append("> " + command, true);
+            _console.RecordCommand(command); // historisation pour rappel Shift+Up/Down (toutes commandes)
+            var result = _engine.Execute(command);
+            _console.Append(result.Messages);
+            _view = _engine.GetView();
+
+            // Sauvegarde automatique après tout changement d'etat (deplacement inclus) (C1).
+            if (_playing && result.StateChanged)
+            {
+                _saveStore.Save(_engine.State);
+            }
         }
-    }
 
     private void StartNewGame()
     {

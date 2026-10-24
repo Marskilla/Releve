@@ -6,6 +6,7 @@ namespace Releve.Game.Ui;
 /// <summary>
 /// Menu de lancement a trois entrees (lot C2) : « Continuer », « Nouvelle partie », « Aide ».
 /// Retourne un choix typé. « Continuer » est grisé sans sauvegarde valide.
+/// Souris : survol = sélection, clic gauche = validation (doublon clavier).
 /// </summary>
 public sealed class MenuScreen
 {
@@ -15,10 +16,12 @@ public sealed class MenuScreen
 
     private int _selected;
     private Texture2D? _background;
+    private Vector2 _lastMousePosition;
 
     public MenuScreen(Fonts fonts)
     {
         _fonts = fonts;
+        _lastMousePosition = Raylib.GetMousePosition();
     }
 
     /// <summary>Définit l'image de fond du menu (null = fond uni).</summary>
@@ -31,6 +34,7 @@ public sealed class MenuScreen
     public void Reset(bool canContinue)
     {
         _selected = canContinue ? 0 : 1;
+        _lastMousePosition = Raylib.GetMousePosition();
     }
 
     /// <summary>Choix retourne par le menu.</summary>
@@ -39,6 +43,7 @@ public sealed class MenuScreen
     /// <summary>Renvoie le choix lorsque le joueur valide, null sinon.</summary>
     public MenuChoice? Update(bool canContinue)
     {
+        // Clavier (inchangé)
         if (Raylib.IsKeyPressed(KeyboardKey.Up))
         {
             _selected = (_selected - 1 + 3) % 3;
@@ -53,7 +58,7 @@ public sealed class MenuScreen
         {
             if (_selected == 0 && !canContinue)
             {
-                return null; // entree inexistante : grisee, rien à faire
+                return null;
             }
 
             return _selected switch
@@ -64,7 +69,64 @@ public sealed class MenuScreen
             };
         }
 
+        // Souris : survol et clic
+        var mousePos = Raylib.GetMousePosition();
+        var mouseDelta = mousePos - _lastMousePosition;
+        bool mouseMoved = mouseDelta.X != 0 || mouseDelta.Y != 0;
+        _lastMousePosition = mousePos;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (i == 0 && !canContinue)
+            {
+                continue; // entrée « Continuer » désactivée
+            }
+
+            var rect = EntryRect(i);
+            if (Raylib.CheckCollisionPointRec(mousePos, rect))
+            {
+                if (mouseMoved)
+                {
+                    _selected = i;
+                }
+
+                if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+                {
+                    return i switch
+                    {
+                        0 => MenuChoice.Continue,
+                        1 => MenuChoice.NewGame,
+                        _ => MenuChoice.Help,
+                    };
+                }
+            }
+        }
+
         return null;
+    }
+
+    /// <summary>Calcule le rectangle d'une entrée (identique à la surbrillance).</summary>
+    private Rectangle EntryRect(int index)
+    {
+        var width = (float)Raylib.GetScreenWidth();
+        var centre = width / 2f;
+        var entryY = 300f + 60f * index;
+
+        var label = index switch
+        {
+            0 => "Continuer",
+            1 => "Nouvelle partie",
+            _ => "Aide",
+        };
+
+        var textWidth = _fonts.MeasureWidth(label);
+        var x = centre - textWidth / 2f;
+
+        return new Rectangle(
+            x - Layout.Padding,
+            entryY - Layout.Padding / 2,
+            textWidth + Layout.Padding * 2,
+            Fonts.Size + Layout.Padding);
     }
 
     public void Draw(bool canContinue)

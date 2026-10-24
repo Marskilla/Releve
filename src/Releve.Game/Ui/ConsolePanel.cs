@@ -85,9 +85,24 @@ public sealed class ConsolePanel
             return false; // saisie vide ignoree (§6.7)
         }
 
-        _sent.Add(line);
         command = line;
         return true;
+    }
+
+    /// <summary>Enregistre une commande dans l'historique (pour rappel Shift+Up/Down).</summary>
+    public void RecordCommand(string command)
+    {
+        if (string.IsNullOrWhiteSpace(command))
+        {
+            return;
+        }
+        // Eviter les doublons consecutifs
+        if (_sent.Count > 0 && _sent[^1] == command)
+        {
+            return;
+        }
+        _sent.Add(command);
+        _recallIndex = -1; // repositionne au debut (derniere entree)
     }
 
     public void Draw()
@@ -240,46 +255,35 @@ public sealed class ConsolePanel
         // Pas de repetition auto sur maintien : un clic = un defilement.
     }
 
-    private void ScrollWithKeyboard()
-    {
-        var page = Math.Max(1, _visibleLines - 1);
-
-        // PageUp / PageDown (appui simple)
-        if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
+private void ScrollWithKeyboard()
         {
-            _scroll = Math.Min(_scroll + page, Math.Max(0, _lines.Count - 1));
-        }
+            var page = Math.Max(1, _visibleLines - 1);
 
-        if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
-        {
-            _scroll = Math.Max(0, _scroll - page);
-        }
+            // PageUp / PageDown (appui simple)
+            if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
+            {
+                _scroll = Math.Min(_scroll + page, Math.Max(0, _lines.Count - 1));
+            }
 
-        // Home / End (appui simple)
-        if (Raylib.IsKeyPressed(KeyboardKey.Home))
-        {
-            _scroll = Math.Max(0, _lines.Count - 1);
-        }
+            if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
+            {
+                _scroll = Math.Max(0, _scroll - page);
+            }
 
-        if (Raylib.IsKeyPressed(KeyboardKey.End))
-        {
-            _scroll = 0;
-        }
+            // Home / End (appui simple)
+            if (Raylib.IsKeyPressed(KeyboardKey.Home))
+            {
+                _scroll = Math.Max(0, _lines.Count - 1);
+            }
 
-        // Up / Down (avec repetition)
-        var up = Raylib.IsKeyPressed(KeyboardKey.Up) || Raylib.IsKeyPressedRepeat(KeyboardKey.Up);
-        var down = Raylib.IsKeyPressed(KeyboardKey.Down) || Raylib.IsKeyPressedRepeat(KeyboardKey.Down);
+            if (Raylib.IsKeyPressed(KeyboardKey.End))
+            {
+                _scroll = 0;
+            }
 
-        if (up)
-        {
-            _scroll = Math.Min(_scroll + 1, Math.Max(0, _lines.Count - 1));
+            // Up / Down sont gérés par RecallHistory pour le rappel d'historique,
+            // et par GameApp pour les déplacements. Ne pas les utiliser pour le scroll de vue.
         }
-
-        if (down)
-        {
-            _scroll = Math.Max(0, _scroll - 1);
-        }
-    }
 
     private void ReadCharacters()
     {
@@ -334,61 +338,50 @@ public sealed class ConsolePanel
         RecallHistory();
     }
 
-    private void RecallHistory()
-    {
-        // Historique commandes : seulement si on ne peut pas scroller (en haut/en bas)
-        // Up: rappelle commande precedente si on est deja en haut du scroll
-        if (Raylib.IsKeyPressed(KeyboardKey.Up))
+private void RecallHistory()
         {
-            var canScrollUp = _scroll < Math.Max(0, _lines.Count - 1);
-            if (canScrollUp)
-            {
-                return; // le scroll a deja ete gere dans ScrollWithKeyboard
-            }
+            // Shift+Up : rappelle commande précédente
+            bool shiftDown = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
 
-            if (_sent.Count == 0)
+            if (shiftDown && Raylib.IsKeyPressed(KeyboardKey.Up))
             {
-                return;
-            }
+                if (_sent.Count == 0)
+                {
+                    return;
+                }
 
-            if (_recallIndex == -1)
-            {
-                _recallIndex = _sent.Count - 1;
-            }
-            else
-            {
-                _recallIndex = Math.Max(0, _recallIndex - 1);
-            }
+                if (_recallIndex == -1)
+                {
+                    _recallIndex = _sent.Count - 1;
+                }
+                else
+                {
+                    _recallIndex = Math.Max(0, _recallIndex - 1);
+                }
 
-            _current = _sent[_recallIndex];
-            _cursor = _current.Length;
+                _current = _sent[_recallIndex];
+                _cursor = _current.Length;
+            }
+            // Shift+Down : rappelle commande suivante
+            else if (shiftDown && Raylib.IsKeyPressed(KeyboardKey.Down))
+            {
+                if (_recallIndex == -1)
+                {
+                    return;
+                }
+
+                _recallIndex++;
+                if (_recallIndex >= _sent.Count)
+                {
+                    _recallIndex = -1;
+                    ResetLine();
+                    return;
+                }
+
+                _current = _sent[_recallIndex];
+                _cursor = _current.Length;
+            }
         }
-        // Down: rappelle commande suivante si on est deja en bas du scroll
-        else if (Raylib.IsKeyPressed(KeyboardKey.Down))
-        {
-            var canScrollDown = _scroll > 0;
-            if (canScrollDown)
-            {
-                return; // le scroll a deja ete gere dans ScrollWithKeyboard
-            }
-
-            if (_recallIndex == -1)
-            {
-                return;
-            }
-
-            _recallIndex++;
-            if (_recallIndex >= _sent.Count)
-            {
-                _recallIndex = -1;
-                ResetLine();
-                return;
-            }
-
-            _current = _sent[_recallIndex];
-            _cursor = _current.Length;
-        }
-    }
 
     private void Insert(string text)
     {

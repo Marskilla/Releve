@@ -5,7 +5,7 @@ using Releve.Engine.Core;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Inventaire : liste verticale de libellés (§9.3), défilement au clavier Ctrl+Haut / Ctrl+Bas (§9.4).
+/// Inventaire : liste verticale de libellés (§9.3), défilement Ctrl+Haut/Ctrl+Bas (sans Shift) et PageHaut/PageBas (§9.4).
 /// </summary>
 public sealed class InventoryPanel
 {
@@ -52,13 +52,17 @@ public sealed class InventoryPanel
         }
     }
 
-    /// <summary>Défilement Ctrl+Haut / Ctrl+Bas (§9.4).</summary>
+    /// <summary>Défilement Ctrl+Haut / Ctrl+Bas (sans Shift) et PageHaut / PageBas (§9.4).</summary>
     public void Update(int itemCount)
     {
         var visible = VisibleRows();
         var maximum = Math.Max(0, itemCount - visible);
 
-        if (Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl))
+        bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
+        bool shiftDown = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
+
+        // Ctrl+Haut / Ctrl+Bas (sans Shift)
+        if (ctrlDown && !shiftDown)
         {
             if (Raylib.IsKeyPressed(KeyboardKey.Up))
             {
@@ -69,6 +73,17 @@ public sealed class InventoryPanel
             {
                 _offset = Math.Min(maximum, _offset + 1);
             }
+        }
+
+        // PageHaut / PageBas
+        if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
+        {
+            _offset = Math.Max(0, _offset - visible);
+        }
+
+        if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
+        {
+            _offset = Math.Min(maximum, _offset + visible);
         }
 
         _offset = Math.Clamp(_offset, 0, maximum);

@@ -125,7 +125,7 @@ public class ImagePatchTests
         engine.Execute("ouvre armoire");
         var view = engine.GetView();
         Assert.Single(view.ActivePatches);
-        AssertPatch(view.ActivePatches[0], 705, 140, 1065, 565);
+        AssertPatch(view.ActivePatches[0], 679, 115, 1108, 635);
 
         // Prends badge (necessaire pour l'utiliser)
         engine.Execute("prends badge");
@@ -145,7 +145,7 @@ public class ImagePatchTests
         engine.Execute("ferme armoire");
         view = engine.GetView();
         Assert.Equal(2, view.ActivePatches.Count);
-        Assert.DoesNotContain(view.ActivePatches, p => p.X1 == 705 && p.Y1 == 140 && p.X2 == 1065 && p.Y2 == 565);
+        Assert.DoesNotContain(view.ActivePatches, p => p.X1 == 679 && p.Y1 == 115 && p.X2 == 1108 && p.Y2 == 635);
     }
 
     [Fact]
