@@ -29,8 +29,7 @@ public sealed class HospitalLobby : RoomBase
     private static readonly string[] PatientRecord =
     {
         "FICHE PATIENT",
-        "Nom : Marchand",
-        "Prénom : Alex",
+        "Nom : Marchand - Prénom : Alex",        
         "Date d’entrée : 14 mars 2113",
         "Motif d’admission : maladie inconnue évolutive nécessitant un traitement adaptatif",
         "Conditions de sortie : maladie en rémission complète",

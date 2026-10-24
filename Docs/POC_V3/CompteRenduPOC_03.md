@@ -397,4 +397,32 @@ Parallèlement, **retour de `Ctrl + ↑ / Ctrl + ↓` pour le scroll inventaire*
 
 **Fichiers** : `GameApp.cs`, `ConsolePanel.cs` (`RecordCommand`, `TryReadCommand`, `RecallHistory`), `InventoryPanel.cs` (`Update`), `ArchitectureTechnique.md` (§9.3, §9.4, §14, §15.3).
 
+### 10.12 PageUp/PageDown : console uniquement (correction finale)
+
+**Problème** : `PageHaut / PageBas` faisaient défiler à la fois la console et l'inventaire. L'utilisateur souhaite la séparation :
+- `PageHaut / PageBas` → défilement visuel **uniquement la console** (et visualiseur §9.8)
+- `Ctrl + ↑ / Ctrl + ↓` (sans Shift) → défilement inventaire (ligne par ligne)
+
+**Correction** (`src/Releve.Game/Ui/InventoryPanel.cs`) :
+- `Update()` : suppression de la gestion `PageUp`/`PageDown` ; conservation de `Ctrl+↑/↓` (sans Shift) seulement.
+
+**Documentation** (`Docs/ArchitectureTechnique.md` §9.3, §9.4, §14, §15.3) :
+- Inventaire : « défilement `Ctrl+Haut / Ctrl+Bas (sans Shift)` » (plus de PageHaut/PageBas)
+- §9.4 : `PageHaut / PageBas` : « défilement visuel par page de l'historique de la console (et du visualiseur de texte, §9.8) **uniquement** (pas l'inventaire) »
+
+**Fichiers** : `InventoryPanel.cs` (`Update`), `ArchitectureTechnique.md`.
+
+### 10.13 Visualiseur de texte : clics souris sur indicateurs de défilement (J7 point 2)
+
+**Problème** : le `TextViewer` (utilisé pour l'aide) ne gérait pas les clics souris sur les indicateurs de défilement (haut/bas), alors que J7 point 2 le prévoyait (zone de clic 30×30 px, défilement de 3 lignes par clic, survol visible).
+
+**Correction** (`src/Releve.Game/Ui/TextViewer.cs`) :
+- Nouveaux champs `_upIndicatorHover`, `_downIndicatorHover`, `_openedThisFrame` (anti-clic fantôme à l'ouverture).
+- `Update()` : détection survol/clic sur rectangles `IndicatorUpRect()` / `IndicatorDownRect()` (30×30 px centrés sur les triangles) ; clic gauche = `_scroll ± 3` lignes (sans répétition à clic maintenu).
+- `DrawScrollIndicators()` : couleur `Palette.Prompt` au survol, `Palette.Text` sinon.
+- `UpdateCloseButton()` : retourne `bool` indiquant si fermeture via souris ; `Update()` renvoie `true` aussi dans ce cas (pour que `GameApp` replace `_menuEntered = true` et conserve la sélection sur « Aide »).
+- `IndicatorUpRect()` / `IndicatorDownRect()` : rectangles 30×30 px centrés sur les triangles (position identique au dessin).
+
+**Fichiers** : `TextViewer.cs` (`Update`, `DrawScrollIndicators`, `UpdateCloseButton`, nouvelles méthodes `IndicatorUpRect`, `IndicatorDownRect`).
+
 Toutes les corrections futures du POC V3 seront documentées dans ce chapitre.

@@ -5,7 +5,7 @@
 > À fournir à l’agent de développement avec la note d’intention (V6) et le mockup bitmap de l’interface. Le document univers/scénario n’est pas nécessaire pour ce qui est purement technique.
 > Les documents ne portent plus de numéro de version dans leur nom de fichier : la version figure dans l’en-tête de chacun.
 
-> **État de cette version.** La V0.1 décrivait l’architecture cible, la V0.2 le reflet du code livré à l’issue de l’initialisation, la V0.3 les changements du PoC V1 (contenu réel, tests de contenu, outillage `agentTools/`). La V0.4 n’avait repris que certaines sections pour le PoC V2. La V0.5 reprenait l’ensemble du document pour le rendre cohérent avec le code livré à l’issue du PoC V2. **La V0.6 intègre le PoC V3** : message d’accueil, descriptions détaillées, réponses variées, filtre grossièretés, zones d’image selon l’état, raccourcis clavier de déplacement, scroll console enrichi, « regarde pièce » ; **128 tests** passent. Les écarts connus sont listés au §15. Le plan et le compte rendu de chaque PoC sont dans `Docs/POC_V1/`, `Docs/POC_V2/` et `Docs/POC_V3/`.
+> **État de cette version.** La V0.1 décrivait l’architecture cible, la V0.2 le reflet du code livré à l’issue de l’initialisation, la V0.3 les changements du PoC V1 (contenu réel, tests de contenu, outillage `agentTools/`). La V0.4 n’avait repris que certaines sections pour le PoC V2. La V0.5 reprenait l’ensemble du document pour le rendre cohérent avec le code livré à l’issue du PoC V2. **La V0.6 intègre le PoC V3** : message d’accueil unique, descriptions détaillées selon l’état, réponses variées (neutres et humoristiques) aux commandes incomprises, filtre de grossièretés avec réponses dédiées, zones d’image actives selon l’état du jeu (superposition `*_AltState.png`), raccourcis clavier de déplacement (flèches directionnelles), « regarde pièce » (mots de pièce), scroll console enrichi (Home/End/PageUp/PageDown/Up/Down avec répétition). `dotnet build` est vert et les **128 tests** du moteur passent. Les écarts connus sont listés au §15. Le plan et le compte rendu de chaque PoC sont dans `Docs/POC_V1/`, `Docs/POC_V2/` et `Docs/POC_V3/`.
 
 ## 1. But et portée
 
@@ -115,7 +115,7 @@ Releve/
         InventoryPanel.cs      inventaire à libellés
         ConsolePanel.cs        historique typé, saisie, **défilement clavier enrichi (Home/End/PageUp/PageDown/Up/Down), boutons souris** (§9.3)
         MenuScreen.cs          menu à trois entrées, image de fond
-        TextViewer.cs          visualiseur de texte modal réutilisable (§9.8)
+        TextViewer.cs          visualiseur de texte modal réutilisable (§9.9)
       Audio/
         MusicPlayer.cs         bandes son en boucle (§9.6)
       assets/                  rooms/ (base + *_AltState.png), fonts/, audio/, menu/, texts/
@@ -647,10 +647,10 @@ La console calcule à chaque image le nombre de lignes visibles et ancre l’his
 
 ### 9.3 Composants
 
-- **Vue du lieu** : texture chargée depuis `assets/rooms/<ImageKey>.png`, mise en cache par clé, **étirée pour remplir exactement `ViewBounds`** avec `DrawTexturePro`. Le cadre est redessiné après l’image. Si l’image est introuvable, rectangle de remplacement.
+- **Vue du lieu** : texture chargée depuis `assets/rooms/<ImageKey>.png`, mise en cache par clé, **étirée pour remplir exactement `ViewBounds`** avec `DrawTexturePro`. Le cadre est redessiné après l’image. Si l’image est introuvable, rectangle de remplacement. **Zones d’image actives (AltState)** : si `RoomView.ActivePatches` n’est pas vide, l’image `_AltState.png` correspondante (même clé + suffixe `_AltState`) est chargée à la demande et les rectangles source (`ImageRect`) sont dessinés par-dessus l’image de base, mis à l’échelle avec les mêmes facteurs que l’image étirée (§9.3, J5/J6). Si l’image `_AltState` est absente, les zones ne sont pas dessinées (silencieux).
 - **Flèches** (`ArrowsPanel`) : disposition en **croix** centrée horizontalement sous le titre « Déplacements possibles : », sur trois rangées de 34 px (`RowHeight`) : Nord en haut, Ouest à gauche (libellé puis flèche) et Est à droite (flèche puis libellé) au milieu, Sud en bas. Les flèches (18 px, `ArrowSize`) sont des **têtes de flèche seules, sans queue** : l’utilisateur a demandé cette simplification après que l’agent de code n’arrivait pas à dessiner correctement fût et pointe ensemble. `Absent` : rien ; `Blocked` : pointe **creuse** (`DrawTriangleLines`), gris sombre (`Palette.ArrowBlocked`), libellé atténué ; `Open` : pointe **pleine** (`DrawTriangle`), couleur vive (`Palette.ArrowOpen`), libellé normal. La distinction ne repose pas que sur la couleur. Ce sont des **indicateurs**, pas des boutons : aucune interaction à la souris. **Règle raylib** : `DrawTriangle` exige des sommets en ordre **anti-horaire à l’écran** ; dans l’autre sens, le triangle n’est pas dessiné (cause du défaut du PoC V1, où seul le fût et la pointe Est apparaissaient). La grille de dessin (constantes de `ArrowsPanel.cs`) est reproduite par la mesure pixelique de `agentTools/` (§16).
-- **Inventaire** : liste verticale de libellés précédés d’une icône de remplacement (carré de 16 px), titre « Inventaire : », défilement visuel **PageHaut / PageBas**.
-- **Console** (`ConsolePanel`) : historique avec retour à la ligne automatique (largeur mesurée avec la police, réduite de la colonne des boutons de défilement), ancré en bas, défilement vertical. **Deux types de ligne**, mémorisés par ligne d’historique : *saisie du joueur* (écho « > commande », couleur `Palette.ConsoleInput`) et *réponse du jeu* (couleur `Palette.ConsoleResponse`) ; les lignes issues du retour à la ligne d’un même message gardent son type (`Append(message, isInput)`). Ligne de saisie avec invite `> ` (couleur `Palette.Prompt`) et texte saisi en couleur de saisie, curseur clignotant (2 clignotements par seconde), décalée vers la gauche quand le curseur dépasse le bord droit. Édition : Retour arrière et Suppr avec répétition à touche maintenue (`IsKeyPressedRepeat`), flèches gauche/droite, début/fin. Flèches haut/bas : rappel de l’historique des commandes saisies. **Deux boutons cliquables** (haut, bas), dessinés comme formes géométriques dans une colonne de 28 px à l’extrémité droite de l’aire de l’historique : un clic fait défiler de **3 lignes** ; **pas de répétition à clic maintenu** (supprimée à la demande de l’utilisateur : défilement trop rapide) ; un bouton est grisé quand le défilement est impossible dans son sens. Page↑ / Page↓ restent actifs. Tout nouveau message ramène l’historique en bas. Les boutons ne réagissent pas quand le visualiseur de texte est ouvert.
+- **Inventaire** : liste verticale de libellés précédés d’une icône de remplacement (carré de 16 px), titre « Inventaire : », défilement **Ctrl+Haut / Ctrl+Bas (sans Shift)**.
+- **Console** (`ConsolePanel`) : historique avec retour à la ligne automatique (largeur mesurée avec la police, réduite de la colonne des boutons de défilement), ancré en bas, défilement vertical. **Deux types de ligne**, mémorisés par ligne d’historique : *saisie du joueur* (écho « > commande », couleur `Palette.ConsoleInput`) et *réponse du jeu* (couleur `Palette.ConsoleResponse`) ; les lignes issues du retour à la ligne d’un même message gardent son type (`Append(message, isInput)`). Ligne de saisie avec invite `> ` (couleur `Palette.Prompt`) et texte saisi en couleur de saisie, curseur clignotant (2 clignotements par seconde), décalée vers la gauche quand le curseur dépasse le bord droit. Édition : Retour arrière et Suppr avec répétition à touche maintenue (`IsKeyPressedRepeat`), flèches gauche/droite, début/fin. **Flèches Haut/Bas : rappel de l’historique des commandes saisies (LIFO, insère sans valider).** **Deux boutons cliquables** (haut, bas), dessinés comme formes géométriques dans une colonne de 28 px à l’extrémité droite de l’aire de l’historique : un clic fait défiler de **3 lignes** ; **pas de répétition à clic maintenu** (supprimée à la demande de l’utilisateur : défilement trop rapide) ; un bouton est grisé quand le défilement est impossible dans son sens. **Page↑ / Page↓ : défilement visuel par page de l’historique (console uniquement, pas l’inventaire).** Tout nouveau message ramène l’historique en bas. Les boutons ne réagissent pas quand le visualiseur de texte est ouvert.
 - **Police** : `Ui/Fonts.cs`, taille 20 (corps, interligne 26) et seconde taille (~64) pour le titre du menu (`MeasureTitleWidth`, `DrawTitle`), chargée depuis `assets/fonts/DejaVuSans.ttf` avec une liste explicite de codepoints. Repli sur la police par défaut de raylib si le fichier est absent ou invalide. **Le jeu de codepoints ne contient pas ▲ ▼ ◄ ►** : tout symbole d’interface est dessiné en géométrie.
 - **Assets** : `Ui/Assets.cs` résout le dossier `assets` à côté de l’exe, sinon en remontant depuis le répertoire courant (lancement depuis les sources). Fournit aussi les chemins `MenuBackground` et `HelpText`.
 - **Palette** : `Ui/Palette.cs`, fond bleu-gris sombre, panneaux, bordures, texte, texte atténué, invite, rectangle de remplacement, couleurs des flèches (`ArrowOpen`, `ArrowBlocked`) et des lignes de console (`ConsoleInput`, `ConsoleResponse`). Valeurs validées à l’écran par l’utilisateur.
@@ -660,7 +660,7 @@ La console calcule à chaque image le nombre de lignes visibles et ancre l’his
 - **Flèches Haut/Bas/Gauche/Droite** (seules) : déplacement dans le jeu (Nord/Sud/Ouest/Est), gérées par `GameApp.UpdateGame` via `IsKeyPressed` / `IsKeyPressedRepeat`. **Ne se déclenchent que si NI Shift NI Ctrl n'est enfoncé**.
 - **Shift + Haut / Shift + Bas** : rappel de la commande précédente/suivante dans la ligne de saisie (insère sans valider). Historique LIFO : toutes les commandes (saisie + raccourcis) mémorisées ; validation ajoute en tête et replace pointeur.
 - **Ctrl + Haut / Ctrl + Bas** (sans Shift) : défilement ligne par ligne de l'inventaire.
-- **PageHaut / PageBas** : défilement visuel par page de l'historique de la console (et du visualiseur de texte, §9.8) **et** de l'inventaire.
+- **PageHaut / PageBas** : défilement visuel par page de l'historique de la console (et du visualiseur de texte, §9.9) **uniquement** (pas l'inventaire).
 
 ### 9.5 Police et accents (point critique)
 
@@ -689,22 +689,34 @@ Au lancement : **trois entrées**, dans l’ordre « Continuer » (grisé si auc
 
 - **Fond d'écran** : `assets/menu/menuBackground.png` étiré pour remplir toute la fenêtre (proportions non conservées), dessiné avant le titre et les entrées. Fichier absent : fond uni (`Palette.Background`), sans erreur.
 - **Titre** : « Relève » en grand (seconde taille de police, `Fonts.Title`), centré en haut, avec ombre portée pour la lisibilité.
-- **« Aide »** ouvre le **visualiseur de texte** (§9.8) en plein écran, titre « Aide », avec le contenu de `assets/texts/help.txt` (UTF-8, lu par `GameApp.OpenHelp`). Fichier absent ou illisible : le visualiseur affiche « Texte d'aide introuvable. ».
+- **« Aide »** ouvre le **visualiseur de texte** (§9.9) en plein écran, titre « Aide », avec le contenu de `assets/texts/help.txt` (UTF-8, lu par `GameApp.OpenHelp`). Fichier absent ou illisible : le visualiseur affiche « Texte d'aide introuvable. ».
+- **Souris** : survol = sélection de l’entrée, clic gauche = validation (doublon clavier). Les rectangles de clic sont calculés par `EntryRect()` et correspondent à la zone de surbrillance.
+- **Version** : affichée en bas à droite (`GameInfo.Version`, actuellement `v0.3`), police standard 20 px, couleur `Palette.DimText`, avec ombre discrète.
 
 Implémentation : l'existence et la validité de la sauvegarde sont évaluées **une seule fois au démarrage** (`_canContinue` dans `GameApp`), et `MenuScreen.Reset` n'est appelé qu'à l'entrée dans l'état menu (drapeau `_menuEntered`, remis à faux au choix d’une entrée). `GameApp.UpdateMenu` n'appelle plus `StartNewGame` par défaut : « Aide » n'entre pas en jeu, ne change pas la musique et ne modifie pas `_playing`. À la fermeture du visualiseur **au clavier** (`Update()` renvoie vrai), `_menuEntered` repasse à vrai et la sélection reste sur « Aide » ; à la fermeture **à la souris**, ce n’est pas le cas (défaut connu, §15).
 
-### 9.8 Visualiseur de texte (`Ui/TextViewer.cs`)
+### 9.8 Fondu d’écran (`Ui/ScreenFade.cs`)
+
+Gère les transitions visuelles (écran noir) lors du démarrage d’une nouvelle partie depuis le menu.
+
+- **États** : `Idle` (inactif), `Out` (sortie vers le noir), `In` (entrée depuis le noir).
+- **Durées** : sortie 0,6 s, entrée 0,8 s (constantes `OutDuration`, `InDuration`).
+- **Déclenchement** : choix « Nouvelle partie » dans le menu → `StartOut()` ; dans la boucle principale, quand `OutFinished` est reçu → `StartNewGame()` + `StartIn()`.
+- **Comportement** : pendant le fondu, **aucune mise à jour du menu, du jeu ni du visualiseur** ; la file de caractères est vidée à chaque image. Le fondu est dessiné **par-dessus tout** (scène, menu, visualiseur).
+- **Événements** : `Update(dt)` renvoie `FadeEvent.OutFinished` ou `FadeEvent.InFinished` à la fin de chaque phase, permettant à `GameApp` d’enchaîner les actions.
+
+### 9.9 Visualiseur de texte (`Ui/TextViewer.cs`)
 
 Composant réutilisable de la couche Game, **superposé** à l’écran courant : aide aujourd’hui, lettre des parents, crédits ou autre texte plus tard. Le déclenchement depuis le moteur (par exemple « lis lettre ») n’existe pas : il demanderait un signal du moteur vers l’interface, hors périmètre à ce jour.
 
-- **API** : `Open(rectangle, titre, texte)`, `IsOpen`, `Update()` (renvoie vrai à la fermeture au clavier), `Draw()`. Le rectangle est un paramètre : plein écran pour l’aide ; une fenêtre partielle est prévue pour un usage en jeu (non déclenchable à ce jour, vérifiée uniquement par construction).
+- **API** : `Open(rectangle, titre, texte)`, `IsOpen`, `Update()` (renvoie vrai à la fermeture au clavier **ou par clic souris sur « Fermer » ou indicateurs**), `Draw()`. Le rectangle est un paramètre : plein écran pour l’aide ; une fenêtre partielle est prévue pour un usage en jeu (non déclenchable à ce jour, vérifiée uniquement par construction).
 - **Opaque et modal** : il remplit son rectangle d’une couleur pleine et masque ce qu’il recouvre. Tant qu’il est ouvert, `GameApp` n’appelle ni la mise à jour du menu, ni celle du jeu (donc ni la console ni l’inventaire) ; la scène sous-jacente est dessinée puis recouverte ; la file de caractères est vidée à chaque image pour qu’aucune saisie ne fuie dans la console à la fermeture. La musique continue.
-- **Texte** : retours CRLF normalisés en LF ; retour à la ligne automatique à la largeur du rectangle (mesurée avec `Fonts.MeasureWidth`) ; lignes vides conservées.
-- **Défilement** : Page↑ / Page↓ (une page moins une ligne), ↑ / ↓ (une ligne), Début / Fin. Indicateurs « texte au-dessus / en dessous » dessinés en triangles (sommets anti-horaires, §9.3).
-- **Fermeture** : bouton « Fermer » cliquable (appui et relâchement sur le bouton, survol visible) et équivalent clavier Échap ou Entrée. Le composant n’a pas de garde explicite pour la frame de création : l’Entrée qui ouvre l’aide depuis le menu ne la ferme pas parce que `IsKeyPressed` ne se déclenche que sur le front et que `GameApp` n’appelle `Update()` qu’à partir de l’image suivante.
+- **Texte** : retours CRLF normalisés en LF ; retour à la ligne automatique à la largeur du rectangle (mesurée avec `Fonts.MeasureWidth`) ; lignes vides conservées. Mots plus larges que `maxWidth` coupés en morceaux.
+- **Défilement** : Page↑ / Page↓ (une page moins une ligne), ↑ / ↓ (une ligne, **répétition à touche maintenue**), Début / Fin. Indicateurs « texte au-dessus / en dessous » dessinés en triangles (sommets anti-horaires, §9.3) ; **zone de clic 30 × 30 px centrée sur chaque indicateur** ; clic gauche = défilement de **3 lignes** (haut : `max(0, _scroll − 3)` ; bas : `min(maxScroll, _scroll + 3)`) ; **pas de répétition à clic maintenu** ; **survol : triangle en `Palette.Prompt`** ; anti-clic fantôme (ignoré dans la frame d'ouverture).
+- **Fermeture** : bouton « Fermer » cliquable (appui et relâchement sur le bouton, survol visible) et équivalent clavier Échap ou Entrée. `Update()` renvoie vrai à la fermeture (clavier **ou** souris) pour que `GameApp` conserve la sélection du menu.
 - Limites connues : voir §15.
 
-### 9.9 Règle d’interaction
+### 9.10 Règle d’interaction
 
 Voir le §2. En résumé : clavier partout ; souris pour les boutons ▲/▼ de la console et le bouton « Fermer » du visualiseur ; curseur visible ; flèches de déplacement non cliquables.
 
@@ -729,7 +741,7 @@ Contraintes à respecter, vérifiées par les tests ou par les conventions :
 
 ## 11. Stratégie de tests (projet `Releve.Engine.Tests`)
 
-Les tests remplacent la validation de schéma qu’offrirait un fichier de données. **103 tests**, tous verts (83 à l’issue du PoC V1, 20 ajoutés au PoC V2).
+Les tests remplacent la validation de schéma qu’offrirait un fichier de données. **128 tests**, tous verts (83 à l’issue du PoC V1, 20 ajoutés au PoC V2, 25 ajoutés au PoC V3).
 
 | Fichier | Ce qu’il couvre |
 |---|---|
@@ -741,6 +753,10 @@ Les tests remplacent la validation de schéma qu’offrirait un fichier de donn�
 | `PocContentTests.cs` | Contenu du PoC : sorties sans destination toujours bloquées, retours existants, ambiguïtés du couloir (« lecteur », « porte »), armoire fermée puis badge pris, fiche patient affichée à l’identique, scénario de référence complet du réveil à la rue provisoire, corbeille selon l’emplacement du sac, réponses à « ouvre », sauvegarde puis rechargement (pièce, inventaire, états, événements ; annonce de réveil non rejouée). |
 | `SaveTests.cs` | Aller-retour chiffré à l’identique, clés et noms d’enums du JSON, fichier corrompu ignoré, version de schéma inconnue ignorée. |
 | `TestWorld/TestWorld.cs` | Monde de test indépendant du contenu réel : pièces, objets dont un objet invisible (`VisibleWhen`), sortie à sens unique, sortie sans destination. |
+| `BedroomV3Tests.cs` | PoC V3 : message d’accueil unique, descriptions détaillées selon l’état, « regarde pièce », sorties, armoire conditionnée. |
+| `ReplyTests.cs` | PoC V3 : réponses variées (`FlavourText`, `ReplyPicker`), filtre grossièretés (`ProfanityFilter`). |
+| `ImagePatchTests.cs` | PoC V3 : zones d’image actives selon l’état (`ImagePatch`), rendu `ActivePatches`. |
+| `EncodingTests.cs` | PoC V3 : apostrophes typographiques `’`, caractères précomposés, absence d’accents décomposés. |
 
 Les tests génériques (analyseur, états de sortie, sauvegarde, comportements) s’appuient sur `TestWorld`, pas sur le monde livré. Les tests de contenu (`PocContentTests`, `WorldConsistencyTests`) s’appuient au contraire sur `GameWorld.Create()` : c’est le seul endroit qui valide le monde réel de bout en bout. Ajouter ou retirer un membre de `RoomId` / `ObjectId` / `GameEvent` impose de mettre à jour les listes de test de `WorldConsistencyTests` et le monde de test : les tests échouent bruyamment plutôt que de valider des données.
 
@@ -807,7 +823,7 @@ Critères propres aux PoC (détail dans les comptes rendus de `Docs/POC_V1/` et 
 4. **Dossier de sauvegarde** : `Documents/Releve/save.dat` retenu. Fréquence : à la fermeture et après chaque commande qui change l’état. Le dossier de données de l’application reste plus conventionnel et est le point à revoir en priorité, notamment pour Linux/macOS.
 5. **Messages neutres d’erreur** : implémentés tels quels (§6.7 et §7.3).
 6. **Bibliothèque native raylib** : vérifiée présente à côté de l’exe après `dotnet publish`.
-7. **Page d’aide pleine page** : implémentée au PoC V2 (§9.8) avec un texte de remplissage (lorem ipsum) : le vrai texte d’aide reste à rédiger.
+7. **Page d’aide pleine page** : implémentée au PoC V2 (§9.9) avec un texte de remplissage (lorem ipsum) : le vrai texte d’aide reste à rédiger.
 8. **Migration .NET** : non planifiée (décision de l’utilisateur).
 
 ## 15. Écarts connus et points ouverts

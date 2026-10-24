@@ -52,7 +52,7 @@ public sealed class InventoryPanel
         }
     }
 
-    /// <summary>Défilement Ctrl+Haut / Ctrl+Bas (sans Shift) et PageHaut / PageBas (§9.4).</summary>
+    /// <summary>Défilement Ctrl+Haut / Ctrl+Bas (sans Shift) (§9.4).</summary>
     public void Update(int itemCount)
     {
         var visible = VisibleRows();
@@ -73,17 +73,6 @@ public sealed class InventoryPanel
             {
                 _offset = Math.Min(maximum, _offset + 1);
             }
-        }
-
-        // PageHaut / PageBas
-        if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
-        {
-            _offset = Math.Max(0, _offset - visible);
-        }
-
-        if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
-        {
-            _offset = Math.Min(maximum, _offset + visible);
         }
 
         _offset = Math.Clamp(_offset, 0, maximum);

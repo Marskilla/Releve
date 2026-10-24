@@ -335,8 +335,7 @@ public class PocContentTests
         Assert.Equal(
         [
             "FICHE PATIENT",
-            "Nom : Marchand",
-            "Prénom : Alex",
+            "Nom : Marchand - Prénom : Alex",
             "Date d’entrée : 14 mars 2113",
             "Motif d’admission : maladie inconnue évolutive nécessitant un traitement adaptatif",
             "Conditions de sortie : maladie en rémission complète",
@@ -412,7 +411,7 @@ public class PocContentTests
 
         // 9. badge sur la borne : fiche patient, puis deverrouillage de la porte vitree.
         var record = engine.Execute("passe le badge sur la borne");
-        Assert.Equal(8, record.Messages.Count);
+        Assert.Equal(7, record.Messages.Count);
         Assert.Equal("FICHE PATIENT", record.Messages[0]);
         Assert.Equal("La porte vitrée de l’entrée se déverrouille.", record.Messages[^1]);
         Assert.Equal(ExitState.Open, engine.GetView().Exits[Direction.West]);
