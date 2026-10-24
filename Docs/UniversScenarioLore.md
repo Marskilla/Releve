@@ -1,6 +1,6 @@
 # Jeu "Relève" - Document de référence — Univers et scénario
 
-> Document de travail — version 0.7
+> Document de travail — version 0.8
 
 ## But du document
 
@@ -199,7 +199,7 @@ Le jeu ne dicte jamais au joueur ses souvenirs, ses pensées ou ses émotions. I
 
 ### 4.2 La situation initiale
 
-Le jeu commence directement dans la pièce où le joueur se réveille. Une voix annonce : « Réveil terminé, constantes stables. » Le joueur porte une blouse médicale.
+Le jeu commence directement dans la pièce où le joueur se réveille. Une voix annonce : « Réveil terminé, constantes stables. » Le joueur porte une chemise d’hôpital, la tenue standard des malades alités.
 
 Le traitement étant expérimental, le joueur n’est pas dans une chambre ordinaire au milieu d’un service : il se trouve dans une pièce isolée du sous-sol de l’hôpital, distincte des étages de soins. Hormis l’accès à la machinerie de l’hôpital, la seule sortie est l’escalier qui mène au rez-de-chaussée, fermé par une porte à lecteur de badge. Le protocole ayant été conduit en marge du circuit hospitalier habituel, le joueur a été oublié.
 
@@ -268,7 +268,7 @@ Chaque section de lieu suit la même structure : rôle narratif, description vis
 
 **Rôle narratif**
 
-Point de départ du jeu. Ce lieu établit la situation du joueur — réveil, corps adulte, environnement médical encore fonctionnel — essentiellement par l'observation, complétée par une unique annonce textuelle à l'entrée dans la pièce. Le lieu reste volontairement simple, tant dans ses possibilités d'action que dans sa sortie, pour ne pas noyer le joueur dans ses premières commandes.
+Point de départ du jeu. Ce lieu établit la situation du joueur — réveil, corps adulte, environnement médical encore fonctionnel — essentiellement par l’observation, complétée par un unique message d’accueil textuel au lancement de la partie. Le lieu reste volontairement simple, tant dans ses possibilités d’action que dans sa sortie, pour ne pas noyer le joueur dans ses premières commandes.
 
 **Description visuelle**
 
@@ -276,13 +276,17 @@ Chambre médicale sans fenêtre, en sous-sol, vue depuis la position du joueur j
 
 **Texte d'introduction du lieu**
 
-À l'arrivée dans la pièce, une voix de synthèse féminine, neutre et sans chaleur, annonce : « Réveil terminé, constantes stables. » Aucun autre son n'accompagne le jeu, hormis la musique de fond : cette annonce constitue donc un événement marquant, propre à ce lieu.
+Au lancement d’une nouvelle partie, le jeu s’ouvre sur un message d’accueil unique, plus long qu’une description de lieu ordinaire, qui précède la description de la pièce. Texte de référence (provisoire) :
+
+> Alors que vous ouvrez doucement les yeux, une voix de synthèse annonce : « Réveil terminé, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d’hôpital, la tenue standard des malades alités.
+
+La voix de synthèse est féminine, neutre et sans chaleur. Aucun autre son n'accompagne le jeu, hormis la musique de fond : cette annonce constitue donc un événement marquant, propre à ce lieu.
 
 **Éléments notables**
 
 - Le lit et les machines de monitoring et de soins adaptatifs, qui renseignent sur l'état du joueur et permettent d'accéder à un dossier médical partiel.
 - L'armoire en contreplaqué, contenant des vêtements d'enfant trop petits pour le joueur et un badge d'identification portant la photo d'un enfant de huit ans.
-- La blouse médicale que porte le joueur, mentionnée textuellement (hors champ en vue subjective).
+- La chemise d’hôpital que porte le joueur, mentionnée une seule fois, dans le message d’accueil (hors champ en vue subjective).
 - Le lecteur de badge, situé près de la porte, qui conditionne la sortie du lieu.
 - Une corbeille contenant un sac poubelle vide — les machines maintiennent l'hygiène de la pièce, qui ne contient donc aucun déchet. Ce sac sera récupéré par le joueur et trouvera un usage ultérieur, hors de ce lieu.
 

@@ -1,5 +1,7 @@
 # Jeu "Relève" - Note d’intention — Jeu d’aventure textuel et graphique
 
+> Version 6 — amende la version 5 : règle d’interaction à la souris (§2) et entrées du menu (§10).
+
 ## 1. Concept général
 
 Le projet est un jeu d’aventure en vue fixe, reposant sur une représentation graphique des lieux et sur des interactions principalement réalisées au moyen de commandes textuelles.
@@ -72,7 +74,14 @@ La représentation graphique, la navigation, l’inventaire et la console sont d
 - l’inventaire montre **ce que le joueur possède** ;
 - la console indique **ce que le jeu lui communique, ce qu’il demande et comment le monde réagit à ses actions**.
 
-L’interface ne repose pas sur la souris : toutes les interactions, y compris les déplacements, passent par la saisie de commandes textuelles (par exemple « Est » ou « Va vers l’est »). Les flèches de la zone de déplacement sont un affichage d’information sur l’état des directions, pas des éléments de commande.
+**Règle d’interaction.** Le jeu reste intégralement jouable au clavier : toutes les interactions de jeu, y compris les déplacements, passent par la saisie de commandes textuelles (par exemple « Est » ou « Va vers l’est »). La souris n’est admise que pour quelques exceptions explicites, destinées à faciliter les premiers instants d’un joueur habitué à la souris, et chacune d’elles possède un équivalent clavier :
+
+1. les deux boutons de défilement de l’historique de la console (équivalent : Page↑ / Page↓) ;
+2. le bouton « Fermer » du visualiseur de texte (équivalent : Échap ou Entrée) ;
+3. les entrées du menu d’accueil (Continuer, Nouvelle partie, Aide) : le survol d’une entrée la sélectionne et un clic gauche la valide (équivalent : flèches Haut / Bas et Entrée) ;
+4. les indicateurs de défilement du visualiseur de texte : un clic fait défiler le texte de trois lignes (équivalent : Page↑ / Page↓, flèches Haut / Bas, Début / Fin).
+
+Le curseur de la souris est visible. Aucune interaction de jeu proprement dite (déplacements, objets, inventaire, personnages) ne se fait à la souris. Les flèches de la zone de déplacement sont un affichage d’information sur l’état des directions, pas des éléments de commande.
 
 Une tentative de déplacement dans une direction existante mais impossible n’est pas exécutée et produit une réponse textuelle qui guide le joueur en décrivant ce qui bloque le passage, sans lui dire comment le débloquer. Par exemple :
 
@@ -198,7 +207,7 @@ Le joueur doit pouvoir expérimenter avec le système et obtenir une réponse co
 
 L’objectif n’est donc pas uniquement de trouver la commande attendue par le jeu, mais de permettre au joueur de comprendre progressivement les règles du monde et de les exploiter pour progresser. Les flèches de déplacement grisées y contribuent : elles signalent qu’une progression est possible sans en indiquer le moyen.
 
-## 10. Éléménts divers
+## 10. Éléments divers
 
 Le jeu disposera au lancement d'un menu permettant :
 
@@ -206,5 +215,6 @@ Le jeu disposera au lancement d'un menu permettant :
 - De commencer une nouvelle partie 
 - D'afficher une aide textuelle pleine page et scrollable.
 
-Les seuls éléments sonores du jeu seront deux bandes son (fichiers mp3 ou ogg) tournant en boucle : une pour le menu/ aide, une pour le jeu.
+Les entrées du menu se sélectionnent au clavier ou à la souris (voir la règle d’interaction, §2).
 
+Les seuls éléments sonores du jeu seront deux bandes son (fichiers mp3 ou ogg) tournant en boucle : une pour le menu/ aide, une pour le jeu.
