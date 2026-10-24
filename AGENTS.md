@@ -7,7 +7,7 @@ Repo-specific notes for working in **Relève** (C# text/graphic adventure). Read
 - `src/Releve.Engine/` — pure game engine: world, parser, state, save. **Must never reference raylib or any display/audio library.** Tests only cover this project.
 - `src/Releve.Game/` — raylib UI. Entry point: `src/Releve.Game/Program.cs` → `GameApp.Run()` (loop in `GameApp.cs`, panels in `Ui/`).
 - `tests/Releve.Engine.Tests/` — the only test project. Includes its own world (`TestWorld/TestWorld.cs`) independent of the real content.
-- Docs: `ArchitectureTechniqueV0.3.md` is the spec and mirrors the shipped code; `NoteIntentionJeuAventureV5.md` governs UI/behaviour and **wins on conflicts** there. `CompteRenduPOCV0.1.md` records what was built and verified (shipped world: 4 rooms, 22 objects, 83 tests); `ImplementationPOCV0.1.md` (that plan) is now implemented — later phases come from `UniversScenarioLoreJeuAventureV0.7.md`, do not implement them yet. PoC V2 documents live under `Docs/POC_V2/` (implementation plan and compte rendu); PoC V1 documents live under `Docs/POC_V1/`.
+- Docs: `ArchitectureTechnique.md` (V0.6) is the spec and mirrors the shipped code; `NoteIntentionJeuAventure.md` (V6) governs UI/behaviour and **wins on conflicts** there. `CompteRenduPOCV0.1.md` records what was built and verified (shipped world: 4 rooms, 22 objects, 83 tests); `ImplementationPOCV0.1.md` (that plan) is now implemented — later phases come from `UniversScenarioLoreJeuAventure.md` (v0.8), do not implement them yet. PoC V2 documents live under `Docs/POC_V2/`; PoC V1 under `Docs/POC_V1/`; **PoC V3 under `Docs/POC_V3/`** (implementation plan, compte rendu).
 
 ## Commands
 
@@ -53,11 +53,17 @@ dotnet test --filter "FullyQualifiedName~NormalizationTests"   # focused run
 
 - `src/Releve.Game/assets/**` is copied to the output folder via `<None Include="assets\**\*" CopyToOutputDirectory>`, so adding a file needs no csproj change.
 - Room images: `assets/rooms/<ImageKey>.png`, loaded and cached by `RoomViewPanel`. Wrong key or missing file → replacement rectangle with the room title. The game must stay playable with **no images and no audio**.
+- **Room image variants (PoC V3)**: `assets/rooms/<ImageKey>_AltState.png` — same dimensions as the base image, loaded on demand by `RoomViewPanel`. Contains the visual changes for active `ImagePatch` zones (opened door, unlocked reader, etc.). If missing, the corresponding patches are silently not drawn.
 - Menu background: `assets/menu/menuBackground.png` (PoC V2), stretched to fill the window; missing file → solid background, no error.
 - Help text: `assets/texts/help.txt` (PoC V2, UTF-8, lorem ipsum placeholder); missing file → "Texte d'aide introuvable." in the viewer.
 - Font: `assets/fonts/DejaVuSans.ttf` (free, licence in `assets/fonts/DejaVuSans-LICENSE.txt`), loaded with an explicit codepoint list in `Ui/Fonts.cs` covering ASCII, French accents, `œ Œ`, guillemets and typographic dashes.
 - Audio: `assets/audio/menu.*` and `assets/audio/game.*` (`.ogg`/`.mp3`), looped. Missing files just mean silence.
 - `assets/rooms/Bedroom.png`, `HospitalLobby.png`, `TechCorridor.png` are the PoC world's live room images (keys `Bedroom`, `HospitalLobby`, `TechCorridor` from `Content/Rooms/`). The street (key `Street`) has **no** image and shows the replacement rectangle with its title — intended, the old `sandbox_a`/`sandbox_b` bootstrap world is gone. Do not treat the missing `Street.png` as a bug.
+
+## Agent limitations
+
+- The agent **cannot observe the screen** nor send keystrokes/clicks to the real game window. Visual and interactive elements (fade transitions, image patch rendering, mouse hover/click on menu/console/text viewer, key repeat) are **"not visually verified by the agent"** and require human validation.
+- `agentTools/` automation (keyboard injection, screenshots) works only for agents that can use it; the current agent cannot. Mouse interactions and fade timing are explicitly **not automatable** — classify as "human validation".
 
 ## Git — forbidden actions
 
@@ -69,3 +75,4 @@ dotnet test --filter "FullyQualifiedName~NormalizationTests"   # focused run
 - Save file: `Documents/Releve/save.dat` (AES-256-GCM obfuscation, not encryption-grade). Delete it to get the "no save" menu state; it is written automatically on quit. Note `Documents` resolves to `D:\MesDocuments` here, not `%USERPROFILE%\Documents`.
 - Adding/removing `RoomId`/`ObjectId`/`GameEvent` members requires updating `WorldConsistencyTests`' `TestRoomIds`/`TestObjectIds` arrays and the test world — tests intentionally fail loudly on world inconsistency instead of using data validation.
 - The `GameApp` layer intercepts the word `quitter` before the engine and saves on shutdown.
+- **Test count**: 128 tests (PoC V3: +25 tests — `EncodingTests`, `BedroomV3Tests`, `ReplyTests`, `ImagePatchTests`).

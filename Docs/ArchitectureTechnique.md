@@ -1,12 +1,11 @@
 # Jeu "Relève" — Architecture technique
 
-> Document de référence — version 0.5
+> Document de référence — version 0.6
 > Valable pour toute la durée du projet. Il décrit la structure du code, pas le contenu du jeu.
-> À fournir à l’agent de développement avec la note d’intention (V5) et le mockup bitmap de l’interface. Le document univers/scénario n’est pas nécessaire pour ce qui est purement technique.
+> À fournir à l’agent de développement avec la note d’intention (V6) et le mockup bitmap de l’interface. Le document univers/scénario n’est pas nécessaire pour ce qui est purement technique.
 > Les documents ne portent plus de numéro de version dans leur nom de fichier : la version figure dans l’en-tête de chacun.
 
-> **État de cette version.** La V0.1 décrivait l’architecture cible, la V0.2 le reflet du code livré à l’issue de l’initialisation, la V0.3 les changements du PoC V1 (contenu réel, tests de contenu, outillage `agentTools/`). La V0.4 n’avait repris que certaines sections pour le PoC V2. **La V0.5 reprend l’ensemble du document pour le rendre cohérent avec le code livré à l’issue du PoC V2** (relu sur la branche `main` : moteur, pièces, objets, vocabulaire, analyseur, `GameApp`, console, flèches, visualiseur de texte). Les écarts connus, y compris ceux relevés à la lecture du code et non corrigés, sont listés au §15.
-> Le plan et le compte rendu de chaque PoC sont dans `Docs/POC_V1/` et `Docs/POC_V2/`.
+> **État de cette version.** La V0.1 décrivait l’architecture cible, la V0.2 le reflet du code livré à l’issue de l’initialisation, la V0.3 les changements du PoC V1 (contenu réel, tests de contenu, outillage `agentTools/`). La V0.4 n’avait repris que certaines sections pour le PoC V2. La V0.5 reprenait l’ensemble du document pour le rendre cohérent avec le code livré à l’issue du PoC V2. **La V0.6 intègre le PoC V3** : message d’accueil, descriptions détaillées, réponses variées, filtre grossièretés, zones d’image selon l’état, raccourcis clavier de déplacement, scroll console enrichi, « regarde pièce » ; **128 tests** passent. Les écarts connus sont listés au §15. Le plan et le compte rendu de chaque PoC sont dans `Docs/POC_V1/`, `Docs/POC_V2/` et `Docs/POC_V3/`.
 
 ## 1. But et portée
 
@@ -14,7 +13,7 @@ Ce document définit l’architecture technique du jeu d’aventure textuel et g
 
 Il ne contient pas le contenu du jeu (lieux, objets, textes). Celui-ci est décrit dans des documents séparés qui s’appuient sur ce document.
 
-**Avancement au moment de cette version.** Les trois jalons d’initialisation du §12.3, le contenu du PoC V1 (quatre lieux, 22 objets, chambre de réveil comme départ) et les évolutions du PoC V2 (vocabulaire et mots de sortie, console colorée avec boutons de défilement, flèches en croix, image du lieu étirée, menu avec image de fond, visualiseur de texte et page d’aide, sauvegarde après chaque changement d’état) sont livrés et jouables de bout en bout dans le jeu réel. `dotnet build` est vert et les **103 tests** du moteur passent. Un dossier d’automatisation hors build (`agentTools/`, §16) permet de piloter la fenêtre réelle du jeu pour les vérifications, selon les capacités de l’agent utilisé.
+**Avancement au moment de cette version.** Les trois jalons d’initialisation du §12.3, le contenu du PoC V1 (quatre lieux, 22 objets, chambre de réveil comme départ) et les évolutions du PoC V2 (vocabulaire et mots de sortie, console colorée avec boutons de défilement, flèches en croix, image du lieu étirée, menu avec image de fond, visualiseur de texte et page d’aide, sauvegarde après chaque changement d’état) sont livrés. **Le PoC V3 ajoute** : message d’accueil unique, descriptions détaillées selon l’état, réponses variées (neutres et humoristiques) aux commandes incomprises, filtre de grossièretés avec réponses dédiées, zones d’image actives selon l’état du jeu (superposition `*_AltState.png`), raccourcis clavier de déplacement (flèches directionnelles), « regarde pièce » (mots de pièce), scroll console enrichi (Home/End/PageUp/PageDown/Up/Down avec répétition). `dotnet build` est vert et les **128 tests** du moteur passent. Un dossier d’automatisation hors build (`agentTools/`, §16) permet de piloter la fenêtre réelle du jeu pour les vérifications, selon les capacités de l’agent utilisé.
 
 ## 2. Principes directeurs
 
@@ -33,6 +32,7 @@ Il ne contient pas le contenu du jeu (lieux, objets, textes). Celui-ci est décr
 - Dans chaque classe de pièce, les textes sont des constantes regroupées en tête de classe, séparées de la logique.
 - **Encodage des textes joueur** : caractères **précomposés** et apostrophe typographique `’` obligatoires. raylib dessine chaque codepoint indépendamment : un accent décomposé (`e` + U+0301) s’affiche en charabia. Vérifier par recherche de `[\u0300-\u036f]` après toute modification de texte. Vérifier aussi l’absence d’apostrophe droite `'` dans les constantes de texte joueur (voir §15, écart connu).
 - Une sortie impossible est expliquée par un message qui décrit ce qui bloque, **sans dire comment débloquer** (note d’intention §2).
+- **Règle de numérotation** : PoC n = version v0.n de ce document (PoC V3 → v0.6). La version figure en en-tête, pas dans le nom de fichier.
 - **Règle de dépôt** : l’agent n’exécute aucune commande git d’écriture (règle d’`AGENTS.md`) ; l’utilisateur commite lui-même.
 
 ## 3. Choix techniques
@@ -44,7 +44,7 @@ Il ne contient pas le contenu du jeu (lieux, objets, textes). Celui-ci est décr
 | Cible | Windows x64, publication autonome (runtime copié à côté de l’exe). |
 | Portabilité | L’architecture doit permettre Linux/macOS sans refonte du moteur. Aucun build Linux/macOS n’est livré à ce stade. |
 | Éditeur | VS Code et ligne de commande `dotnet`. Aucun concepteur visuel requis. |
-| Tests | xUnit sur le moteur (103 tests). |
+| Tests | xUnit sur le moteur (**128 tests**). |
 | Sauvegarde | JSON chiffré (AES-GCM), un seul fichier, dossier Documents de l’utilisateur. |
 | Versions de paquets | Gestion centralisée dans `Directory.Packages.props` ; aucune version dans un `.csproj`. Raylib-cs 8.1.0, Microsoft.NET.Test.Sdk 17.14.1, xunit 2.9.3, xunit.runner.visualstudio 2.8.2. |
 | RuntimeIdentifier | `win-x64` **fixé** dans `src/Releve.Game/Releve.Game.csproj` : la bibliothèque native `raylib.dll` est copiée à côté de l’exe dans tous les modes de build. |
@@ -78,14 +78,18 @@ Releve/
       GameEngine.cs            Execute / Start / GetView
       Core/
         Domain.cs              GameAction, Direction, ObjectState, ExitState, LocationKind,
-                               Command, Location, ObjectDef, Exit, CommandResult, InventoryItem, RoomView
+                                Command, Location, ObjectDef, Exit, CommandResult, InventoryItem, RoomView,
+                                ImagePatch, ImageRect
         GameState.cs           état mutable, seul élément sauvegardé
         Messages.cs            textes neutres du moteur (§6.7, §7.3)
+        FlavourText.cs         listes réponses variées (UnknownNeutral, UnknownHumour, ProfanityReplies) (§7.5)
+        ReplyPicker.cs         sélecteur sans répétition consécutive par liste (§7.5)
       Parsing/
         TextNormalizer.cs      normalisation (§6.2)
-        Vocabulary.cs          tables verbes / directions, mots de fermeture (§6.3)
-        CommandParser.cs       analyse, mots de sortie et résolution des noms (§6.4-§6.6)
+        Vocabulary.cs          tables verbes / directions, mots de fermeture, **mots de pièce** (§6.3, §6.7)
+        CommandParser.cs       analyse, mots de sortie, **mots de pièce**, résolution des noms (§6.4-§6.6, §6.7)
         ParseResult.cs         ParseError, ParseResult
+        ProfanityFilter.cs     filtre grossièretés (mots isolés + expressions) (§6.8)
       World/
         Ids.cs                 RoomId, ObjectId, GameEvent, extension Directions.Opposite
         World.cs               RoomBase et World (point de construction unique)
@@ -106,22 +110,23 @@ Releve/
         Palette.cs             couleurs de l'interface
         Fonts.cs               police TTF, deux tailles, codepoints (§9.5)
         Assets.cs              localisation du dossier assets
-        RoomViewPanel.cs       vue du lieu et rectangle de remplacement
+        RoomViewPanel.cs       vue du lieu, rectangle de remplacement, **zones AltState** (§9.3)
         ArrowsPanel.cs         croix des déplacements
         InventoryPanel.cs      inventaire à libellés
-        ConsolePanel.cs        historique typé, saisie, défilement clavier et boutons souris
+        ConsolePanel.cs        historique typé, saisie, **défilement clavier enrichi (Home/End/PageUp/PageDown/Up/Down), boutons souris** (§9.3)
         MenuScreen.cs          menu à trois entrées, image de fond
         TextViewer.cs          visualiseur de texte modal réutilisable (§9.8)
       Audio/
         MusicPlayer.cs         bandes son en boucle (§9.6)
-      assets/                  rooms/, fonts/, audio/, menu/, texts/
+      assets/                  rooms/ (base + *_AltState.png), fonts/, audio/, menu/, texts/
   tests/
     Releve.Engine.Tests/
       TestWorld/TestWorld.cs   monde de test indépendant du contenu (§11)
       TestSupport.cs           fabrication d'un moteur prêt à jouer
       WorldConsistencyTests.cs, NormalizationTests.cs, ParserTests.cs, ExitWordsTests.cs,
-      EngineBehaviourTests.cs, PocContentTests.cs, SaveTests.cs
-  Docs/                        documents de référence ; POC_V1/ et POC_V2/ : plans et comptes rendus
+      EngineBehaviourTests.cs, PocContentTests.cs, SaveTests.cs,
+      **BedroomV3Tests.cs, ReplyTests.cs, ImagePatchTests.cs, EncodingTests.cs**
+  Docs/                        documents de référence ; POC_V1/, POC_V2/, **POC_V3/** : plans et comptes rendus
   agentTools/                  automatisation hors build (§16)
   .kilo/, _ContentSources/     configuration de l'agent et sources de contenu : ne pas modifier
 ```
@@ -137,6 +142,7 @@ Releve/
 ```text
 Saisie (Game) ──► GameEngine.Execute(texte)
                        │
+                       ├─ Contrôle grossièretés (ProfanityFilter) ─► réponse ProfanityReplies si détecté
                        ├─ CommandParser.Parse(texte, objets accessibles, mots de sortie de la pièce)
                        │                                   ─► Command ou erreur
                        ├─ Go ? ──► sans direction : « Vous ne pouvez pas aller par là. »
@@ -274,7 +280,10 @@ public abstract class RoomBase
     public abstract string Title { get; }
     public abstract string ImageKey(GameState s);                   // clé d'image, variante possible selon l'état
     public abstract string Description(GameState s);                // texte affiché à l'entrée
-    public virtual IEnumerable<string> OnEnter(GameState s) => Array.Empty<string>();   // messages d'entrée supplémentaires
+    public virtual IEnumerable<string> IntroMessages(GameState s) => Array.Empty<string>(); // messages d'introduction (uniques, avant Description)
+    public virtual string? DetailedDescription(GameState s) => null; // description détaillée pour « regarde » sans cible
+    public virtual IReadOnlyList<ImagePatch> ImagePatches => Array.Empty<ImagePatch>();      // zones d'image actives selon l'état
+    public virtual IEnumerable<string> OnEnter(GameState s) => Array.Empty<string>();        // messages d'entrée supplémentaires (après Description)
     public abstract IReadOnlyList<Exit> Exits { get; }
     public virtual CommandResult? Handle(Command c, GameState s) => null;   // null = non géré : comportements par défaut
 }
@@ -293,12 +302,27 @@ public sealed record CommandResult(IReadOnlyList<string> Messages, bool StateCha
 
 public sealed record InventoryItem(ObjectId Id, string Name);
 
+/// <summary>Zone d'image : rectangle source [X1,X2) x [Y1,Y2) et condition d'activation.</summary>
+public sealed record ImagePatch(int X1, int Y1, int X2, int Y2, Func<GameState, bool> IsActive);
+
+/// <summary>Rectangle d'image (coordonnées source).</summary>
+public readonly record struct ImageRect(int X1, int Y1, int X2, int Y2);
+
 public sealed record RoomView(
     RoomId Room,
     string Title,
     string ImageKey,
     IReadOnlyDictionary<Direction, ExitState> Exits,
-    IReadOnlyList<InventoryItem> Inventory);
+    IReadOnlyList<InventoryItem> Inventory,
+    IReadOnlyList<ImageRect> ActivePatches)
+{
+    // Constructeur de compatibilité pour les appels existants sans ActivePatches
+    public RoomView(RoomId room, string title, string imageKey,
+        IReadOnlyDictionary<Direction, ExitState> exits, IReadOnlyList<InventoryItem> inventory)
+        : this(room, title, imageKey, exits, inventory, Array.Empty<ImageRect>())
+    {
+    }
+}
 
 // Alias WorldModel dans GlobalUsings.cs (voir §4.1).
 public sealed class World   // point de construction unique : assemble toutes les pièces et tous les objets
@@ -313,9 +337,9 @@ public sealed class World   // point de construction unique : assemble toutes le
 
 public sealed class GameEngine
 {
-    public GameEngine(WorldModel world, GameState state);
+    public GameEngine(WorldModel world, GameState state, Random? random = null);
     public GameState State { get; }
-    public IReadOnlyList<string> Start();    // à appeler au démarrage : description + OnEnter de la pièce courante
+    public IReadOnlyList<string> Start();    // à appeler au démarrage : IntroMessages, Description, OnEnter de la pièce courante
     public CommandResult Execute(string input);
     public RoomView GetView();
 }
@@ -396,6 +420,14 @@ Parse(input, scope, exitWords = null):   // scope = objets accessibles (§6.6) ;
       sinon -> Erreur(MissingObject)       // "Prendre quoi ?"
 
   si reste[0] est une préposition -> la retirer (si rien ne reste : MissingObject)
+
+  // J3.5 : pour Look seulement, si tous les mots restants (hors prépositions) sont dans RoomWords
+  // et qu'au moins un n'est pas "moi" -> Look sans cible.
+  si verbe == Look:
+      nonPrep = mots de reste qui ne sont pas préposition
+      si nonPrep non vide et tous dans RoomWords et au moins un != "moi":
+          -> Succès(Look)
+
   groupe1 = mots de reste jusqu'à la prochaine préposition
   groupe2 = mots après cette préposition (peut être vide)
 
@@ -413,7 +445,7 @@ ParseGo(verbe, reste, exitWords):
   si candidats non vide et tous sont des mots de sortie de la pièce:
       si ils désignent une seule direction -> Succès(Go, direction)
   si reste vide:
-      si verbe in {va, aller} -> Erreur(MissingObject)       // « va » seul
+      si verbe in {va, vas, aller, allez, avance, avancer} -> Erreur(MissingObject)
   -> Succès(Go, sans direction)    // « va porte », « sors » sans sortie correspondante : refusé par le moteur
 
 Résoudre(groupe, scope):
@@ -426,18 +458,15 @@ Résoudre(groupe, scope):
   si > 1         -> Erreur(Ambiguous, noms des candidats)
 ```
 
-Conséquences à connaître :
-- Pour un verbe de la classe `Go`, les mots de sortie sont **prioritaires** sur les alias d’objets : « va rue » est un déplacement, jamais une cible « porte vitrée ». Pour tout autre verbe, seuls les alias d’objets comptent : « regarde escalier » reste un `Look`.
-- Le verbe compte comme mot de sortie s’il figure dans la liste de la sortie (« sors », « monte » seuls).
-- Un verbe de déplacement sans sortie correspondante (« sors » dans le couloir, « va porte ») donne `Go` sans direction, que le moteur refuse par « Vous ne pouvez pas aller par là. ». « va » et « aller » seuls répondent « Précisez l’objet de la commande. ». « vas », « allez », « avance » et « avancer » seuls répondent, eux, « Vous ne pouvez pas aller par là. » (voir §15).
+### 6.8 Filtre de grossièretés (PoC V3)
 
-### 6.6 Portée
+`ProfanityFilter.Contains(normalizedWords)` est appelé **avant** l'analyseur dans `GameEngine.Execute`. Il vérifie :
+- **Mots isolés** (83 entrées) : chaque mot normalisé de la saisie est testé contre un `HashSet`.
+- **Expressions** (14 suites contiguës de mots) : recherche de fenêtre glissante sur la liste des mots normalisés.
 
-Les objets accessibles pour une commande sont ceux dont l’emplacement est la pièce courante ou l’inventaire, **et** dont `VisibleWhen` est nul ou vrai (`GameEngine.Scope()`). Un objet que le joueur ne peut pas voir est donc **absent de la portée** et inconnu de l’analyseur.
+Si détecté : `Execute` renvoie immédiatement une réponse tirée de `FlavourText.ProfanityReplies` (via `ReplyPicker`), sans analyser la commande, sans changer l'état (`StateChanged = false`). La liste contient volontairement `lechecul` (forme normalisée de « lèche-cul » avec trait d'union supprimé par `TextNormalizer`).
 
-**Conséquence pour l’écriture du contenu** : la correspondance partielle teste si *tous les mots du groupe* figurent dans l’alias (et non l’inverse). Deux objets de la même pièce partageant un mot d’alias (« lecteur de l’escalier » et « lecteur du local technique ») deviennent ambigus dès que le joueur tape « lecteur ». Les tests de cohérence du §11 détectent ces collisions.
-
-> **Comportement connu, accepté (décision PoC V2, A1).** Dans la chambre, « prends badge » avant « ouvre armoire » répond « Vous ne pouvez pas prendre cela. » au lieu de « objet inconnu ». Explication : le badge, caché par `VisibleWhen`, est **hors de la portée** et n’est donc jamais candidat. C’est « badge » qui correspond partiellement à l’alias « lecteur badge » du lecteur, visible, que le moteur résout puis refuse de prendre. Exclure les objets invisibles des candidats serait **sans effet**, puisqu’ils le sont déjà. Le message ne révèle rien sur l’objet caché. Aucun changement de moteur. Comportement documenté par le test `Badge_Is_Reachable_Only_After_Opening_The_Wardrobe`.
+Mots **absents volontairement** (sens légitime dans le jeu ou le monde, ne pas les ajouter) : `cul` seul (« cul-de-sac »), `bander`, `fumier`, `ordure`, `bouse`, `bâtard`, `pouffe`, `chatte`, `gueule` seul, `pine`. Les insultes discriminatoires sont hors périmètre.
 
 ### 6.7 Erreurs et messages
 
@@ -449,7 +478,19 @@ Les objets accessibles pour une commande sont ceux dont l’emplacement est la p
 | UnknownObject | « Vous ne voyez pas cela ici. » |
 | Ambiguous | « Précisez : » suivi des noms des candidats joints par « ou » (« le lecteur de l’escalier ou le lecteur du local technique »). |
 
-La correction automatique de fautes de frappe n’est pas prévue. Les formes courantes sont couvertes par la table de verbes et les alias.
+La correction automatique de fautes de frappe n'est pas prévue. Les formes courantes sont couvertes par la table de verbes et les alias.
+
+### 6.7 Erreurs et messages
+
+| Erreur | Message |
+|---|---|
+| Empty | (rien : la saisie vide est ignorée) |
+| UnknownVerb | Réponse tirée au hasard de `FlavourText.UnknownNeutral` (75 %) ou `FlavourText.UnknownHumour` (25 %), **jamais deux fois le même message consécutif** pour une même liste (`ReplyPicker`). |
+| MissingObject | « Précisez l’objet de la commande. » |
+| UnknownObject | « Vous ne voyez pas cela ici. » |
+| Ambiguous | « Précisez : » suivi des noms des candidats joints par « ou » (« le lecteur de l’escalier ou le lecteur du local technique »). |
+
+La correction automatique de fautes de frappe n'est pas prévue. Les formes courantes sont couvertes par la table de verbes et les alias.
 
 ## 7. Exécution des commandes
 
@@ -457,6 +498,10 @@ La correction automatique de fautes de frappe n’est pas prévue. Les formes co
 
 ```text
 Execute(input):
+  mots = Normaliser(input)
+  si mots non vide et ProfanityFilter.Contains(mots):
+      return ProfanityReplies (via ReplyPicker), StateChanged = false
+
   r = Parse(input, Scope(), ExitWords())
   si erreur == Empty    -> aucun message (saisie vide ignorée)
   si autre erreur       -> message correspondant (§6.7)

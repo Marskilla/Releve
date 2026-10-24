@@ -3,9 +3,14 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Objects;
 
-/// <summary>Objets de la chambre de reveil (PoC §3.1).</summary>
+/// <summary>Objets de la chambre de réveil (PoC §3.1).</summary>
 public static class BedroomObjects
 {
+    // Textes partagés pour éviter la duplication (J2.4)
+    public const string BedroomMachinesDescription =
+        "Dossier partiel affiché : maladie inconnue évolutive, traitement adaptatif expérimental. "
+        + "Statut : réveil terminé, constantes stables. Le reste du dossier est indisponible.";
+
     public static IReadOnlyDictionary<ObjectId, ObjectDef> Create() => new Dictionary<ObjectId, ObjectDef>
     {
         [ObjectId.BedroomBed] = new ObjectDef(
@@ -24,9 +29,7 @@ public static class BedroomObjects
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
             InitialState: ObjectState.None,
-            Describe: _ =>
-                "Dossier partiel affiché : maladie inconnue évolutive, traitement adaptatif expérimental. "
-                + "Statut : réveil terminé, constantes stables. Le reste du dossier est indisponible."),
+            Describe: _ => BedroomMachinesDescription),
 
         [ObjectId.BedroomWardrobe] = new ObjectDef(
             Id: ObjectId.BedroomWardrobe,
@@ -108,6 +111,6 @@ public static class BedroomObjects
         state.Locations.TryGetValue(ObjectId.GarbageBag, out var location)
         && location.Kind == LocationKind.Room
         && location.Room == RoomId.Bedroom
-            ? "Une corbeille. Elle ne contient qu'un sac poubelle vide."
+            ? "Une corbeille. Elle ne contient qu’un sac poubelle vide."
             : "Une corbeille, vide.";
 }

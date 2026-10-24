@@ -12,7 +12,7 @@ namespace Releve.Game.Ui;
 /// </summary>
 public sealed class ArrowsPanel
 {
-    private const string TitleText = "Deplacements possibles :";
+    private const string TitleText = "Déplacements possibles :";
     private const float CellWidth = 100f;
     private const float RowHeight = 34f;
     private const float ArrowSize = 18f;

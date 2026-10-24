@@ -18,7 +18,16 @@ public abstract class RoomBase
     /// <summary>Texte affiche a l'entree.</summary>
     public abstract string Description(GameState s);
 
-    /// <summary>Messages d'entree supplementaires.</summary>
+    /// <summary>Messages d'introduction (uniques, avant la description).</summary>
+    public virtual IEnumerable<string> IntroMessages(GameState s) => Array.Empty<string>();
+
+    /// <summary>Description detaillee (pour « regarde » sans cible). Null = pas de description detaillee.</summary>
+    public virtual string? DetailedDescription(GameState s) => null;
+
+    /// <summary>Zones d'image actives selon l'etat.</summary>
+    public virtual IReadOnlyList<ImagePatch> ImagePatches => Array.Empty<ImagePatch>();
+
+    /// <summary>Messages d'entree supplementaires (apres description).</summary>
     public virtual IEnumerable<string> OnEnter(GameState s) => Array.Empty<string>();
 
     public abstract IReadOnlyList<Exit> Exits { get; }

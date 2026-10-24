@@ -22,9 +22,9 @@ public static class CommandParser
             return ParseResult.Fail(ParseError.Empty);
         }
 
-        // Direction seule (« Est ») ou « va [vers] est ».
+        // Direction seule (« Est », « n ») : déplacement SEULEMENT si c'est le seul mot.
         var directionAlone = DirectionAt(words, 0);
-        if (directionAlone is not null)
+        if (directionAlone is not null && words.Count == 1)
         {
             return ParseResult.Ok(new Command(GameAction.Go, Direction: directionAlone));
         }
@@ -56,6 +56,18 @@ public static class CommandParser
             if (rest.Count == 0)
             {
                 return ParseResult.Fail(ParseError.MissingObject);
+            }
+        }
+
+        // J3.5 : pour Look seulement, si tous les mots restants (hors prepositions) sont dans RoomWords
+        // et qu'au moins un n'est pas "moi" -> Look sans cible.
+        if (action == GameAction.Look)
+        {
+            var nonPrepWords = rest.Where(w => !TextNormalizer.IsPreposition(w)).ToList();
+            if (nonPrepWords.Count > 0 && nonPrepWords.All(w => Vocabulary.RoomWords.Contains(w))
+                && nonPrepWords.Any(w => w != "moi"))
+            {
+                return ParseResult.Ok(new Command(GameAction.Look));
             }
         }
 
@@ -139,8 +151,8 @@ public static class CommandParser
 
         if (rest.Count == 0)
         {
-            // « va » et « aller » seuls gardent leur comportement actuel.
-            if (verb == "va" || verb == "aller")
+            // « va », « vas », « aller », « allez », « avance », « avancer » seuls → MissingObject.
+            if (verb == "va" || verb == "vas" || verb == "aller" || verb == "allez" || verb == "avance" || verb == "avancer")
             {
                 return ParseResult.Fail(ParseError.MissingObject);
             }

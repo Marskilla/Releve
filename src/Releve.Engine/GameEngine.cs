@@ -10,20 +10,30 @@ namespace Releve.Engine;
 public sealed class GameEngine
 {
     private readonly WorldModel _world;
+    private readonly ReplyPicker _replyPicker;
+    private readonly Random _random;
 
-    public GameEngine(WorldModel world, GameState state)
+    public GameEngine(WorldModel world, GameState state, Random? random = null)
     {
         _world = world;
         State = state;
+        _random = random ?? new Random();
+        _replyPicker = new ReplyPicker(_random);
     }
 
     public GameState State { get; }
 
-    /// <summary>A appeler au demarrage : description + OnEnter de la piece courante.</summary>
+    /// <summary>A appeler au demarrage : IntroMessages, Description, OnEnter de la piece courante.</summary>
     public IReadOnlyList<string> Start() => RoomMessages(State.CurrentRoom);
 
     public CommandResult Execute(string input)
     {
+        var words = TextNormalizer.Normalize(input);
+        if (words.Count > 0 && ProfanityFilter.Contains(words))
+        {
+            return CommandResult.Say(_replyPicker.Pick(FlavourText.ProfanityReplies, "ProfanityReplies"));
+        }
+
         var parse = CommandParser.Parse(input, Scope(), ExitWords());
         if (parse.Error == ParseError.Empty)
         {
@@ -32,6 +42,12 @@ public sealed class GameEngine
 
         if (parse.Error != ParseError.None)
         {
+            if (parse.Error == ParseError.UnknownVerb)
+            {
+                var useHumour = _random.NextDouble() < FlavourText.HumourProbability;
+                var list = useHumour ? FlavourText.UnknownHumour : FlavourText.UnknownNeutral;
+                return CommandResult.Say(_replyPicker.Pick(list, useHumour ? "UnknownHumour" : "UnknownNeutral"));
+            }
             return CommandResult.Say(parse.ErrorMessage);
         }
 
@@ -82,7 +98,12 @@ public sealed class GameEngine
         }
 
         var inventory = InventoryItems();
-        return new RoomView(State.CurrentRoom, room.Title, room.ImageKey(State), exits, inventory);
+        var activePatches = room.ImagePatches
+            .Where(p => p.IsActive(State))
+            .Select(p => new ImageRect(p.X1, p.Y1, p.X2, p.Y2))
+            .ToList();
+
+        return new RoomView(State.CurrentRoom, room.Title, room.ImageKey(State), exits, inventory, activePatches);
     }
 
     private CommandResult DefaultBehaviour(Command command)
@@ -92,7 +113,9 @@ public sealed class GameEngine
         {
             return command.Action switch
             {
-                GameAction.Look => CommandResult.Say(_world.Rooms[State.CurrentRoom].Description(State)),
+                GameAction.Look => CommandResult.Say(
+                    _world.Rooms[State.CurrentRoom].DetailedDescription(State)
+                    ?? _world.Rooms[State.CurrentRoom].Description(State)),
                 GameAction.Read => CommandResult.Say(Messages.NothingToRead),
                 GameAction.Inventory => InventoryResult(),
                 _ => CommandResult.Say(Messages.MissingObject),
@@ -107,10 +130,6 @@ public sealed class GameEngine
                 return CommandResult.Say(def.Describe(State));
 
             case GameAction.Read:
-                if (target == ObjectId.Display || target == ObjectId.BedroomMachines)
-                {
-                    return CommandResult.Say(def.Describe(State));
-                }
                 return CommandResult.Say(Messages.NothingToRead);
 
             case GameAction.Take:
@@ -139,7 +158,9 @@ public sealed class GameEngine
 
             case GameAction.Use:
                 return command.Instrument is null
-                    ? CommandResult.Say(Messages.UseWithoutInstrument)
+                    ? (State.IsInInventory(target)
+                        ? CommandResult.Say(Messages.UseWithoutInstrument)
+                        : CommandResult.Say(Messages.NothingHappens))
                     : CommandResult.Say(Messages.NothingHappens);
 
             case GameAction.Talk:
@@ -187,7 +208,9 @@ public sealed class GameEngine
     private IReadOnlyList<string> RoomMessages(RoomId roomId)
     {
         var room = _world.Rooms[roomId];
-        var messages = new List<string> { room.Description(State) };
+        var messages = new List<string>();
+        messages.AddRange(room.IntroMessages(State));
+        messages.Add(room.Description(State));
         messages.AddRange(room.OnEnter(State));
         return messages;
     }
@@ -210,7 +233,7 @@ public sealed class GameEngine
         .Select(kv => new InventoryItem(kv.Key, _world.Objects[kv.Key].Name))
         .ToList();
 
-    /// <summary>Objets accessibles : piece courante ou inventaire, et visibles (Â§6.6).</summary>
+    /// <summary>Objets accessibles : piece courante ou inventaire, et visibles (§6.6).</summary>
     private List<ObjectDef> Scope() => _world.Objects.Values
         .Where(def =>
         {

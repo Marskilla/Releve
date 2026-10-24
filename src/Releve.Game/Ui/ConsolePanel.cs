@@ -27,7 +27,6 @@ public sealed class ConsolePanel
     private bool _scrollDownHover;
     private bool _scrollUpPressed;
     private bool _scrollDownPressed;
-    private int _scrollHoldTimer;
 
     public ConsolePanel(Fonts fonts)
     {
@@ -245,6 +244,7 @@ public sealed class ConsolePanel
     {
         var page = Math.Max(1, _visibleLines - 1);
 
+        // PageUp / PageDown (appui simple)
         if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
         {
             _scroll = Math.Min(_scroll + page, Math.Max(0, _lines.Count - 1));
@@ -253,6 +253,31 @@ public sealed class ConsolePanel
         if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
         {
             _scroll = Math.Max(0, _scroll - page);
+        }
+
+        // Home / End (appui simple)
+        if (Raylib.IsKeyPressed(KeyboardKey.Home))
+        {
+            _scroll = Math.Max(0, _lines.Count - 1);
+        }
+
+        if (Raylib.IsKeyPressed(KeyboardKey.End))
+        {
+            _scroll = 0;
+        }
+
+        // Up / Down (avec repetition)
+        var up = Raylib.IsKeyPressed(KeyboardKey.Up) || Raylib.IsKeyPressedRepeat(KeyboardKey.Up);
+        var down = Raylib.IsKeyPressed(KeyboardKey.Down) || Raylib.IsKeyPressedRepeat(KeyboardKey.Down);
+
+        if (up)
+        {
+            _scroll = Math.Min(_scroll + 1, Math.Max(0, _lines.Count - 1));
+        }
+
+        if (down)
+        {
+            _scroll = Math.Max(0, _scroll - 1);
         }
     }
 
@@ -311,13 +336,16 @@ public sealed class ConsolePanel
 
     private void RecallHistory()
     {
-        if (!Raylib.IsKeyPressed(KeyboardKey.Up) && !Raylib.IsKeyPressed(KeyboardKey.Down))
-        {
-            return;
-        }
-
+        // Historique commandes : seulement si on ne peut pas scroller (en haut/en bas)
+        // Up: rappelle commande precedente si on est deja en haut du scroll
         if (Raylib.IsKeyPressed(KeyboardKey.Up))
         {
+            var canScrollUp = _scroll < Math.Max(0, _lines.Count - 1);
+            if (canScrollUp)
+            {
+                return; // le scroll a deja ete gere dans ScrollWithKeyboard
+            }
+
             if (_sent.Count == 0)
             {
                 return;
@@ -335,8 +363,15 @@ public sealed class ConsolePanel
             _current = _sent[_recallIndex];
             _cursor = _current.Length;
         }
-        else
+        // Down: rappelle commande suivante si on est deja en bas du scroll
+        else if (Raylib.IsKeyPressed(KeyboardKey.Down))
         {
+            var canScrollDown = _scroll > 0;
+            if (canScrollDown)
+            {
+                return; // le scroll a deja ete gere dans ScrollWithKeyboard
+            }
+
             if (_recallIndex == -1)
             {
                 return;

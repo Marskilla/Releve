@@ -1,6 +1,6 @@
 # Relève
 
-Jeu d'aventure textuel et graphique en C# : une console de texte pour interagir, une vue du lieu, des flèches de déplacement et un inventaire.
+Jeu d'aventure textuel et graphique en C# : une console de texte pour interagir, une vue du lieu, des flèches de déplacement et un inventaire. **Version affichée : v0.3** (PoC V3).
 
 ## Structure
 
@@ -8,8 +8,8 @@ Jeu d'aventure textuel et graphique en C# : une console de texte pour interagir,
 |---|---|
 | `src/Releve.Engine` | Moteur : monde, analyseur de commandes, états, sauvegarde. Aucune dépendance à l'affichage ou au son. |
 | `src/Releve.Game` | Interface raylib : fenêtre, disposition, console, menu, audio. |
-| `tests/Releve.Engine.Tests` | Tests xUnit du moteur (cohérence du monde, analyse, sauvegarde). |
-| `src/Releve.Game/assets` | Ressources : police (`fonts/`), images de lieux (`rooms/`), fond de menu (`menu/`), texte d'aide (`texts/`), audio (`audio/`). |
+| `tests/Releve.Engine.Tests` | Tests xUnit du moteur (cohérence du monde, analyse, sauvegarde) — **128 tests**. |
+| `src/Releve.Game/assets` | Ressources : police (`fonts/`), images de lieux (`rooms/`) + variantes `*_AltState.png`, fond de menu (`menu/`), texte d'aide (`texts/`), audio (`audio/`). |
 
 ## Prérequis
 
@@ -41,10 +41,12 @@ Le fichier est `Documents/Releve/save.dat`, chiffré (AES-256-GCM). Il s'agit d'
 
 ## Développement
 
-- `Docs/ArchitectureTechniqueV0.3.md` — architecture technique (V0.4, reflète le code livré après PoC V2) : structure, modèle de domaine, analyseur, sauvegarde, couche raylib, tests, automatisation.
-- `Docs/NoteIntentionJeuAventureV5.md` — intention de jeu (interface et comportement) ; elle prévaut sur le document d'architecture en cas de désaccord.
+- `Docs/ArchitectureTechnique.md` (V0.6) — architecture technique (reflète le code livré après PoC V3) : structure, modèle de domaine, analyseur, sauvegarde, couche raylib, tests, automatisation.
+- `Docs/NoteIntentionJeuAventure.md` (V6) — intention de jeu (interface et comportement) ; elle prévaut sur le document d'architecture en cas de désaccord.
 - `Docs/POC_V1/ImplementationPOCV0.1.md` — plan du PoC V1 (implémenté).
 - `Docs/POC_V1/CompteRenduPOCV0.1.md` — compte rendu du PoC V1.
 - `Docs/POC_V2/ImplementationPOC2V1.0.md` — plan d'implémentation du PoC V2.
-- `Docs/POC_V2/CompteRenduPOC2V0.1.md` — compte rendu du PoC V2 (livré, jouable de bout en bout).
+- `Docs/POC_V2/CompteRenduPOC2V0.1.md` — compte rendu du PoC V2.
+- **`Docs/POC_V3/ImplementationPOC_03.md` — plan du PoC V3 (implémenté).**
+- **`Docs/POC_V3/CompteRenduPOC_03.md` — compte rendu du PoC V3 (ce document).**
 - `AGENTS.md` — consignes de travail pour les sessions de développement assisté.

@@ -3,9 +3,12 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Objects;
 
-/// <summary>Objets de l'accueil de l'hopital (PoC §3.3). Aucun n'est portable.</summary>
+/// <summary>Objets de l’accueil de l’hôpital (PoC §3.3). Aucun n'est portable.</summary>
 public static class HospitalLobbyObjects
 {
+    // Textes partagés pour éviter la duplication (J2.4)
+    public const string DisplayDescription = "L’afficheur indique : 9 octobre 2173.";
+
     public static IReadOnlyDictionary<ObjectId, ObjectDef> Create() => new Dictionary<ObjectId, ObjectDef>
     {
         [ObjectId.Android] = new ObjectDef(
@@ -34,7 +37,7 @@ public static class HospitalLobbyObjects
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
-            Describe: _ => "L’afficheur indique : 9 octobre 2173."),
+            Describe: _ => DisplayDescription),
 
         [ObjectId.Wheelchairs] = new ObjectDef(
             Id: ObjectId.Wheelchairs,
@@ -50,7 +53,7 @@ public static class HospitalLobbyObjects
         [ObjectId.GlassDoor] = new ObjectDef(
             Id: ObjectId.GlassDoor,
             Name: "la porte vitrée",
-            Aliases: new[] { "porte", "porte vitree", "vitre", "rue" },
+            Aliases: new[] { "porte", "porte vitrée", "vitre", "rue" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,

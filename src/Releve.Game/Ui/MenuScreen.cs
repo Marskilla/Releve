@@ -98,6 +98,13 @@ public sealed class MenuScreen
         DrawEntry(0, "Continuer", canContinue ? Palette.Text : Palette.DimText, centre, entryY);
         DrawEntry(1, "Nouvelle partie", Palette.Text, centre, entryY + entrySpacing);
         DrawEntry(2, "Aide", Palette.Text, centre, entryY + entrySpacing * 2);
+
+        // Version en bas à droite (même police que les entrées de menu : 20 px, couleur DimText, ombre légère).
+        var versionText = GameInfo.Version;
+        var versionWidth = _fonts.MeasureWidth(versionText);
+        var versionX = width - Layout.Padding - versionWidth;
+        var versionY = height - Layout.Padding - Fonts.Size;
+        DrawVersionText(versionText, new Vector2(versionX, versionY), Palette.DimText);
     }
 
     private void DrawEntry(int index, string label, Color colour, float centre, float y)
@@ -124,5 +131,13 @@ public sealed class MenuScreen
         var shadowOffset = new Vector2(2, 2);
         _fonts.DrawTitle(text, position + shadowOffset, new Color(0, 0, 0, 180));
         _fonts.DrawTitle(text, position, colour);
+    }
+
+    /// <summary>Dessine la version avec la police standard (20 px) et une ombre discrète.</summary>
+    private void DrawVersionText(string text, Vector2 position, Color colour)
+    {
+        var shadowOffset = new Vector2(1, 1);
+        _fonts.Draw(text, position + shadowOffset, new Color(0, 0, 0, 120));
+        _fonts.Draw(text, position, colour);
     }
 }

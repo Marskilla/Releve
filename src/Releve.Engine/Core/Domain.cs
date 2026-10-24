@@ -68,10 +68,25 @@ public sealed record CommandResult(IReadOnlyList<string> Messages, bool StateCha
 /// <summary>Ligne d'inventaire.</summary>
 public sealed record InventoryItem(ObjectId Id, string Name);
 
+/// <summary>Zone d'image : rectangle source [X1,X2) x [Y1,Y2) et condition d'activation.</summary>
+public sealed record ImagePatch(int X1, int Y1, int X2, int Y2, Func<GameState, bool> IsActive);
+
+/// <summary>Rectangle d'image (coordonnées source).</summary>
+public readonly record struct ImageRect(int X1, int Y1, int X2, int Y2);
+
 /// <summary>Instantane de l'etat a afficher, relu par la couche Game a chaque image.</summary>
 public sealed record RoomView(
     RoomId Room,
     string Title,
     string ImageKey,
     IReadOnlyDictionary<Direction, ExitState> Exits,
-    IReadOnlyList<InventoryItem> Inventory);
+    IReadOnlyList<InventoryItem> Inventory,
+    IReadOnlyList<ImageRect> ActivePatches)
+{
+    // Constructeur de compatibilité pour les appels existants sans ActivePatches
+    public RoomView(RoomId room, string title, string imageKey,
+        IReadOnlyDictionary<Direction, ExitState> exits, IReadOnlyList<InventoryItem> inventory)
+        : this(room, title, imageKey, exits, inventory, Array.Empty<ImageRect>())
+    {
+    }
+}

@@ -94,7 +94,13 @@ public class EngineBehaviourTests
     {
         var engine = TestSupport.FreshTestEngine();
 
-        Assert.Equal(["Précisez sur quoi l'utiliser."], engine.Execute("utilise clef").Messages);
+        // La clef est dans la pièce, pas dans l'inventaire -> "Rien ne se passe."
+        Assert.Equal(["Rien ne se passe."], engine.Execute("utilise clef").Messages);
+
+        // Après avoir pris la clef, "utilise clef" sans instrument -> "Précisez sur quoi l'utiliser."
+        engine.Execute("prends clef");
+        Assert.Equal(["Précisez sur quoi l’utiliser."], engine.Execute("utilise clef").Messages);
+
         Assert.Equal(["Rien ne se passe."], engine.Execute("parle clef").Messages);
     }
 
@@ -132,9 +138,12 @@ public class EngineBehaviourTests
     [Fact]
     public void Errors_Are_Neutral()
     {
-        var engine = TestSupport.FreshTestEngine();
+        var engine = TestSupport.FreshTestEngineWithFixedRandom();
 
-        Assert.Equal(["Cette commande n’est pas comprise."], engine.Execute("saute").Messages);
+        var unknownVerb = engine.Execute("saute").Messages[0];
+        var validResponses = FlavourText.UnknownNeutral.Concat(FlavourText.UnknownHumour).ToArray();
+        Assert.Contains(unknownVerb, validResponses);
+
         Assert.Equal(["Précisez l’objet de la commande."], engine.Execute("prends").Messages);
         Assert.Equal(["Vous ne voyez pas cela ici."], engine.Execute("prends crayon").Messages);
         Assert.Empty(engine.Execute("   ").Messages);

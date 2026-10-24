@@ -15,13 +15,19 @@ public sealed class TechCorridor : RoomBase
         "La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe.";
     private const string BadgeUsedOnStairsReader =
         "Le voyant passe au vert : la porte de l’escalier se déverrouille.";
+    private const string StairsReaderAlreadyUnlocked =
+        "Le lecteur de l’escalier est déjà déverrouillé.";
     private const string BadgeUsedOnTechReader =
         "Le lecteur refuse le badge. Son voyant clignote en rouge.";
     private const string OpenStairsDoorLocked =
-        "La porte de l'escalier est fermée. Le lecteur de badge affiche un rouge fixe.";
-    private const string OpenStairsDoorUnlocked = "La porte de l'escalier est déverrouillée.";
+        "La porte de l’escalier est fermée. Le lecteur de badge affiche un rouge fixe.";
+    private const string OpenStairsDoorUnlocked = "La porte de l’escalier est déverrouillée.";
     private const string OpenTechDoor =
         "La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe.";
+
+    // Coordonnées zones d'image (J5) - image 1774x887
+    private const int StairsDoorX1 = 796, StairsDoorY1 = 205, StairsDoorX2 = 990, StairsDoorY2 = 566;
+    private const int StairsReflectionX1 = 830, StairsReflectionY1 = 566, StairsReflectionX2 = 975, StairsReflectionY2 = 775;
 
     public override RoomId Id => RoomId.TechCorridor;
 
@@ -30,6 +36,17 @@ public sealed class TechCorridor : RoomBase
     public override string ImageKey(GameState s) => "TechCorridor";
 
     public override string Description(GameState s) => RoomDescription;
+
+    /// <summary>Zones d'image actives selon l'etat (J5).</summary>
+    public override IReadOnlyList<ImagePatch> ImagePatches => new[]
+    {
+        // Porte de l'escalier ouverte, panneau de sortie et lecteur associé
+        new ImagePatch(StairsDoorX1, StairsDoorY1, StairsDoorX2, StairsDoorY2,
+            s => s.StateOf(ObjectId.StairsReader) == ObjectState.Unlocked),
+        // Reflet de la porte ouverte sur le sol
+        new ImagePatch(StairsReflectionX1, StairsReflectionY1, StairsReflectionX2, StairsReflectionY2,
+            s => s.StateOf(ObjectId.StairsReader) == ObjectState.Unlocked),
+    };
 
     public override IReadOnlyList<Exit> Exits { get; } = new[]
     {
@@ -44,10 +61,14 @@ public sealed class TechCorridor : RoomBase
     {
         if (c.Action == GameAction.Use && c.Target == ObjectId.StairsReader)
         {
-            if (c.Instrument != ObjectId.Badge
-                || s.StateOf(ObjectId.StairsReader) == ObjectState.Unlocked)
+            if (c.Instrument != ObjectId.Badge)
             {
-                return null; // autre instrument ou lecteur deja deverrouille : comportement par defaut
+                return null; // autre instrument : comportement par defaut
+            }
+
+            if (s.StateOf(ObjectId.StairsReader) == ObjectState.Unlocked)
+            {
+                return CommandResult.Say(StairsReaderAlreadyUnlocked);
             }
 
             s.States[ObjectId.StairsReader] = ObjectState.Unlocked;

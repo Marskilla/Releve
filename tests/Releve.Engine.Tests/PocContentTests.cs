@@ -102,7 +102,7 @@ public class PocContentTests
 
         // Sac dans la chambre : la corbeille le contient.
         Assert.Equal(
-            ["Une corbeille. Elle ne contient qu'un sac poubelle vide."],
+            ["Une corbeille. Elle ne contient qu’un sac poubelle vide."],
             engine.Execute("regarde corbeille").Messages);
 
         // Le sac passe dans l'inventaire : la corbeille est vide.
@@ -225,7 +225,7 @@ public class PocContentTests
 
         // Badge dans l'inventaire, mais « utilise badge » n'a pas d'instrument.
         var result = engine.Execute("utilise badge");
-        Assert.Equal(["Précisez sur quoi l'utiliser."], result.Messages);
+        Assert.Equal(["Précisez sur quoi l’utiliser."], result.Messages);
         Assert.False(result.StateChanged);
     }
 
@@ -243,13 +243,13 @@ public class PocContentTests
         var corridor = EngineInCorridor();
         var escalierVerrouille = corridor.Execute("ouvre porte de l'escalier");
         Assert.Equal(
-            ["La porte de l'escalier est fermée. Le lecteur de badge affiche un rouge fixe."],
+            ["La porte de l’escalier est fermée. Le lecteur de badge affiche un rouge fixe."],
             escalierVerrouille.Messages);
 
         // Couloir : apres deverrouillage, porte de l'escalier ouverte.
         corridor.Execute("utilise badge sur lecteur escalier");
         var escalierOuvert = corridor.Execute("ouvre porte de l'escalier");
-        Assert.Equal(["La porte de l'escalier est déverrouillée."], escalierOuvert.Messages);
+        Assert.Equal(["La porte de l’escalier est déverrouillée."], escalierOuvert.Messages);
 
         // Couloir : porte du local technique, toujours refusee.
         var localTechnique = corridor.Execute("ouvre porte technique");
@@ -260,19 +260,17 @@ public class PocContentTests
         // Accueil : porte vitree verrouillee.
         var lobby = EngineInLobby();
         var vitreeFermee = lobby.Execute("ouvre porte vitree");
-        Assert.Equal(["La porte vitrée de l'entrée reste fermée."], vitreeFermee.Messages);
+        Assert.Equal(["La porte vitrée de l’entrée reste fermée."], vitreeFermee.Messages);
 
         // Accueil : apres activation du borne, porte vitree ouverte.
         lobby.Execute("passe le badge sur la borne");
         var vitreeOuverte = lobby.Execute("ouvre porte vitree");
-        Assert.Equal(
-            ["La porte vitrée est déverrouillée. Le passage est libre vers l'ouest."],
-            vitreeOuverte.Messages);
+        Assert.Equal(["La porte vitrée de l’entrée se déverrouille."], vitreeOuverte.Messages);
 
         // Accueil : ascenseur, toujours refuse.
         var ascenseur = lobby.Execute("ouvre ascenseur");
         Assert.Equal(
-            ["Les portes de l'ascenseur restent closes. Le lecteur de badge affiche un rouge fixe."],
+            ["Les portes de l’ascenseur restent closes. Le lecteur de badge affiche un rouge fixe."],
             ascenseur.Messages);
     }
 
@@ -299,7 +297,7 @@ public class PocContentTests
 
         // « pousse » et « actionne » sont des verbes Use.
         var pousse = corridor.Execute("pousse lecteur escalier");
-        Assert.Contains("Précisez", pousse.Messages[0]); // pas d'instrument -> UseWithoutInstrument
+        Assert.Equal(["Rien ne se passe."], pousse.Messages); // cible pas dans l'inventaire -> NothingHappens
 
         // « utilise badge sur lecteur escalier » fonctionne deja (instrument present).
         var actionne = corridor.Execute("actionne badge sur lecteur escalier");
@@ -357,11 +355,11 @@ public class PocContentTests
     {
         var engine = CreateEngine();
 
-        // 1. depart : description de la piece, puis annonce de reveil ; fleche est bloquee.
+        // 1. depart : message d'accueil, puis description courte ; fleche est bloquee.
         var start = engine.Start();
         Assert.Equal(2, start.Count);
-        Assert.Equal("Vous portez une blouse médicale. La pièce est propre, éclairée, sans fenêtre.", start[0]);
-        Assert.Equal("Une voix de synthèse annonce : « Réveil terminé, constantes stables. »", start[1]);
+        Assert.Equal("Alors que vous ouvrez doucement les yeux, une voix de synthèse annonce : « Réveil terminé, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d’hôpital, la tenue standard des malades alités.", start[0]);
+        Assert.Equal("La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire.", start[1]);
         Assert.Equal(ExitState.Blocked, engine.GetView().Exits[Direction.East]);
 
         // 2. « est » : message de porte fermee, sans indiquer comment debloquer.
@@ -464,7 +462,7 @@ public class PocContentTests
             Assert.Equal(ObjectState.Activated, restored.State.StateOf(ObjectId.Terminal));
             Assert.Contains(GameEvent.WakeAnnouncementDone, restored.State.Events);
             Assert.Equal(ExitState.Open, restored.GetView().Exits[Direction.East]);
-            Assert.DoesNotContain(messages, m => m.Contains("voix de synthèse", StringComparison.Ordinal));
+            Assert.DoesNotContain(messages, m => m.Contains("ouvrez doucement les yeux", StringComparison.Ordinal));
         }
         finally
         {

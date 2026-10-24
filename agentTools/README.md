@@ -6,6 +6,13 @@ clavier, captures d'écran, vérification des états de flèche par mesure pixel
 Ces outils ne font **pas partie du build** : aucun fichier `.cs` ici, rien à compiler,
 `dotnet build` et `dotnet test` restent strictement inchangés.
 
+## Limites d'automatisation (validation humaine requise)
+
+- **Souris** : survol/clic sur les entrées du menu, les indicateurs de défileur (console/visualiseur), le bouton « Fermer » — ne peuvent pas être pilotés par `agentTools/` (pas d'injection souris fiable).
+- **Fondu (fade)** : transitions noir/ouverture (durées 0,6 s / 0,8 s) — impossible à chronométrer ni valider sans observation visuelle.
+- **Répétition de touche maintenue** (`Retour arrière`, `Suppr`, flèches directionnelles) : `IsKeyPressedRepeat` est implémenté dans le moteur, mais `agentTools/` ne peut pas le valider comme un vrai clavier.
+- **`Wait-ReleveGameWindow`** : la recette de rejeu du compte rendu du PoC V2 appelle cette fonction, mais elle n'est **pas listée** dans le tableau des fonctions ci-dessus (cf. §8.3 du PoC V3). Ne pas s'y fier avant de l'avoir testée au regard de la contrainte d'injection sans fenêtre (piège 1).
+
 ## Prérequis
 
 - Windows, PowerShell 5.1 (celui de VS Code convient).

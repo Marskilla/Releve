@@ -1,9 +1,10 @@
+using Releve.Engine.Content.Objects;
 using Releve.Engine.Core;
 using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Rooms;
 
-/// <summary>Accueil de l'hopital (lore §5.3, PoC §3.3).</summary>
+/// <summary>Accueil de l’hôpital (lore §5.3, PoC §3.3).</summary>
 public sealed class HospitalLobby : RoomBase
 {
     private const string RoomTitle = "Accueil de l’hôpital";
@@ -17,10 +18,12 @@ public sealed class HospitalLobby : RoomBase
     private const string TerminalUnlockedMessage = "La porte vitrée de l’entrée se déverrouille.";
     private const string ElevatorReaderRefuses = "Le lecteur refuse le badge.";
     private const string ButtonDoesNothing = "Le bouton ne produit aucun effet.";
-    private const string OpenGlassDoorLocked = "La porte vitrée de l'entrée reste fermée.";
-    private const string OpenGlassDoorUnlocked = "La porte vitrée est déverrouillée. Le passage est libre vers l'ouest.";
-    private const string OpenElevator =
-        "Les portes de l'ascenseur restent closes. Le lecteur de badge affiche un rouge fixe.";
+    // OpenGlassDoorLocked réutilise WestBlockedMessage (J1.2)
+    // OpenGlassDoorUnlocked réutilise TerminalUnlockedMessage (J1.2)
+    private const string OpenElevator = NorthBlockedMessage; // réutilise la constante (J1.2)
+
+    // Coordonnées zones d'image (J5) - image 1774x887
+    private const int GlassDoorX1 = 88, GlassDoorY1 = 150, GlassDoorX2 = 272, GlassDoorY2 = 668;
 
     // Fiche patient : texte du lore, repris a l'identique (PoC §3.3).
     private static readonly string[] PatientRecord =
@@ -41,6 +44,14 @@ public sealed class HospitalLobby : RoomBase
     public override string ImageKey(GameState s) => "HospitalLobby";
 
     public override string Description(GameState s) => RoomDescription;
+
+    /// <summary>Zones d'image actives selon l'etat (J5).</summary>
+    public override IReadOnlyList<ImagePatch> ImagePatches => new[]
+    {
+        // Porte vitrée de sortie ouverte
+        new ImagePatch(GlassDoorX1, GlassDoorY1, GlassDoorX2, GlassDoorY2,
+            s => s.StateOf(ObjectId.Terminal) == ObjectState.Activated),
+    };
 
     public override IReadOnlyList<Exit> Exits { get; } = new[]
     {
@@ -89,15 +100,21 @@ public sealed class HospitalLobby : RoomBase
         {
             if (s.StateOf(ObjectId.Terminal) != ObjectState.Activated)
             {
-                return CommandResult.Say(OpenGlassDoorLocked);
+                return CommandResult.Say(WestBlockedMessage);
             }
-            return CommandResult.Say(OpenGlassDoorUnlocked);
+            return CommandResult.Say(TerminalUnlockedMessage);
         }
 
         // « ouvre ascenseur ».
         if (c.Action == GameAction.Open && c.Target == ObjectId.Elevator)
         {
-            return CommandResult.Say(OpenElevator);
+            return CommandResult.Say(NorthBlockedMessage);
+        }
+
+        // « lis afficheur » : même texte que Describe.
+        if (c.Action == GameAction.Read && c.Target == ObjectId.Display)
+        {
+            return CommandResult.Say(HospitalLobbyObjects.DisplayDescription);
         }
 
         return null;
