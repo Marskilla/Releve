@@ -1,6 +1,15 @@
 # Relève
 
-Jeu d'aventure textuel et graphique en C# : une console de texte pour interagir, une vue du lieu, des flèches de déplacement et un inventaire. **Version affichée : v0.3** (PoC V3).
+Jeu d'aventure textuel et graphique en C# : une console de texte pour interagir, une vue du lieu, des flèches de déplacement et un inventaire. **Version affichée : v0.3** (PoC V3 — terminé, 128 tests).
+
+## Fonctionnalités principales (PoC V3)
+
+- **Moteur pur** (`Releve.Engine`) : analyseur de commandes français, états objets/pièces, événements, sauvegarde chiffrée AES-256-GCM.
+- **Interface raylib** (`Releve.Game`) : console enrichie (scroll clavier + historique LIFO), vue de lieu avec zones d'image actives selon l'état (`*_AltState.png`), inventaire, menu principal cliquable à la souris, fondu au démarrage.
+- **Raccourcis clavier** : flèches seules = déplacement ; **Shift+flèches** = rappel historique commandes (LIFO, terminal-like) ; **Ctrl+flèches** = scroll inventaire ; **PageUp/PageDown** = scroll console.
+- **Visualiseur de texte** (`TextViewer`) : scroll souris avec indicateurs cliquables (30×30 px, 3 lignes/clic), survol stylé, anti-clic fantôme.
+- **Réponses variées** : messages neutres/humoristiques selon contexte, filtre grossièretés.
+- **4 lieux, 22 objets, 8 événements** — monde PoC cohérent (chambre, couloir technique, accueil hôpital, rue).
 
 ## Structure
 
@@ -44,9 +53,9 @@ Le fichier est `Documents/Releve/save.dat`, chiffré (AES-256-GCM). Il s'agit d'
 - `Docs/ArchitectureTechnique.md` (V0.6) — architecture technique (reflète le code livré après PoC V3) : structure, modèle de domaine, analyseur, sauvegarde, couche raylib, tests, automatisation.
 - `Docs/NoteIntentionJeuAventure.md` (V6) — intention de jeu (interface et comportement) ; elle prévaut sur le document d'architecture en cas de désaccord.
 - `Docs/POC_V1/ImplementationPOCV0.1.md` — plan du PoC V1 (implémenté).
-- `Docs/POC_V1/CompteRenduPOCV0.1.md` — compte rendu du PoC V1.
+- `Docs/POC_V1/CompteRenduPOCV0.1.md` — compte rendu du PoC V1 (4 lieux, 22 objets, 83 tests).
 - `Docs/POC_V2/ImplementationPOC2V1.0.md` — plan d'implémentation du PoC V2.
-- `Docs/POC_V2/CompteRenduPOC2V0.1.md` — compte rendu du PoC V2.
-- **`Docs/POC_V3/ImplementationPOC_03.md` — plan du PoC V3 (implémenté).**
-- **`Docs/POC_V3/CompteRenduPOC_03.md` — compte rendu du PoC V3 (ce document).**
+- `Docs/POC_V2/CompteRenduPOC2V0.1.md` — compte rendu du PoC V2 (menu, fond, aide, audio, police).
+- `Docs/POC_V3/ImplementationPOC_03.md` — plan du PoC V3 (implémenté, jalons J0–J8).
+- `Docs/POC_V3/CompteRenduPOC_03.md` — compte rendu du PoC V3 (128 tests, corrections post-livraison, raccourcis clavier, TextViewer souris).
 - `AGENTS.md` — consignes de travail pour les sessions de développement assisté.
