@@ -1,38 +1,43 @@
 Features attendues du poc V4
 
--scrolling des images des lieux lors des déplacements : lorsque le joueur se deplace (par exemple avec ouest) un scrolling de la zone d'image est effectué dans un sens cohérent avec la direction (donc dans l'exemple : de la chambre au couloir technique l'image du couloir technique apparaît et l'image de la chambre disparait avec un scrolling vers la gauche). Le scroll ne doit pas être trop rapide pour qu'il soit perçu par le joueur et ne pas excéder 0,5 secondes
+-Scrolling des images des lieux lors des déplacements : lorsque le joueur se deplace (par exemple avec ouest) un scrolling de la zone d'image est effectué dans un sens cohérent avec la direction (donc dans l'exemple : de la chambre au couloir technique l'image du couloir technique apparaît et l'image de la chambre disparait avec un scrolling vers la gauche). Le scroll ne doit pas être trop rapide pour qu'il soit perçu par le joueur et ne pas excéder 0,5 secondes
 
--je voudrais que tu me génères un fichier pour remplacer le lorem ipsum présent dans "\src\Releve.Game\assets\texts\help.txt". Ce fichier d'aide n'aura aucune révélation du lore ou du but du jeu et ne comprendra l'explication que des principes du gameplay  : interactions au clavier avec des prompts, inventaire, exemple d'actions disponibles (mais pas toutes car ça fait partie du jeu de découvrir les actions / verbes compris par le jeu avec des essais), commandes d'interaction au clavier (flèches du curseur, page up / page down, shift + fleches, etc.), il faudra donner la commande pour quitter. Bref le minimum pour connaitre toutes les commandes et le principe de gameplay. Pour information : je complèterai moi-même ce fichier avec des paragraphes expliquant les influences, les outils et IA utilisées, etc. Ne le fait donc pas et ce que tu produira ne serait pas tel quel dans le jeu.
+-Je voudrais que tu me génères un fichier pour remplacer le lorem ipsum présent dans "\src\Releve.Game\assets\texts\help.txt". Ce fichier d'aide n'aura aucune révélation du lore ou du but du jeu et ne comprendra l'explication que des principes du gameplay  : interactions au clavier avec des prompts, inventaire, exemple d'actions disponibles (mais pas toutes car ça fait partie du jeu de découvrir les actions / verbes compris par le jeu avec des essais), commandes d'interaction au clavier (flèches du curseur, page up / page down, shift + fleches, etc.), il faudra donner la commande pour quitter. Bref le minimum pour connaitre toutes les commandes principales et le principe de gameplay. Pour information : je complèterai moi-même ce fichier avec des paragraphes expliquant les influences, les outils et IA utilisées, etc. Ne le fais donc pas et ce que tu produiras ne sera pas tel quel dans le jeu. En revanche je veux que tu ajoutes un paragraphe avec les licences utilisées (.net, raylib, la fonte déjà vu, etc.)
 
--ajout d'une icone pour le jeu (ico) : je voudrais que tu me génères un prompt pour faire produire une icone carrée représentative du jeu dans le style des graphismes du jeu. Ce sera un fichier ico de 64x64 ou max 128x128 donc il ne faut pas mettre trop de détail, je te laisse être créatif pour trouver un truc qui représente bien le jeu dans une petite image. Je me chargerai de la convertir en fichier ico et de l'ajouter dans un fichier \src\Releve.Game\assets\icons\releve.ico . En revanche il faudra que l'agent de code modifie les sources pour que le build de l'application la prenne en compte pour construire le fichier exe.
+-Ajout d'une icone pour le jeu (ico) : je voudrais que tu me génères un prompt pour faire produire une icone carrée représentative du jeu dans le style des graphismes du jeu. Ce sera un fichier ico qui varie entre une taille de 256x256 jusqu'à une taille de 16x16. Il ne faut pas mettre trop de détails, je te laisse être créatif pour trouver un truc qui représente bien le jeu dans une petite image. Je me chargerai de la convertir en fichier ico et de l'ajouter dans un fichier \src\Releve.Game\assets\icons\releve.ico . En revanche, il faudra que l'agent de code modifie les sources pour que le build de l'application la prenne en compte pour construire le fichier exe.
 
--gestion du fullscreen : je voudrais que le jeu soit basculable en plein écran. Et correctement ! : sans casser les proportions de l'interface, que les images soient étirées comme il faut, etc. C'est la combinaison de touches alt+entrée qui effectuera la bascule entre le mode fenêtré actuel (taille fixe) et le plein écran.
+-Gestion du fullscreen : je voudrais que le jeu soit basculable en plein écran. Et correctement ! : sans casser les proportions de l'interface, que les images soient étirées comme il faut, etc. C'est la combinaison de touches alt+entrée qui effectuera la bascule entre le mode fenêtré actuel (taille fixe) et le plein écran.
 
--ajout d'un item "options" au menu (avant l'item "aide"). La sélection de cet item ouvrira une nouvelle fenetre modale sur le menu du jeu et comportera trois controles
+-Ajout d'un item "options" au menu (avant l'item "aide"). La sélection de cet item ouvrira une nouvelle fenetre modale sur le menu du jeu et comportera trois controles
     - Une case à cocher "musique" pour basculer la musique on/off
     - Une case à cocher "fullscreen" pour basculer le plein écran on/off
     - Un bouton "fermer" pour revenir au menu
 la navigation dans ce sous menu doit pouvoir être faite au clavier ou à la souris (cases à cocher, bouton fermer)
 
--Nous allons ajouter un script InnoSetup pour faire le packaging/installeur. Mais c'est toi qui va m'aider à le faire, pas l'agent de code : il créera un package d'installation à partir du contenu de \src\Releve.Game\bin\Release\net8.0\win-x64\publish mais ne prendra pas les fichiers qui sont clairement optionnels à une exécution (les fichiers pdb par exemple, et je ne sais pas si tous les fichiers json sont bien utiles : par exemple Releve.Game.deps.json). Le but est de faire un .exe d'installation avec la même icone que le jeu avec un fichier de contenu à côté. Je sais qu'on peut faire ça dans InnoSetup plutôt que d'avoir un gros exe qui met en peine les antivirus. Je vais aussi avoir besoin d'un prompt pour générer l'image qui sera affichée dans l'installeur. Je te laisse être créatif pour ça mais il faut que les graphismes soient dans le même style que le jeu. J'ai initié un script dans \Innosetup\InnoSetupReleve.iss dont voici le contenu :
-On peut tout à fait réaliser ce point avant de rédiger le doc du POC V4 (on va s'en occuper tous les deux), c'est juste que le fichier ISS partira dans git avec les sources du poc V4.
-Le repertoire de destination du package sera \Innosetup\publish il faut prévoir de générer un .gitignore pour ne pas envoyer ça dans les sources. On enverra juste le iss.
+-Pour le Poc et la suite du projet, j'ai ajouté un script InnoSetup pour faire le packaging/installeur. Pour customiser l'installeur je vais aussi avoir besoin de deux prompts pour générer les images qui seront affichées dans l'installeur. Je te laisse être créatif pour ça mais il faut que les graphismes soient dans le même style que le jeu. Et rendent bien dans un thème light comme dans un thème dark.
+Je vais avoir besoin d'un prompt pour l'image "WizardImageFile"/"WizardImageFileDynamicDark" et d'un autre pour "WizardSmallImageFile"/"WizardSmallImageFileDynamicDark".
+Tu trouveras de la documentation sur les contraintes techniques à respecter à ces addresses : https://jrsoftware.org/ishelp/index.php?topic=setup_wizardimagefile , https://jrsoftware.org/ishelp/index.php?topic=setup_wizardimagefiledynamicdark, https://jrsoftware.org/ishelp/index.php?topic=setup_wizardsmallimagefile, https://jrsoftware.org/ishelp/index.php?topic=setup_wizardsmallimagefiledynamicdark, https://jrsoftware.org/ishelp/index.php?topic=setup_wizardstyle
+Il est important de noter que si un dossier InnoSetup (avec le fichier iss et les images) a été ajouté au repo l'agent de code n'interviendra pas sur cette partie. Je prends à ma charge l'installeur et les fichiers seront là quand l'agent de code va commencer à bosser. On va gérer ça que tous les deux.
 
--dans la chambre de l'hoptial sur un regarde / examine "materiel" ou "matériel médical" devra avoir le même retour que regarde machine (ajout synonyme)
+-Dans la chambre de l'hoptial sur un regarde / examine "materiel" ou "matériel médical" devra avoir le même retour que regarde machine (ajout synonyme)
 
--dans le couloir la commande "utilise badge sur lecteur local technique" renvoie "vous ne voyez pas cela ici" alors que "utilise badge sur lecteur local" fonctionne correctement et renvoie ce qui est attendu : "Le lecteur refuse le badge..."
+-Dans le couloir technique la commande "utilise badge sur lecteur local technique" renvoie "vous ne voyez pas cela ici" alors que "utilise badge sur lecteur local" fonctionne correctement et renvoie ce qui est attendu : "Le lecteur refuse le badge...". Il faut que "local technique" soit un synonyme de "local"
 
--dans le lobby de l'hopital, si on fait ouest avec la porte fermée, le programme répond "La porte vitrée de l'entrée reste fermée", il faudrait une autre reponse "La porte vitrée de l'entrée est fermée. L'androide s'adresse alors à vous «S'il vous plait !» vous invitant à aller le voir"
+-Dans le couloir technique la commande "regarde porte local technique" renvoie "vous ne voyez pas cela ici" alors que "regarde porte local" fonctionne correctement et revoie ce qui est attendu : "Une porte pleine à hublot. A travers on distingue...". Il faut que "local technique" soit un synonyme de "local"
 
--dans le lobby de l'hopital, la commande "parle androide" donne une réponse peu satisfaisante "L'andoide s'anime. Veuillez passez votre badge pour sortir" Il faudrait l'élaborer un peu plus "L'androide qui semblait être en pause prend vie il s'adresse alors à vous « la politique de l'établissement nous empêche de laisser sortir des patient sans avoir émargé auparavant. Passez votre badge sur la borne du comptoir pour émarger, merci.»"
+-Dans le couloir technique je voudrais que lorsque le joueur fasse un "regarde porte local technique", en plus de renvoyer une description texte, on affiche dans une fenêtre modale carrée dans le centre de l'écran (60% de la hauteur de la fenêtre de jeu) qui dispose d'un bouton fermer cliquable (ou qui se ferme avec ESC, tout doit être faisable au clavier). Il faudrait que tu me génère un prompt dans le même style graphique que le reste du jeu ce que verrait le joueur s'il était derrière la porte : au travers d'un hublot, la chaufferie, les lave linge, les compteurs électriques. Il n'y aura par définition pas d'altState. Je ferai générer cette image et la mettrai dans \src\Releve.Game\assets\views\technicalRoom.png.
 
--dans le lobby de l'hopital, la description devrait indiquer qu'une horloge/un afficheur est présent au dessus du comptoir pour inviter le joueur à le lire.
+-Dans le lobby de l'hopital, si on fait "ouest" avec la porte fermée, le programme répond "La porte vitrée de l'entrée reste fermée", il faudrait une autre reponse "La porte vitrée de l'entrée est fermée. L'androide s'adresse alors à vous «S'il vous plait !» vous invitant à aller le voir". Faut guider un peu le joueur (sans lui dire explicitement ce qu'il doit faire non plus).
 
--dans le lobby de l'hopital, quand on passe le badge sur la borne, plutôt que d'utiliser le retour dans la zone de prompt, on utilise l'afficheur de texte utilisé jusqu'ici pour l'aide, mais cette fois, sans recouvrir tout l'écran (on utilise 60% de la surface, c'est ce qui sera utilisé pour l'utilisation du visalisateur ingame) pour afficher le contenu du dossier du patient (HospitalLobby.PatientRecord). Le bouton "Fermer" du visualisateur aura pour libellé "J'accepte de sortir". Sur fermeture du visualisateur la porte ouest sera ouverte.
+-Dans le lobby de l'hopital, la commande "parle androide" donne une réponse peu satisfaisante "L'andoide s'anime. Veuillez passez votre badge pour sortir" Il faudrait l'élaborer un peu plus "L'androide qui semblait être en pause prend vie il s'adresse alors à vous « la politique de l'établissement nous empêche de laisser sortir des patient sans avoir émargé auparavant. Passez votre badge sur la borne du comptoir pour émarger, merci.»"
+
+-Dans le lobby de l'hopital, la description devrait indiquer qu'une horloge/un afficheur est présent au dessus du comptoir pour inviter le joueur à le lire. et si le joueur fait "examine horloge" ou "examine afficheur" il faut qu'il aie la réponse de la date du jour.
+
+-Dans le lobby de l'hopital, quand on passe le badge sur la borne, plutôt que d'utiliser le retour dans la zone de prompt, on utilise l'afficheur de texte utilisé jusqu'ici pour l'aide, mais cette fois, sans recouvrir tout l'écran (on utilise 60% de la surface, c'est ce qui sera utilisé pour l'utilisation du visalisateur ingame) pour afficher le contenu du dossier du patient (HospitalLobby.PatientRecord). Au lieu du bouton "Fermer" du visualisateur pour l'aide du menu. Il y aura deux boutons cliquable un qui aura pour libellé "J'accepte de sortir" Et qu'on pourra sélectionner au clavier, l'autre qui aura "Je ne suis pas prêt à sortir". Sur sélection de "j'accepte de sortir", fermeture du visualisateur, la porte ouest sera ouverte et l'android doit maintenant se comporter conformément à ça : quand on lui parle il dit un truc du genre "Merci d'avoir fait appel à nos services, et j'espère pour vous ne pas vous revoir bientôt ah ah ah". Si l'utilisateur a choisi "je ne suis pas prêt" l'état ne change pas (porte fermée, etc.)
 
 -J'avais aussi identifié de mon côté le problème dans les contrôles : quand on utilise les fleches du curseur du clavier, le curseur du prompt se déplace dans la zone de texte et le programme envoie également "est" et "ouest". Le raccourci d'envoi de est et ouest avec les touches → et ← du clavier ne sont envoyés au jeu que quand le prompt est vide de toute saisie utilisateur
 
--Lorsqu'on publie l'application avec "dotnet publish -c Release -r win-x64 --self-contained" le programme Releve.Game.exe lance une console avec des messages exemple :
+-Lorsqu'on publie l'application avec "dotnet publish -c Release -r win-x64 --self-contained" le programme Releve.Game.exe lance en même temps que le jeu une console avec des messages exemple :
     INFO: Initializing raylib 6.0
     INFO: Platform backend: DESKTOP (GLFW)
     INFO: Supported raylib modules:
@@ -44,3 +49,28 @@ Le repertoire de destination du package sera \Innosetup\publish il faut prévoir
     INFO:     > rmodels:... loaded (optional)
     INFO:     > raudio:.... loaded (optional)
 il faudrait un moyen de builder en release / publish (avec le framework selfcontained) sans cette console.
+
+Et afin que tu saches pourquoi ce POC sera bien le dernier, car ça avait l'air de te tracasser ou tu semblais être préssé d'en finir avec ces Pocs dans une autre conversation.
+- On a le socle technique complet (.net raylib) qui compile et fonctionne
+- On a toutes les features techniques importantes du jeu :
+    -menu
+    -sauvegarde du jeu
+    -musique
+    -plein écran / fenêtré
+    -afficheur de fenêtre texte ingame (ce qui va nous être partique pour la lettre des parents par exemple) ou sur le menu, avec des options sélectionnable (ce qui nous sera utile pour la décision de fin de jeu, tu te souviens ?)
+    -afficheur d'image sur certaines commandes (pour donner un visuel genre "zoom sur objet" ou un aperçu d'une pièce dans laquelle le joueur ne pourra se déplacer)
+    -contrôles clavier complet (rappel des commandes, déplacement, inventaire, etc.)
+    -gestion de la souris
+    -modification d'élements graphiques unitaires selon les états (armoire ouverte / fermée)
+    -fullscreen / fenêtré
+    -une UI valable avec l'affichage des déplacements fonctionnels
+    -gestion des prompts utilisateurs
+    -etc (tu connais le périmètre aussi bien que moi).
+- On a le package de release
+- On a un périmètre de lore implémenté simple, mais qui correspond au jeu final avec les fonctionnalités attendues
+- On a fait des graphismes qui nous permettent de générer des prompts dans un style graphique homogène (dans une autre conversation)
+- On a une documentation solide
+Donc j'estime qu'on a pas perdu notre temps du tout en faisant ces Pocs. On sait ce que le jeu technique sera... on pourra donc définir le scénario de manière précise et cohérente avec ce que le jeu peut faire.
+Et toi tu ne ressens pas ça car tu es une IA mais de voir le produit final avancer et ressembler de plus en plus à ce que le jeu sera au final est extrêmement motivant pour moi.
+Tu te rends compte ? Avec ce dernier POC je disposerai quasiment d'une demo publiable !
+On va donc pouvoir travailler sur le scénario/lore quand tout ça sera fait.
