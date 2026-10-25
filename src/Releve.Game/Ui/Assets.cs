@@ -18,6 +18,9 @@ public static class Assets
     /// <summary>Texte d'aide (lot C4).</summary>
     public static string HelpText => Combine("texts", "help.txt");
 
+    /// <summary>J9-5: Image pour visualiseur modal (dossier assets/views).</summary>
+    public static string ViewImage(string key) => Combine("views", key + ".png");
+
     private static string ResolveRoot()
     {
         // Les assets sont copies a cote de l'exe.

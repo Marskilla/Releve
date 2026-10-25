@@ -5,7 +5,7 @@ using Releve.Engine.Core;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Inventaire : liste verticale de libellés (§9.3), défilement Ctrl+Haut/Ctrl+Bas (sans Shift) et PageHaut/PageBas (§9.4).
+/// Inventaire : liste verticale de libellés (§9.3), défilement Ctrl+Haut/Ctrl+Bas (sans Shift).
 /// </summary>
 public sealed class InventoryPanel
 {

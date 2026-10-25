@@ -3,23 +3,23 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Objects;
 
-/// <summary>Objets de l’accueil de l’hôpital (PoC §3.3). Aucun n'est portable.</summary>
+/// <summary>Objets de l'accueil de l'hopital (PoC §3.3). Aucun n'est portable.</summary>
 public static class HospitalLobbyObjects
 {
     // Textes partagés pour éviter la duplication (J2.4)
-    public const string DisplayDescription = "L’afficheur indique : 9 octobre 2173.";
+    public const string DisplayDescription = "L'afficheur indique : 9 octobre 2173.";
 
     public static IReadOnlyDictionary<ObjectId, ObjectDef> Create() => new Dictionary<ObjectId, ObjectDef>
     {
         [ObjectId.Android] = new ObjectDef(
             Id: ObjectId.Android,
-            Name: "l’androïde",
+            Name: "l'androide",
             Aliases: new[] { "androide", "android", "robot" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
             Describe: _ =>
-                "Un androïde à l’allure humanoïde sobre, immobile derrière le comptoir, en position d’attente."),
+                "Un androide a l'allure humanoide sobre, immobile derriere le comptoir, en position d'attente."),
 
         [ObjectId.Terminal] = new ObjectDef(
             Id: ObjectId.Terminal,
@@ -28,12 +28,12 @@ public static class HospitalLobbyObjects
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
-            Describe: _ => "Une borne interactive équipée d’un lecteur de badge."),
+            Describe: _ => "Une borne interactive equipee d'un lecteur de badge."),
 
         [ObjectId.Display] = new ObjectDef(
             Id: ObjectId.Display,
-            Name: "l’afficheur",
-            Aliases: new[] { "afficheur", "date", "affichage" },
+            Name: "l'afficheur",
+            Aliases: new[] { "afficheur", "date", "affichage", "horloge" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
@@ -42,7 +42,7 @@ public static class HospitalLobbyObjects
         [ObjectId.Wheelchairs] = new ObjectDef(
             Id: ObjectId.Wheelchairs,
             Name: "les fauteuils et brancards",
-            Aliases: new[] { "fauteuil", "fauteuils", "fauteuil roulant", "brancard", "brancards" },
+            Aliases: new[] { "fauteuil", "fauteuils", "fauteuil roulant", "brancard", "brancards", "fauteuils et brancards" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
@@ -71,17 +71,17 @@ public static class HospitalLobbyObjects
 
         [ObjectId.Elevator] = new ObjectDef(
             Id: ObjectId.Elevator,
-            Name: "l’ascenseur",
+            Name: "l'ascenseur",
             Aliases: new[] { "ascenseur" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
             Describe: _ =>
-                "Les portes métalliques d’un ascenseur, avec un lecteur de badge et un unique bouton."),
+                "Les portes metalliques d'un ascenseur, avec un lecteur de badge et un unique bouton."),
 
         [ObjectId.ElevatorReader] = new ObjectDef(
             Id: ObjectId.ElevatorReader,
-            Name: "le lecteur de l’ascenseur",
+            Name: "le lecteur de l'ascenseur",
             Aliases: new[] { "lecteur", "lecteur ascenseur" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),

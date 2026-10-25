@@ -38,20 +38,20 @@ public sealed class MenuScreen
     }
 
     /// <summary>Choix retourne par le menu.</summary>
-    public enum MenuChoice { Continue, NewGame, Help }
+    public enum MenuChoice { Continue, NewGame, Options, Help }
 
     /// <summary>Renvoie le choix lorsque le joueur valide, null sinon.</summary>
     public MenuChoice? Update(bool canContinue)
     {
-        // Clavier (inchangé)
+        // Clavier (navigation cyclique sur 4 entrees)
         if (Raylib.IsKeyPressed(KeyboardKey.Up))
         {
-            _selected = (_selected - 1 + 3) % 3;
+            _selected = (_selected - 1 + 4) % 4;
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Down))
         {
-            _selected = (_selected + 1) % 3;
+            _selected = (_selected + 1) % 4;
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Enter) || Raylib.IsKeyPressed(KeyboardKey.KpEnter))
@@ -65,6 +65,7 @@ public sealed class MenuScreen
             {
                 0 => MenuChoice.Continue,
                 1 => MenuChoice.NewGame,
+                2 => MenuChoice.Options,
                 _ => MenuChoice.Help,
             };
         }
@@ -75,11 +76,11 @@ public sealed class MenuScreen
         bool mouseMoved = mouseDelta.X != 0 || mouseDelta.Y != 0;
         _lastMousePosition = mousePos;
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
         {
             if (i == 0 && !canContinue)
             {
-                continue; // entrée « Continuer » désactivée
+                continue; // entree « Continuer » desactivee
             }
 
             var rect = EntryRect(i);
@@ -90,12 +91,16 @@ public sealed class MenuScreen
                     _selected = i;
                 }
 
+                // J10-2: un appui du bouton gauche fixe la selection avant de renvoyer,
+                // meme si la souris n'a pas bouge.
                 if (Raylib.IsMouseButtonPressed(MouseButton.Left))
                 {
+                    _selected = i; // fixer la selection
                     return i switch
                     {
                         0 => MenuChoice.Continue,
                         1 => MenuChoice.NewGame,
+                        2 => MenuChoice.Options,
                         _ => MenuChoice.Help,
                     };
                 }
@@ -108,7 +113,7 @@ public sealed class MenuScreen
     /// <summary>Calcule le rectangle d'une entrée (identique à la surbrillance).</summary>
     private Rectangle EntryRect(int index)
     {
-        var width = (float)Raylib.GetScreenWidth();
+        var width = Layout.ScreenWidth;
         var centre = width / 2f;
         var entryY = 300f + 60f * index;
 
@@ -116,6 +121,7 @@ public sealed class MenuScreen
         {
             0 => "Continuer",
             1 => "Nouvelle partie",
+            2 => "Options",
             _ => "Aide",
         };
 
@@ -131,8 +137,8 @@ public sealed class MenuScreen
 
     public void Draw(bool canContinue)
     {
-        var width = (float)Raylib.GetScreenWidth();
-        var height = (float)Raylib.GetScreenHeight();
+        var width = Layout.ScreenWidth;
+        var height = Layout.ScreenHeight;
         var centre = width / 2f;
 
         // Fond : image etiree si disponible, sinon couleur unie.
@@ -159,9 +165,10 @@ public sealed class MenuScreen
 
         DrawEntry(0, "Continuer", canContinue ? Palette.Text : Palette.DimText, centre, entryY);
         DrawEntry(1, "Nouvelle partie", Palette.Text, centre, entryY + entrySpacing);
-        DrawEntry(2, "Aide", Palette.Text, centre, entryY + entrySpacing * 2);
+        DrawEntry(2, "Options", Palette.Text, centre, entryY + entrySpacing * 2);
+        DrawEntry(3, "Aide", Palette.Text, centre, entryY + entrySpacing * 3);
 
-        // Version en bas à droite (même police que les entrées de menu : 20 px, couleur DimText, ombre légère).
+        // Version en bas a droite (meme police que les entrees de menu : 20 px, couleur DimText, ombre legere).
         var versionText = GameInfo.Version;
         var versionWidth = _fonts.MeasureWidth(versionText);
         var versionX = width - Layout.Padding - versionWidth;

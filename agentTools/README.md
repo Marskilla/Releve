@@ -11,6 +11,9 @@ Ces outils ne font **pas partie du build** : aucun fichier `.cs` ici, rien à co
 - **Souris** : survol/clic sur les entrées du menu, les indicateurs de défileur (console/visualiseur), le bouton « Fermer » — ne peuvent pas être pilotés par `agentTools/` (pas d'injection souris fiable).
 - **Fondu (fade)** : transitions noir/ouverture (durées 0,6 s / 0,8 s) — impossible à chronométrer ni valider sans observation visuelle.
 - **Répétition de touche maintenue** (`Retour arrière`, `Suppr`, flèches directionnelles) : `IsKeyPressedRepeat` est implémenté dans le moteur, mais `agentTools/` ne peut pas le valider comme un vrai clavier.
+- **Plein écran (Alt+Entrée)** : bascule plein écran / fenêtre — ne peut pas être injectée ni validée sans observation visuelle.
+- **Transition d'image** : défilement entre deux vues de lieux (durée 0,4 s) — impossible à valider sans observation visuelle.
+- **Modales** (fenêtre texte, fenêtre image, Options) : ouverture, sélection de bouton, validation — ne peuvent pas être pilotées par `agentTools/`.
 - **`Wait-ReleveGameWindow`** : la recette de rejeu du compte rendu du PoC V2 appelle cette fonction, mais elle n'est **pas listée** dans le tableau des fonctions ci-dessus (cf. §8.3 du PoC V3). Ne pas s'y fier avant de l'avoir testée au regard de la contrainte d'injection sans fenêtre (piège 1).
 
 ## Prérequis

@@ -197,6 +197,7 @@ public class ImagePatchTests
 
         // Activer borne
         engine.Execute("passe le badge sur la borne");
+        engine.ResolveDialog(DialogIds.PatientAccept); // Accepter pour activer la borne
         view = engine.GetView();
         Assert.Single(view.ActivePatches);
         AssertPatch(view.ActivePatches[0], 88, 150, 272, 668);
@@ -224,6 +225,7 @@ public class ImagePatchTests
             engine.Execute("utilise badge sur lecteur escalier");
             engine.Execute("nord");
             engine.Execute("passe le badge sur la borne");
+            engine.ResolveDialog(DialogIds.PatientAccept); // Accepter pour activer la borne
 
             // Sauvegarder
             store.Save(engine.State);

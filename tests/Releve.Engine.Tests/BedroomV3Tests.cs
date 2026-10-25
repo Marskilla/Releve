@@ -33,8 +33,8 @@ public class BedroomV3Tests
         var messages = engine.Start();
 
         Assert.Equal(2, messages.Count);
-        Assert.Equal("Alors que vous ouvrez doucement les yeux, une voix de synthèse annonce : « Réveil terminé, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d’hôpital, la tenue standard des malades alités.", messages[0]);
-        Assert.Equal("La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire.", messages[1]);
+        Assert.Equal("Alors que vous ouvrez doucement les yeux, une voix de synthese annonce : « Reveil termine, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d'hopital, la tenue standard des malades alites.", messages[0]);
+        Assert.Equal("La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire.", messages[1]);
         Assert.Contains(GameEvent.WakeAnnouncementDone, engine.State.Events);
     }
 
@@ -49,7 +49,7 @@ public class BedroomV3Tests
         var messages = engine.Start();
 
         Assert.Single(messages);
-        Assert.Equal("La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire.", messages[0]);
+        Assert.Equal("La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire.", messages[0]);
     }
 
     [Fact]
@@ -58,7 +58,7 @@ public class BedroomV3Tests
         var corridor = EngineInCorridor();
         var reenter = corridor.Execute("ouest");
         Assert.Single(reenter.Messages);
-        Assert.Equal("La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire.", reenter.Messages[0]);
+        Assert.Equal("La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire.", reenter.Messages[0]);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class BedroomV3Tests
 
         // Avec sac present
         var look = engine.Execute("regarde");
-        Assert.Equal("La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire. Dans un coin se trouve une corbeille et son sac vide. Une porte contrôlée par un lecteur de badge constitue la seule sortie.", look.Messages[0]);
+        Assert.Equal("La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire. Dans un coin se trouve une corbeille et son sac vide. Une porte controlee par un lecteur de badge constitue la seule sortie.", look.Messages[0]);
 
         var observe = engine.Execute("observe");
         Assert.Equal(look.Messages, observe.Messages);
@@ -89,7 +89,7 @@ public class BedroomV3Tests
         // Prendre le sac -> description detaillee sans sac
         engine.Execute("prends sac");
         var lookSansSac = engine.Execute("regarde");
-        Assert.Equal("La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire. Dans un coin se trouve une corbeille. Une porte contrôlée par un lecteur de badge constitue la seule sortie.", lookSansSac.Messages[0]);
+        Assert.Equal("La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire. Dans un coin se trouve une corbeille. Une porte controlee par un lecteur de badge constitue la seule sortie.", lookSansSac.Messages[0]);
     }
 
     [Fact]

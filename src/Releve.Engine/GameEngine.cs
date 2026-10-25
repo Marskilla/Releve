@@ -114,8 +114,9 @@ public sealed class GameEngine
             return command.Action switch
             {
                 GameAction.Look => CommandResult.Say(
-                    _world.Rooms[State.CurrentRoom].DetailedDescription(State)
-                    ?? _world.Rooms[State.CurrentRoom].Description(State)),
+                    string.IsNullOrEmpty(_world.Rooms[State.CurrentRoom].DetailedDescription(State))
+                        ? _world.Rooms[State.CurrentRoom].Description(State)
+                        : _world.Rooms[State.CurrentRoom].DetailedDescription(State)!),
                 GameAction.Read => CommandResult.Say(Messages.NothingToRead),
                 GameAction.Inventory => InventoryResult(),
                 _ => CommandResult.Say(Messages.MissingObject),
@@ -202,7 +203,7 @@ public sealed class GameEngine
         }
 
         State.CurrentRoom = exit.To.Value;
-        return CommandResult.Changed(RoomMessages(State.CurrentRoom).ToArray());
+        return new CommandResult(RoomMessages(State.CurrentRoom).ToArray(), true, direction);
     }
 
     private IReadOnlyList<string> RoomMessages(RoomId roomId)
@@ -265,5 +266,20 @@ public sealed class GameEngine
         }
 
         return words;
+    }
+
+    /// <summary>J8-4: Resout un choix de dialogue modal.</summary>
+    public CommandResult ResolveDialog(string choiceId)
+    {
+        var currentRoom = _world.Rooms[State.CurrentRoom];
+        var result = currentRoom.OnDialogChoice(choiceId, State);
+        
+        // Choix inconnu ou sans effet -> aucun message, aucun changement
+        if (result is null)
+        {
+            return CommandResult.Say();
+        }
+        
+        return result;
     }
 }

@@ -139,7 +139,7 @@ public class ReplyTests
         engine.Start();
 
         // MissingObject
-        Assert.Equal(["Précisez l’objet de la commande."], engine.Execute("prends").Messages);
+        Assert.Equal(["Precisez l'objet de la commande."], engine.Execute("prends").Messages);
 
         // UnknownObject
         Assert.Equal(["Vous ne voyez pas cela ici."], engine.Execute("prends crayon").Messages);
@@ -147,7 +147,7 @@ public class ReplyTests
         // Ambiguous (dans le monde de test : "livre" ambigu entre "livre ancien" et "livre de comptes")
         var engine2 = TestSupport.FreshTestEngine();
         var amb = engine2.Execute("regarde livre");
-        Assert.StartsWith("Précisez : ", amb.Messages[0]);
+        Assert.StartsWith("Precisez : ", amb.Messages[0]);
     }
 
     [Fact]

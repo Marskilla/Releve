@@ -10,18 +10,18 @@ public static class TechCorridorObjects
     {
         [ObjectId.StairsDoor] = new ObjectDef(
             Id: ObjectId.StairsDoor,
-            Name: "la porte de l’escalier",
+            Name: "la porte de l'escalier",
             Aliases: new[] { "porte escalier", "porte fond", "escalier" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.TechCorridor),
             InitialState: ObjectState.None,
             Describe: _ =>
-                "Une porte pleine percée d’un grand vitrage en verre armé. On distingue les premières marches, "
-                + "qui montent vers une lumière plus claire."),
+                "Une porte pleine percee d'un grand vitrage en verre arme. On distingue les premieres marches, "
+                + "qui montent vers une lumiere plus claire."),
 
         [ObjectId.StairsReader] = new ObjectDef(
             Id: ObjectId.StairsReader,
-            Name: "le lecteur de l’escalier",
+            Name: "le lecteur de l'escalier",
             Aliases: new[] { "lecteur escalier", "lecteur fond" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.TechCorridor),
@@ -31,18 +31,18 @@ public static class TechCorridorObjects
         [ObjectId.TechDoor] = new ObjectDef(
             Id: ObjectId.TechDoor,
             Name: "la porte du local technique",
-            Aliases: new[] { "porte local", "porte technique", "hublot" },
+            Aliases: new[] { "porte local", "porte technique", "hublot", "porte local technique" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.TechCorridor),
             InitialState: ObjectState.None,
             Describe: _ =>
-                "Une porte pleine à hublot. À travers, on distingue les éléments d’une chaufferie, "
-                + "une rangée de lave-linge à l’arrêt depuis longtemps et des compteurs électriques."),
+                "Une porte pleine a hublot. A travers, on distingue les elements d'une chaufferie, "
+                + "une rangee de lave-linge a l'arret depuis longtemps et des compteurs electriques."),
 
         [ObjectId.TechReader] = new ObjectDef(
             Id: ObjectId.TechReader,
             Name: "le lecteur du local technique",
-            Aliases: new[] { "lecteur local", "lecteur technique" },
+            Aliases: new[] { "lecteur local", "lecteur technique", "lecteur local technique" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.TechCorridor),
             InitialState: ObjectState.Locked,

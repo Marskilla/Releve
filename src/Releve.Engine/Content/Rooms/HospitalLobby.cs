@@ -4,20 +4,30 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Rooms;
 
-/// <summary>Accueil de l’hôpital (lore §5.3, PoC §3.3).</summary>
+/// <summary>Accueil de l'hopital (lore §5.3, PoC §3.3).</summary>
 public sealed class HospitalLobby : RoomBase
 {
-    private const string RoomTitle = "Accueil de l’hôpital";
+    private const string RoomTitle = "Accueil de l'hopital";
     private const string RoomDescription =
-        "Le hall d’accueil est vaste, lumineux et parfaitement entretenu. Derrière le comptoir, un androïde se tient immobile.";
-    private const string WestBlockedMessage = "La porte vitrée de l’entrée reste fermée.";
+        "Le hall d'accueil est vaste, lumineux et parfaitement entretenu. Derriere le comptoir, un androide se tient immobile. Un afficheur lumineux est fixe au-dessus du comptoir.";
+    private const string WestBlockedMessage =
+        "La porte vitree de l'entree est fermee. L'androide s'adresse alors a vous : « S'il vous plait ! » Il semble vous inviter a venir le voir.";
     private const string NorthBlockedMessage =
-        "Les portes de l’ascenseur restent closes. Le lecteur de badge affiche un rouge fixe.";
-    private const string AndroidAnswer =
-        "L’androïde s’anime : « Veuillez passer votre badge sur la borne pour sortir. »";
-    private const string TerminalUnlockedMessage = "La porte vitrée de l’entrée se déverrouille.";
+        "Les portes de l'ascenseur restent closes. Le lecteur de badge affiche un rouge fixe.";
+    private const string AndroidAnswerBeforeActivation =
+        "L'androide, qui semblait etre en pause, prend vie et s'adresse a vous : « La politique de l'etablissement nous empeche de laisser sortir des patients sans emargement precedent. Passez votre badge sur la borne du comptoir pour emarger, merci. »";
+    private const string AndroidAnswerAfterActivation =
+        "L'androide s'anime : « Merci d'avoir fait appel a nos services, et j'espere, pour vous, ne pas vous revoir bientot. Ah ah ah ! »";
+    private const string TerminalUnlockedMessage = "La porte vitree de l'entree se deverrouille.";
     private const string ElevatorReaderRefuses = "Le lecteur refuse le badge.";
     private const string ButtonDoesNothing = "Le bouton ne produit aucun effet.";
+    // J8-6: messages pour le dialogue de la borne
+    private const string BadgeOnTerminalMessage =
+        "Vous passez le badge devant la borne. La fiche patient s'affiche.";
+    private const string AcceptMessage =
+        "Vous validez la sortie. La porte vitree de l'entree se deverrouille.";
+    private const string RefuseMessage =
+        "Vous ne validez pas la sortie.";
     // OpenGlassDoorLocked réutilise WestBlockedMessage (J1.2)
     // OpenGlassDoorUnlocked réutilise TerminalUnlockedMessage (J1.2)
     private const string OpenElevator = NorthBlockedMessage; // réutilise la constante (J1.2)
@@ -29,10 +39,10 @@ public sealed class HospitalLobby : RoomBase
     private static readonly string[] PatientRecord =
     {
         "FICHE PATIENT",
-        "Nom : Marchand - Prénom : Alex",        
-        "Date d’entrée : 14 mars 2113",
-        "Motif d’admission : maladie inconnue évolutive nécessitant un traitement adaptatif",
-        "Conditions de sortie : maladie en rémission complète",
+        "Nom : Marchand - Prenom : Alex",        
+        "Date d'entree : 14 mars 2113",
+        "Motif d'admission : maladie inconnue evolutive necessitant un traitement adaptatif",
+        "Conditions de sortie : maladie en remission complete",
         "Adresse de sortie : Alex Marchand, chez M. et Mme Marchand, 12 rue des Tilleuls",
     };
 
@@ -64,23 +74,53 @@ public sealed class HospitalLobby : RoomBase
 
     public override CommandResult? Handle(Command c, GameState s)
     {
-        // Seule reponse de l'androïde, quelle que soit la forme de la demande.
+        // Reponse de l'androïde selon l'etat de la borne.
         if (c.Action == GameAction.Talk && c.Target == ObjectId.Android)
         {
-            return CommandResult.Say(AndroidAnswer);
+            var terminalActivated = s.StateOf(ObjectId.Terminal) == ObjectState.Activated;
+            return CommandResult.Say(terminalActivated ? AndroidAnswerAfterActivation : AndroidAnswerBeforeActivation);
         }
 
         if (c.Action == GameAction.Use)
         {
             if (c.Target == ObjectId.Terminal && c.Instrument == ObjectId.Badge)
             {
-                var first = s.StateOf(ObjectId.Terminal) != ObjectState.Activated;
-                s.States[ObjectId.Terminal] = ObjectState.Activated;
+                var terminalActivated = s.StateOf(ObjectId.Terminal) == ObjectState.Activated;
+                
+                // Construire la fiche patient
+                var patientRecord = string.Join("\n", PatientRecord);
+                
+                DialogRequest dialog;
+                if (terminalActivated)
+                {
+                    // Deja active : un seul choix Close
+                    dialog = new DialogRequest(
+                        DialogKind.Text,
+                        null,
+                        patientRecord,
+                        new[] { new DialogChoice(DialogIds.Close, "Fermer") },
+                        DialogIds.Close,
+                        DialogIds.Close);
+                }
+                else
+                {
+                    // Pas encore active : deux choix PatientAccept / PatientRefuse
+                    dialog = new DialogRequest(
+                        DialogKind.Text,
+                        null,
+                        patientRecord,
+                        new[]
+                        {
+                            new DialogChoice(DialogIds.PatientAccept, "J'accepte de sortir"),
+                            new DialogChoice(DialogIds.PatientRefuse, "Je ne suis pas pret a sortir")
+                        },
+                        DialogIds.PatientRefuse,
+                        DialogIds.PatientRefuse);
+                }
 
-                // Repeter l'action reaffiche la fiche, sans le message de deverrouillage.
-                return first
-                    ? CommandResult.Changed(WithUnlockMessage())
-                    : CommandResult.Say(PatientRecord);
+                // J8-6: Say (pas Changed) + dialog. La fiche n'est plus dans la console.
+                // L'etat de Terminal n'est PAS modifie ici.
+                return CommandResult.Say(BadgeOnTerminalMessage).WithDialog(dialog);
             }
 
             if (c.Target == ObjectId.ElevatorReader && c.Instrument == ObjectId.Badge)
@@ -94,7 +134,7 @@ public sealed class HospitalLobby : RoomBase
             }
         }
 
-        // « ouvre porte vitree ».
+        // « ouvre porte vitree » : meme message que la sortie bloquee si borne non activee.
         if (c.Action == GameAction.Open && c.Target == ObjectId.GlassDoor)
         {
             if (s.StateOf(ObjectId.Terminal) != ObjectState.Activated)
@@ -110,8 +150,8 @@ public sealed class HospitalLobby : RoomBase
             return CommandResult.Say(NorthBlockedMessage);
         }
 
-        // « lis afficheur » : même texte que Describe.
-        if (c.Action == GameAction.Read && c.Target == ObjectId.Display)
+        // « lis afficheur » / « regarde afficheur » / « examine horloge » : date du jour.
+        if ((c.Action == GameAction.Read || c.Action == GameAction.Look) && c.Target == ObjectId.Display)
         {
             return CommandResult.Say(HospitalLobbyObjects.DisplayDescription);
         }
@@ -119,8 +159,20 @@ public sealed class HospitalLobby : RoomBase
         return null;
     }
 
-    private static string[] WithUnlockMessage() => PatientRecord.Append(TerminalUnlockedMessage).ToArray();
-
     private static bool IsWestOpen(GameState s) =>
         s.StateOf(ObjectId.Terminal) == ObjectState.Activated;
+    
+    /// <summary>J8-7: Reaction aux choix du dialogue de la borne.</summary>
+    public override CommandResult? OnDialogChoice(string choiceId, GameState s)
+    {
+        return choiceId switch
+        {
+            DialogIds.PatientAccept => s.StateOf(ObjectId.Terminal) != ObjectState.Activated
+                ? (s.States[ObjectId.Terminal] = ObjectState.Activated, CommandResult.Changed(AcceptMessage)).Item2
+                : CommandResult.Say(), // deja active : aucun effet
+            DialogIds.PatientRefuse => CommandResult.Say(RefuseMessage),
+            DialogIds.Close => CommandResult.Say(),
+            _ => null,
+        };
+    }
 }

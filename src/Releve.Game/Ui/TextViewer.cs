@@ -1,13 +1,15 @@
 using System.Numerics;
 using Raylib_cs;
+using Releve.Engine.Core;
+using Releve.Engine.World;
 
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Visualiseur de texte modal et superpose (lot C3).
+/// Visualiseur de texte modal et superpose (lot C3, J9).
 /// Opaque : remplit son rectangle d'une couleur pleine et masque ce qu'il recouvre.
-/// Texte avec retour a la ligne automatique, défilement Page/Haut/Bas, fermeture par
-/// Échap, Entrée ou bouton « Fermer ».
+/// Texte avec retour a la ligne automatique, defilement Page/Haut/Bas, fermeture par
+/// Echap, Entree ou bouton « Fermer » / boutons de dialogue.
 /// </summary>
 public sealed class TextViewer
 {
@@ -28,6 +30,11 @@ public sealed class TextViewer
     private bool _upIndicatorHover;
     private bool _downIndicatorHover;
 
+    // J9-2: Boutons de dialogue
+    private DialogButtons? _dialogButtons;
+    private string? _cancelChoiceId;
+    private string? _chosenId;
+
     public TextViewer(Fonts fonts)
     {
         _fonts = fonts;
@@ -36,19 +43,52 @@ public sealed class TextViewer
     /// <summary>Vrai tant que le visualiseur est ouvert.</summary>
     public bool IsOpen => _isOpen;
 
-    /// <summary>Ouvre le visualiseur. Ne traite aucune entree dans l'image de creation.</summary>
-    public void Open(Rectangle rectangle, string? title, string text)
+    /// <summary>Identifiant du choix valide (rempli a la validation).</summary>
+    public string? ChosenId => _chosenId;
+
+    /// <summary>J9-2: Ouvre le visualiseur avec boutons de dialogue.</summary>
+    public void Open(Rectangle rectangle, string? title, string text,
+        IReadOnlyList<DialogChoice> choices, string defaultChoiceId, string cancelChoiceId)
     {
         _rectangle = rectangle;
         _title = title;
         _wrappedLines.Clear();
-        WrapText(text, rectangle.Width - 2 * Layout.Padding);
+        // Largeur reduite de 40 px pour la colonne des indicateurs de defilement
+        WrapText(text, rectangle.Width - 2 * Layout.Padding - 40f);
         _scroll = 0;
         _isOpen = true;
         _openedThisFrame = true;
+        _cancelChoiceId = cancelChoiceId;
+        _chosenId = null;
+
+        // Creer les boutons de dialogue (J9-1)
+        // Les boutons sont places en bas du rectangle, centres
+        float buttonsY = rectangle.Y + rectangle.Height - Layout.Padding - 50f;
+        _dialogButtons = new DialogButtons(choices, _fonts, buttonsY);
+
+        // Trouver l'index du choix par defaut
+        int defaultIndex = 0;
+        for (int i = 0; i < choices.Count; i++)
+        {
+            if (choices[i].Id == defaultChoiceId)
+            {
+                defaultIndex = i;
+                break;
+            }
+        }
+        _dialogButtons.SetDefaultIndex(defaultIndex);
     }
 
-    /// <summary>Renvoie vrai lorsque le visualiseur est fermé (après avoir traité l'entree de fermeture).</summary>
+    /// <summary>Signature originale conservee (J9-2) : equivalentes a un seul bouton « Fermer » (Close).</summary>
+    public void Open(Rectangle rectangle, string? title, string text)
+    {
+        Open(rectangle, title, text,
+            new[] { new DialogChoice(DialogIds.Close, CloseLabel) },
+            DialogIds.Close,
+            DialogIds.Close);
+    }
+
+    /// <summary>Renvoie vrai lorsque le visualiseur est ferme (apres avoir traite l'entree de validation).</summary>
     public bool Update()
     {
         if (!_isOpen)
@@ -56,85 +96,108 @@ public sealed class TextViewer
             return false;
         }
 
-        // Ignorer toute entrée souris/clavier dans la frame d'ouverture (anti-clic fantôme).
+        // Ignorer toute entree souris/clavier dans la frame d'ouverture (anti-clic fantome).
         if (_openedThisFrame)
         {
             _openedThisFrame = false;
+            // Vider la file de caracteres
+            while (Raylib.GetCharPressed() > 0) { }
+            return false;
+        }
+
+        // J9-3: Si on a des boutons de dialogue, les gerer en priorite
+        if (_dialogButtons is not null)
+        {
+            int chosenIndex = _dialogButtons.Update();
+            if (chosenIndex >= 0)
+            {
+                _chosenId = _dialogButtons.SelectedChoiceId ?? _cancelChoiceId;
+                Close();
+                return true;
+            }
+
+            // Echap = valide cancelChoiceId
+            if (Raylib.IsKeyPressed(KeyboardKey.Escape))
+            {
+                _chosenId = _cancelChoiceId;
+                Close();
+                return true;
+            }
         }
         else
         {
-            // Échap ou Entrée ferme.
+            // Ancien comportement : Echap ou Entree ferme
             if (Raylib.IsKeyPressed(KeyboardKey.Escape) || Raylib.IsKeyPressed(KeyboardKey.Enter)
                 || Raylib.IsKeyPressed(KeyboardKey.KpEnter))
             {
                 Close();
                 return true;
             }
-
-            // Défilement clavier (avec répétition pour ↑/↓).
-            var page = Math.Max(1, VisibleLines() - 1);
-            var maxScroll = Math.Max(0, _wrappedLines.Count - VisibleLines());
-
-            if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
-            {
-                _scroll = Math.Max(0, _scroll - page);
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
-            {
-                _scroll = Math.Min(maxScroll, _scroll + page);
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.Up) || Raylib.IsKeyPressedRepeat(KeyboardKey.Up))
-            {
-                _scroll = Math.Max(0, _scroll - 1);
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.Down) || Raylib.IsKeyPressedRepeat(KeyboardKey.Down))
-            {
-                _scroll = Math.Min(maxScroll, _scroll + 1);
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.Home))
-            {
-                _scroll = 0;
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.End))
-            {
-                _scroll = maxScroll;
-            }
-
-            // Indicateur haut (clic = -3 lignes).
-            if (_scroll > 0)
-            {
-                var upRect = IndicatorUpRect();
-                var mouse = Raylib.GetMousePosition();
-                _upIndicatorHover = Raylib.CheckCollisionPointRec(mouse, upRect);
-                if (_upIndicatorHover && Raylib.IsMouseButtonPressed(MouseButton.Left))
-                {
-                    _scroll = Math.Max(0, _scroll - 3);
-                }
-            }
-            else
-            {
-                _upIndicatorHover = false;
-            }
-
-            // Indicateur bas (clic = +3 lignes).
-            if (_scroll < maxScroll)
-            {
-                var downRect = IndicatorDownRect();
-                var mouse = Raylib.GetMousePosition();
-                _downIndicatorHover = Raylib.CheckCollisionPointRec(mouse, downRect);
-                if (_downIndicatorHover && Raylib.IsMouseButtonPressed(MouseButton.Left))
-                {
-                    _scroll = Math.Min(maxScroll, _scroll + 3);
-                }
-            }
-            else
-            {
-                _downIndicatorHover = false;
-            }
         }
 
-        // Bouton « Fermer » à la souris.
-        if (UpdateCloseButton())
+        // Defilement clavier (avec repetition pour Haut/Bas).
+        var page = Math.Max(1, VisibleLines() - 1);
+        var maxScroll = Math.Max(0, _wrappedLines.Count - VisibleLines());
+
+        if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
+        {
+            _scroll = Math.Max(0, _scroll - page);
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
+        {
+            _scroll = Math.Min(maxScroll, _scroll + page);
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.Up) || Raylib.IsKeyPressedRepeat(KeyboardKey.Up))
+        {
+            _scroll = Math.Max(0, _scroll - 1);
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.Down) || Raylib.IsKeyPressedRepeat(KeyboardKey.Down))
+        {
+            _scroll = Math.Min(maxScroll, _scroll + 1);
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.Home))
+        {
+            _scroll = 0;
+        }
+        if (Raylib.IsKeyPressed(KeyboardKey.End))
+        {
+            _scroll = maxScroll;
+        }
+
+        // Indicateur haut (clic = -3 lignes).
+        if (_scroll > 0)
+        {
+            var upRect = IndicatorUpRect();
+            var mouse = Raylib.GetMousePosition();
+            _upIndicatorHover = Raylib.CheckCollisionPointRec(mouse, upRect);
+            if (_upIndicatorHover && Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                _scroll = Math.Max(0, _scroll - 3);
+            }
+        }
+        else
+        {
+            _upIndicatorHover = false;
+        }
+
+        // Indicateur bas (clic = +3 lignes).
+        if (_scroll < maxScroll)
+        {
+            var downRect = IndicatorDownRect();
+            var mouse = Raylib.GetMousePosition();
+            _downIndicatorHover = Raylib.CheckCollisionPointRec(mouse, downRect);
+            if (_downIndicatorHover && Raylib.IsMouseButtonPressed(MouseButton.Left))
+            {
+                _scroll = Math.Min(maxScroll, _scroll + 3);
+            }
+        }
+        else
+        {
+            _downIndicatorHover = false;
+        }
+
+        // Bouton « Fermer » a la souris (seulement si pas de boutons de dialogue).
+        if (_dialogButtons is null && UpdateCloseButton())
         {
             return true;
         }
@@ -142,7 +205,7 @@ public sealed class TextViewer
         return false;
     }
 
-    /// <summary>Dessine la scène sous-jacente puis le visualiseur par-dessus.</summary>
+    /// <summary>Dessine la scene sous-jacente puis le visualiseur par-dessus.</summary>
     public void Draw()
     {
         if (!_isOpen)
@@ -179,10 +242,18 @@ public sealed class TextViewer
             y += Fonts.LineHeight;
         }
 
-        // Bouton « Fermer ».
-        DrawCloseButton();
+        // J9-2: Dessiner les boutons de dialogue (remplace le bouton « Fermer »)
+        if (_dialogButtons is not null)
+        {
+            _dialogButtons.Draw();
+        }
+        else
+        {
+            // Bouton « Fermer » classique.
+            DrawCloseButton();
+        }
 
-        // Indicateurs de défilement (formes géométriques) - APRÈS le bouton pour ne pas être couverts.
+        // Indicateurs de defilement (formes geometriques) - APRES les boutons pour ne pas etre couverts.
         DrawScrollIndicators();
     }
 
@@ -192,39 +263,13 @@ public sealed class TextViewer
         _wrappedLines.Clear();
         _title = null;
         _scroll = 0;
+        _dialogButtons = null;
+        _cancelChoiceId = null;
     }
 
     private void WrapText(string text, float maxWidth)
     {
-        // Normaliser les fins de ligne Windows \r\n -> \n
-        var normalized = text.Replace("\r\n", "\n").Replace('\r', '\n');
-
-        foreach (var paragraph in normalized.Split('\n'))
-        {
-            if (paragraph.Length == 0)
-            {
-                _wrappedLines.Add(string.Empty);
-                continue;
-            }
-
-            var current = new System.Text.StringBuilder();
-            foreach (var word in paragraph.Split(' '))
-            {
-                var candidate = current.Length == 0 ? word : current + " " + word;
-                if (_fonts.MeasureWidth(candidate) <= maxWidth || current.Length == 0)
-                {
-                    current.Clear();
-                    current.Append(candidate);
-                    continue;
-                }
-
-                _wrappedLines.Add(current.ToString());
-                current.Clear();
-                current.Append(word);
-            }
-
-            _wrappedLines.Add(current.ToString());
-        }
+        _wrappedLines.AddRange(TextWrapper.Wrap(text, maxWidth, _fonts.MeasureWidth));
     }
 
     private int VisibleLines()
@@ -235,7 +280,9 @@ public sealed class TextViewer
             startY += Fonts.LineHeight + Layout.Padding;
         }
 
-        var available = _rectangle.Height - Layout.Padding - (startY - _rectangle.Y) - CloseButtonHeight - Layout.Padding;
+        // Reserver l'espace pour les boutons de dialogue ou le bouton Fermer
+        float buttonsHeight = _dialogButtons is not null ? 60f : CloseButtonHeight + Layout.Padding;
+        var available = _rectangle.Height - Layout.Padding - (startY - _rectangle.Y) - buttonsHeight;
         return Math.Max(1, (int)(available / Fonts.LineHeight));
     }
 
@@ -259,9 +306,9 @@ public sealed class TextViewer
         var lastVisible = _scroll + VisibleLines() - 1;
         if (lastVisible < _wrappedLines.Count - 1)
         {
-            // Laisser de l'espace au-dessus du bouton "Fermer" (CloseButtonHeight + padding).
-            var bottomY = _rectangle.Y + _rectangle.Height - Layout.Padding - CloseButtonHeight - Layout.Padding - IndicatorSize;
-            // Comme ArrowsPanel South : (centre-bas) -> (haut-droite) -> (haut-gauche)
+            // Laisser de l'espace au-dessus des boutons.
+            float buttonsHeight = _dialogButtons is not null ? 60f : CloseButtonHeight + Layout.Padding;
+            var bottomY = _rectangle.Y + _rectangle.Height - Layout.Padding - buttonsHeight - IndicatorSize;
             var color = _downIndicatorHover ? Palette.Prompt : Palette.Text;
             Raylib.DrawTriangle(
                 new Vector2(indicatorX + IndicatorSize / 2f, bottomY),
@@ -326,6 +373,7 @@ public sealed class TextViewer
         var indicatorX = _rectangle.X + _rectangle.Width - Layout.Padding - IndicatorSize;
         var indicatorY = _rectangle.Y + Layout.Padding + IndicatorSize;
         const float clickSize = 30f;
+        // Centre sur la pointe du triangle (indicatorY)
         return new Rectangle(
             indicatorX + IndicatorSize / 2f - clickSize / 2f,
             indicatorY - clickSize / 2f,
@@ -335,9 +383,10 @@ public sealed class TextViewer
     private Rectangle IndicatorDownRect()
     {
         var indicatorX = _rectangle.X + _rectangle.Width - Layout.Padding - IndicatorSize;
-        var lastVisible = _scroll + VisibleLines() - 1;
-        var bottomY = _rectangle.Y + _rectangle.Height - Layout.Padding - CloseButtonHeight - Layout.Padding - IndicatorSize;
+        float buttonsHeight = _dialogButtons is not null ? 60f : CloseButtonHeight + Layout.Padding;
+        var bottomY = _rectangle.Y + _rectangle.Height - Layout.Padding - buttonsHeight - IndicatorSize;
         const float clickSize = 30f;
+        // Centre sur la pointe du triangle (bottomY)
         return new Rectangle(
             indicatorX + IndicatorSize / 2f - clickSize / 2f,
             bottomY - clickSize / 2f,

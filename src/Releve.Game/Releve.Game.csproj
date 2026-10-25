@@ -3,10 +3,12 @@
   <PropertyGroup>
     <AssemblyName>Releve.Game</AssemblyName>
     <RootNamespace>Releve.Game</RootNamespace>
-    <OutputType>Exe</OutputType>
+    <OutputType Condition="'$(Configuration)' == 'Release'">WinExe</OutputType>
+    <OutputType Condition="'$(Configuration)' != 'Release'">Exe</OutputType>
     <!-- RID fixe : la bibliotheque native raylib est copiee a cote de l'exe, quel que soit le mode de build. -->
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <ApplicationIcon Condition="Exists('assets\icons\releve.ico')">assets\icons\releve.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

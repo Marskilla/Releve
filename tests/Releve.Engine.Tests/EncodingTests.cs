@@ -9,7 +9,7 @@ using Xunit;
 namespace Releve.Engine.Tests;
 
 /// <summary>
-/// Tests d'encodage : pas d'apostrophe droite, pas de caractères décomposés (§5.1).
+/// Tests d'encodage : pas d'apostrophe typographique (U+2019), pas de caractères décomposés (§5.1).
 /// </summary>
 public class EncodingTests
 {
@@ -25,11 +25,11 @@ public class EncodingTests
         // 1. Titres et descriptions des pièces (état initial)
         foreach (var (roomId, room) in world.Rooms)
         {
-            AssertNoStraightApostrophe(room.Title, $"Room {roomId} Title");
+            AssertNoTypographicApostrophe(room.Title, $"Room {roomId} Title");
             AssertNoDecomposedChars(room.Title, $"Room {roomId} Title");
 
             var desc = room.Description(state);
-            AssertNoStraightApostrophe(desc, $"Room {roomId} Description");
+            AssertNoTypographicApostrophe(desc, $"Room {roomId} Description");
             AssertNoDecomposedChars(desc, $"Room {roomId} Description");
 
             // DetailedDescription (peut être null)
@@ -39,7 +39,7 @@ public class EncodingTests
                 var detailed = detailedMethod.Invoke(room, new object[] { state }) as string;
                 if (!string.IsNullOrEmpty(detailed))
                 {
-                    AssertNoStraightApostrophe(detailed, $"Room {roomId} DetailedDescription");
+                    AssertNoTypographicApostrophe(detailed, $"Room {roomId} DetailedDescription");
                     AssertNoDecomposedChars(detailed, $"Room {roomId} DetailedDescription");
                 }
             }
@@ -49,7 +49,7 @@ public class EncodingTests
             {
                 if (!string.IsNullOrWhiteSpace(exit.BlockedMessage))
                 {
-                    AssertNoStraightApostrophe(exit.BlockedMessage, $"Room {roomId} Exit {exit.Dir} BlockedMessage");
+                    AssertNoTypographicApostrophe(exit.BlockedMessage, $"Room {roomId} Exit {exit.Dir} BlockedMessage");
                     AssertNoDecomposedChars(exit.BlockedMessage, $"Room {roomId} Exit {exit.Dir} BlockedMessage");
                 }
             }
@@ -58,11 +58,11 @@ public class EncodingTests
         // 2. Noms et Describe (état initial) de chaque objet
         foreach (var (objectId, def) in world.Objects)
         {
-            AssertNoStraightApostrophe(def.Name, $"Object {objectId} Name");
+            AssertNoTypographicApostrophe(def.Name, $"Object {objectId} Name");
             AssertNoDecomposedChars(def.Name, $"Object {objectId} Name");
 
             var describe = def.Describe(state);
-            AssertNoStraightApostrophe(describe, $"Object {objectId} Describe");
+            AssertNoTypographicApostrophe(describe, $"Object {objectId} Describe");
             AssertNoDecomposedChars(describe, $"Object {objectId} Describe");
         }
 
@@ -74,26 +74,47 @@ public class EncodingTests
                 var s = field.GetValue(null) as string;
                 if (!string.IsNullOrEmpty(s))
                 {
-                    AssertNoStraightApostrophe(s, $"Messages.{field.Name}");
+                    AssertNoTypographicApostrophe(s, $"Messages.{field.Name}");
                     AssertNoDecomposedChars(s, $"Messages.{field.Name}");
+                }
+            }
+        }
+
+        // 4. Constantes de FlavourText
+        foreach (var field in typeof(FlavourText).GetFields(BindingFlags.Public | BindingFlags.Static))
+        {
+            if (field.FieldType == typeof(string[]))
+            {
+                var arr = field.GetValue(null) as string[];
+                if (arr != null)
+                {
+                    foreach (var s in arr)
+                    {
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            AssertNoTypographicApostrophe(s, $"FlavourText.{field.Name}");
+                            AssertNoDecomposedChars(s, $"FlavourText.{field.Name}");
+                        }
+                    }
                 }
             }
         }
     }
 
     [Fact]
-    public void Source_Files_Have_No_Straight_Apostrophe_In_Player_Texts()
+    public void Source_Files_Have_No_Typographic_Apostrophe_In_Player_Texts()
     {
         var srcDir = FindSrcDirectory();
         Assert.True(Directory.Exists(srcDir), $"Dossier src introuvable : {srcDir}");
 
         var contentDir = Path.Combine(srcDir, "Releve.Engine", "Content");
         var coreDir = Path.Combine(srcDir, "Releve.Engine", "Core");
+        var gameDir = Path.Combine(srcDir, "Releve.Game");
 
         var files = new List<string>();
         files.AddRange(Directory.GetFiles(contentDir, "*.cs", SearchOption.AllDirectories));
-        files.Add(Path.Combine(coreDir, "Messages.cs"));
-        // FlavourText.cs n'existe pas encore (créé en J4)
+        files.AddRange(Directory.GetFiles(coreDir, "*.cs", SearchOption.AllDirectories));
+        files.AddRange(Directory.GetFiles(gameDir, "*.cs", SearchOption.AllDirectories));
 
         foreach (var file in files)
         {
@@ -110,9 +131,76 @@ public class EncodingTests
                 foreach (Match m in matches)
                 {
                     var literal = m.Value;
-                    if (literal.Contains("'"))
+                    if (literal.Contains('\u2019'))
                     {
-                        Assert.Fail($"Apostrophe droite trouvée dans {file}:{i + 1} : {literal}");
+                        Assert.Fail($"Apostrophe typographique (U+2019) trouvée dans {file}:{i + 1} : {literal}");
+                    }
+                }
+            }
+        }
+    }
+
+    [Fact]
+    public void No_Blouse_Word_In_Engine_Texts()
+    {
+        var world = GameWorld.Create();
+        var state = world.CreateInitialState();
+
+        foreach (var (roomId, room) in world.Rooms)
+        {
+            Assert.DoesNotContain("blouse", room.Title, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("blouse", room.Description(state), StringComparison.OrdinalIgnoreCase);
+
+            var detailedMethod = room.GetType().GetMethod("DetailedDescription");
+            if (detailedMethod != null)
+            {
+                var detailed = detailedMethod.Invoke(room, new object[] { state }) as string;
+                if (!string.IsNullOrEmpty(detailed))
+                {
+                    Assert.DoesNotContain("blouse", detailed, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+
+            foreach (var exit in room.Exits)
+            {
+                if (!string.IsNullOrWhiteSpace(exit.BlockedMessage))
+                {
+                    Assert.DoesNotContain("blouse", exit.BlockedMessage, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+        }
+
+        foreach (var (objectId, def) in world.Objects)
+        {
+            Assert.DoesNotContain("blouse", def.Name, StringComparison.OrdinalIgnoreCase);
+            Assert.DoesNotContain("blouse", def.Describe(state), StringComparison.OrdinalIgnoreCase);
+        }
+
+        foreach (var field in typeof(Messages).GetFields(BindingFlags.Public | BindingFlags.Static))
+        {
+            if (field.FieldType == typeof(string))
+            {
+                var s = field.GetValue(null) as string;
+                if (!string.IsNullOrEmpty(s))
+                {
+                    Assert.DoesNotContain("blouse", s, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+        }
+
+        foreach (var field in typeof(FlavourText).GetFields(BindingFlags.Public | BindingFlags.Static))
+        {
+            if (field.FieldType == typeof(string[]))
+            {
+                var arr = field.GetValue(null) as string[];
+                if (arr != null)
+                {
+                    foreach (var s in arr)
+                    {
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            Assert.DoesNotContain("blouse", s, StringComparison.OrdinalIgnoreCase);
+                        }
                     }
                 }
             }
@@ -130,11 +218,11 @@ public class EncodingTests
         return dir == null ? string.Empty : Path.Combine(dir.FullName, "src");
     }
 
-    private static void AssertNoStraightApostrophe(string text, string context)
+    private static void AssertNoTypographicApostrophe(string text, string context)
     {
-        if (text.Contains("'"))
+        if (text.Contains('\u2019'))
         {
-            Assert.Fail($"Apostrophe droite (U+0027) dans {context} : {text}");
+            Assert.Fail($"Apostrophe typographique (U+2019) dans {context} : {text}");
         }
     }
 

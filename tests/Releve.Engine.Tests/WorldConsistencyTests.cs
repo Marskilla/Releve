@@ -34,6 +34,36 @@ public class WorldConsistencyTests
     }
 
     [Fact]
+    public void Game_World_DisplayName_Recognized_In_Aliases()
+    {
+        var world = GameWorld.Create();
+
+        foreach (var (objectId, def) in world.Objects)
+        {
+            var normalizedName = string.Join(" ", TextNormalizer.Normalize(def.Name));
+            if (string.IsNullOrWhiteSpace(normalizedName))
+            {
+                continue;
+            }
+
+            var nameWords = normalizedName.Split(' ');
+            var hasMatchingAlias = def.Aliases.Any(alias =>
+            {
+                var normalizedAlias = string.Join(" ", TextNormalizer.Normalize(alias));
+                return nameWords.All(w => normalizedAlias.Split(' ').Contains(w));
+            });
+
+            if (!hasMatchingAlias)
+            {
+                // Ajouter l'alias manquant (test pour documenter l'ajout)
+                var missingAlias = normalizedName;
+                Assert.True(false,
+                    $"Objet {objectId} (\"{def.Name}\") : aucun alias ne contient tous les mots du nom normalisé ({normalizedName}). Alias manquant suggéré : \"{missingAlias}\"");
+            }
+        }
+    }
+
+    [Fact]
     public void Test_World_Is_Consistent()
     {
         var world = Releve.Engine.Tests.World.TestWorldFactory.Create();

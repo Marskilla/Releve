@@ -10,20 +10,25 @@ public sealed class TechCorridor : RoomBase
     private const string RoomDescription =
         "Un couloir de service étroit, sans fenêtre. Quelques plafonniers sont faibles ou éteints ; une poussière légère recouvre le sol.";
     private const string NorthBlockedMessage =
-        "La porte de l’escalier est fermée. Le lecteur de badge affiche un rouge fixe.";
+        "La porte de l'escalier est fermee. Le lecteur de badge affiche un rouge fixe.";
     private const string EastBlockedMessage =
         "La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe.";
     private const string BadgeUsedOnStairsReader =
-        "Le voyant passe au vert : la porte de l’escalier se déverrouille.";
+        "Le voyant passe au vert : la porte de l'escalier se deverrouille.";
     private const string StairsReaderAlreadyUnlocked =
-        "Le lecteur de l’escalier est déjà déverrouillé.";
+        "Le lecteur de l'escalier est deja deverrouille.";
     private const string BadgeUsedOnTechReader =
         "Le lecteur refuse le badge. Son voyant clignote en rouge.";
     private const string OpenStairsDoorLocked =
-        "La porte de l’escalier est fermée. Le lecteur de badge affiche un rouge fixe.";
-    private const string OpenStairsDoorUnlocked = "La porte de l’escalier est déverrouillée.";
+        "La porte de l'escalier est fermee. Le lecteur de badge affiche un rouge fixe.";
+    private const string OpenStairsDoorUnlocked = "La porte de l'escalier est deverrouillee.";
     private const string OpenTechDoor =
-        "La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe.";
+        "La porte du local technique est fermee. Le lecteur de badge affiche un rouge fixe.";
+
+    // Description de la porte du local technique (reutilisee pour le dialogue Image)
+    private const string TechDoorDescription =
+        "Une porte pleine a hublot. A travers, on distingue les elements d'une chaufferie, "
+        + "une rangee de lave-linge a l'arret depuis longtemps et des compteurs electriques.";
 
     // Coordonnées zones d'image (J5) - image 1774x887
     private const int StairsDoorX1 = 796, StairsDoorY1 = 205, StairsDoorX2 = 990, StairsDoorY2 = 566;
@@ -94,6 +99,19 @@ public sealed class TechCorridor : RoomBase
         if (c.Action == GameAction.Open && c.Target == ObjectId.TechDoor)
         {
             return CommandResult.Say(OpenTechDoor);
+        }
+
+        // J8-5: « regarde porte du local technique » / « regarde hublot » -> description + dialogue Image
+        if (c.Action == GameAction.Look && (c.Target == ObjectId.TechDoor || c.Target == ObjectId.TechReader))
+        {
+            var dialog = new DialogRequest(
+                DialogKind.Image,
+                null,
+                "technicalRoom",
+                new[] { new DialogChoice(DialogIds.Close, "Fermer") },
+                DialogIds.Close,
+                DialogIds.Close);
+            return CommandResult.Say(TechDoorDescription).WithDialog(dialog);
         }
 
         return null;

@@ -25,7 +25,7 @@ public static class BedroomObjects
         [ObjectId.BedroomMachines] = new ObjectDef(
             Id: ObjectId.BedroomMachines,
             Name: "les machines",
-            Aliases: new[] { "machine", "machines", "moniteur", "appareil", "appareils" },
+            Aliases: new[] { "machine", "machines", "moniteur", "appareil", "appareils", "materiel", "materiel medical" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
             InitialState: ObjectState.None,
@@ -33,7 +33,7 @@ public static class BedroomObjects
 
         [ObjectId.BedroomWardrobe] = new ObjectDef(
             Id: ObjectId.BedroomWardrobe,
-            Name: "l’armoire",
+            Name: "l'armoire",
             Aliases: new[] { "armoire", "placard" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
@@ -47,7 +47,7 @@ public static class BedroomObjects
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
             InitialState: ObjectState.None,
-            Describe: _ => "Des vêtements d’enfant, bien trop petits pour vous.",
+            Describe: _ => "Des vetements d'enfant, bien trop petits pour vous.",
             VisibleWhen: s => s.StateOf(ObjectId.BedroomWardrobe) == ObjectState.Open),
 
         [ObjectId.Badge] = new ObjectDef(
@@ -57,7 +57,7 @@ public static class BedroomObjects
             Portable: true,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
             InitialState: ObjectState.None,
-            Describe: _ => "Un badge d’identification. La photo est celle d’un enfant d’environ huit ans.",
+            Describe: _ => "Un badge d'identification. La photo est celle d'un enfant d'environ huit ans.",
             VisibleWhen: s => s.StateOf(ObjectId.BedroomWardrobe) == ObjectState.Open),
 
         [ObjectId.BedroomReader] = new ObjectDef(
@@ -76,7 +76,7 @@ public static class BedroomObjects
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
             InitialState: ObjectState.None,
-            Describe: _ => "Une porte pleine, équipée d’un lecteur de badge."),
+            Describe: _ => "Une porte pleine, equipee d'un lecteur de badge."),
 
         [ObjectId.BedroomBin] = new ObjectDef(
             Id: ObjectId.BedroomBin,
@@ -99,8 +99,8 @@ public static class BedroomObjects
 
     private static string DescribeWardrobe(GameState state) =>
         state.StateOf(ObjectId.BedroomWardrobe) == ObjectState.Open
-            ? "L’armoire est ouverte : elle contient des vêtements et un badge."
-            : "Une armoire en contreplaqué, de modèle hospitalier standard.";
+            ? "L'armoire est ouverte : elle contient des vetements et un badge."
+            : "Une armoire en contreplaqué, de modele hospitalier standard.";
 
     private static string DescribeReader(GameState state) =>
         state.StateOf(ObjectId.BedroomReader) == ObjectState.Unlocked
@@ -111,6 +111,6 @@ public static class BedroomObjects
         state.Locations.TryGetValue(ObjectId.GarbageBag, out var location)
         && location.Kind == LocationKind.Room
         && location.Room == RoomId.Bedroom
-            ? "Une corbeille. Elle ne contient qu’un sac poubelle vide."
+            ? "Une corbeille. Elle ne contient qu'un sac poubelle vide."
             : "Une corbeille, vide.";
 }

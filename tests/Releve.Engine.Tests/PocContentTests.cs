@@ -57,6 +57,7 @@ public class PocContentTests
         Assert.Equal(ExitState.Open, lobby.GetView().Exits[Direction.South]);
 
         lobby.Execute("passe le badge sur la borne");
+        lobby.ResolveDialog(DialogIds.PatientAccept); // Accepter la sortie
         Assert.Equal(ExitState.Open, lobby.GetView().Exits[Direction.West]);
 
         var street = lobby;
@@ -72,12 +73,12 @@ public class PocContentTests
 
         var reader = engine.Execute("utilise badge sur lecteur");
         Assert.Equal(
-            ["Précisez : le lecteur de l’escalier ou le lecteur du local technique."],
+            ["Precisez : le lecteur de l'escalier ou le lecteur du local technique."],
             reader.Messages);
 
         var door = engine.Execute("regarde porte");
         Assert.Equal(
-            ["Précisez : la porte de l’escalier ou la porte du local technique."],
+            ["Precisez : la porte de l'escalier ou la porte du local technique."],
             door.Messages);
     }
 
@@ -91,7 +92,7 @@ public class PocContentTests
         // refuse donc la prise au lieu de signaler un objet inconnu.
         Assert.Equal(["Vous ne pouvez pas prendre cela."], engine.Execute("prends badge").Messages);
 
-        Assert.Equal(["Vous ouvrez l’armoire."], engine.Execute("ouvre armoire").Messages);
+        Assert.Equal(["Vous ouvrez l'armoire."], engine.Execute("ouvre armoire").Messages);
         Assert.Equal(["Pris."], engine.Execute("prends badge").Messages);
     }
 
@@ -102,7 +103,7 @@ public class PocContentTests
 
         // Sac dans la chambre : la corbeille le contient.
         Assert.Equal(
-            ["Une corbeille. Elle ne contient qu’un sac poubelle vide."],
+            ["Une corbeille. Elle ne contient qu'un sac poubelle vide."],
             engine.Execute("regarde corbeille").Messages);
 
         // Le sac passe dans l'inventaire : la corbeille est vide.
@@ -118,7 +119,7 @@ public class PocContentTests
         // « sors » depuis la chambre = Est (mot de sortie, verbe compte lui-meme).
         var sors = engine.Execute("sors");
         Assert.Equal(
-            ["La porte est solidement fermée et le lecteur de badge affiche un rouge fixe."],
+            ["La porte est solidement fermee et le lecteur de badge affiche un rouge fixe."],
             sors.Messages);
         Assert.Equal(ExitState.Blocked, engine.GetView().Exits[Direction.East]);
 
@@ -136,6 +137,7 @@ public class PocContentTests
     {
         var lobby = EngineInLobby();
         lobby.Execute("passe le badge sur la borne"); // Ouest desormais ouvert
+        lobby.ResolveDialog(DialogIds.PatientAccept); // Accepter la sortie
 
         // « va rue » depuis l'accueil : « rue » est un mot de sortie (Ouest), prioritaire sur
         // l'alias « rue » de la porte vitree.
@@ -162,7 +164,7 @@ public class PocContentTests
 
         // « sors » dans le couloir : pas de mot de sortie correspondant.
         var sors = corridor.Execute("sors");
-        Assert.Equal(["Vous ne pouvez pas aller par là."], sors.Messages);
+        Assert.Equal(["Vous ne pouvez pas aller par la."], sors.Messages);
         Assert.False(sors.StateChanged);
         Assert.Equal(RoomId.TechCorridor, corridor.State.CurrentRoom);
     }
@@ -174,12 +176,12 @@ public class PocContentTests
 
         // « va porte » dans la chambre : « porte » n'est pas un mot de sortie.
         var r1 = engine.Execute("va porte");
-        Assert.Equal(["Vous ne pouvez pas aller par là."], r1.Messages);
+        Assert.Equal(["Vous ne pouvez pas aller par la."], r1.Messages);
         Assert.False(r1.StateChanged);
 
         // « aller lit » : « lit » n'est pas un mot de sortie.
         var r2 = engine.Execute("aller lit");
-        Assert.Equal(["Vous ne pouvez pas aller par là."], r2.Messages);
+        Assert.Equal(["Vous ne pouvez pas aller par la."], r2.Messages);
 
         // « va ascenseur » depuis l'accueil : « ascenseur » est un mot de sortie (Nord), mais
         // la sortie est bloquee -> message de blocage, pas d'exception.
@@ -195,7 +197,7 @@ public class PocContentTests
         var engine = CreateEngine();
 
         var result = engine.Execute("lis");
-        Assert.Equal(["Il n’y a rien à lire ici."], result.Messages);
+        Assert.Equal(["Il n'y a rien a lire ici."], result.Messages);
         Assert.False(result.StateChanged);
     }
 
@@ -225,7 +227,7 @@ public class PocContentTests
 
         // Badge dans l'inventaire, mais « utilise badge » n'a pas d'instrument.
         var result = engine.Execute("utilise badge");
-        Assert.Equal(["Précisez sur quoi l’utiliser."], result.Messages);
+        Assert.Equal(["Precisez sur quoi l'utiliser."], result.Messages);
         Assert.False(result.StateChanged);
     }
 
@@ -236,41 +238,42 @@ public class PocContentTests
         var bedroom = CreateEngine();
         var porteVerrouillee = bedroom.Execute("ouvre porte");
         Assert.Equal(
-            ["La porte est solidement fermée et le lecteur de badge affiche un rouge fixe."],
+            ["La porte est solidement fermee et le lecteur de badge affiche un rouge fixe."],
             porteVerrouillee.Messages);
 
         // Couloir : porte de l'escalier verrouillee.
         var corridor = EngineInCorridor();
         var escalierVerrouille = corridor.Execute("ouvre porte de l'escalier");
         Assert.Equal(
-            ["La porte de l’escalier est fermée. Le lecteur de badge affiche un rouge fixe."],
+            ["La porte de l'escalier est fermee. Le lecteur de badge affiche un rouge fixe."],
             escalierVerrouille.Messages);
 
         // Couloir : apres deverrouillage, porte de l'escalier ouverte.
         corridor.Execute("utilise badge sur lecteur escalier");
         var escalierOuvert = corridor.Execute("ouvre porte de l'escalier");
-        Assert.Equal(["La porte de l’escalier est déverrouillée."], escalierOuvert.Messages);
+        Assert.Equal(["La porte de l'escalier est deverrouillee."], escalierOuvert.Messages);
 
         // Couloir : porte du local technique, toujours refusee.
         var localTechnique = corridor.Execute("ouvre porte technique");
         Assert.Equal(
-            ["La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe."],
+            ["La porte du local technique est fermee. Le lecteur de badge affiche un rouge fixe."],
             localTechnique.Messages);
 
         // Accueil : porte vitree verrouillee.
         var lobby = EngineInLobby();
         var vitreeFermee = lobby.Execute("ouvre porte vitree");
-        Assert.Equal(["La porte vitrée de l’entrée reste fermée."], vitreeFermee.Messages);
+        Assert.Equal(["La porte vitree de l'entree est fermee. L'androide s'adresse alors a vous : « S'il vous plait ! » Il semble vous inviter a venir le voir."], vitreeFermee.Messages);
 
         // Accueil : apres activation du borne, porte vitree ouverte.
         lobby.Execute("passe le badge sur la borne");
+        lobby.ResolveDialog(DialogIds.PatientAccept); // Accepter la sortie
         var vitreeOuverte = lobby.Execute("ouvre porte vitree");
-        Assert.Equal(["La porte vitrée de l’entrée se déverrouille."], vitreeOuverte.Messages);
+        Assert.Equal(["La porte vitree de l'entree se deverrouille."], vitreeOuverte.Messages);
 
         // Accueil : ascenseur, toujours refuse.
         var ascenseur = lobby.Execute("ouvre ascenseur");
         Assert.Equal(
-            ["Les portes de l’ascenseur restent closes. Le lecteur de badge affiche un rouge fixe."],
+            ["Les portes de l'ascenseur restent closes. Le lecteur de badge affiche un rouge fixe."],
             ascenseur.Messages);
     }
 
@@ -281,12 +284,12 @@ public class PocContentTests
 
         var interroge = lobby.Execute("interroge androide");
         Assert.Equal(
-            ["L’androïde s’anime : « Veuillez passer votre badge sur la borne pour sortir. »"],
+            ["L'androide, qui semblait etre en pause, prend vie et s'adresse a vous : « La politique de l'etablissement nous empeche de laisser sortir des patients sans emargement precedent. Passez votre badge sur la borne du comptoir pour emarger, merci. »"],
             interroge.Messages);
 
         var demande = lobby.Execute("demande androide");
         Assert.Equal(
-            ["L’androïde s’anime : « Veuillez passer votre badge sur la borne pour sortir. »"],
+            ["L'androide, qui semblait etre en pause, prend vie et s'adresse a vous : « La politique de l'etablissement nous empeche de laisser sortir des patients sans emargement precedent. Passez votre badge sur la borne du comptoir pour emarger, merci. »"],
             demande.Messages);
     }
 
@@ -301,7 +304,7 @@ public class PocContentTests
 
         // « utilise badge sur lecteur escalier » fonctionne deja (instrument present).
         var actionne = corridor.Execute("actionne badge sur lecteur escalier");
-        Assert.Equal(["Le voyant passe au vert : la porte de l’escalier se déverrouille."], actionne.Messages);
+        Assert.Equal(["Le voyant passe au vert : la porte de l'escalier se deverrouille."], actionne.Messages);
     }
 
     [Fact]
@@ -316,7 +319,7 @@ public class PocContentTests
         // « monte » depuis le couloir (bloque, lecteur de l'escalier encore verrouille).
         var monte = engine.Execute("monte");
         Assert.Equal(
-            ["La porte de l’escalier est fermée. Le lecteur de badge affiche un rouge fixe."],
+            ["La porte de l'escalier est fermee. Le lecteur de badge affiche un rouge fixe."],
             monte.Messages);
 
         // « descendre » depuis l'accueil (vers le couloir, ouvert).
@@ -327,26 +330,35 @@ public class PocContentTests
     }
 
     [Fact]
-    public void Patient_Record_Is_Displayed_Verbatim()
+    public void Patient_Record_Is_Displayed_In_Dialog()
     {
         var lobby = EngineInLobby();
         var result = lobby.Execute("passe le badge sur la borne");
 
-        Assert.Equal(
-        [
+        // Message console seulement (la fiche est dans le dialogue)
+        Assert.Equal(["Vous passez le badge devant la borne. La fiche patient s'affiche."], result.Messages);
+        Assert.False(result.StateChanged);
+        
+        // Le dialogue contient la fiche patient
+        Assert.NotNull(result.Dialog);
+        Assert.Equal(DialogKind.Text, result.Dialog.Kind);
+        
+        var expectedRecord = string.Join("\n", new[]
+        {
             "FICHE PATIENT",
-            "Nom : Marchand - Prénom : Alex",
-            "Date d’entrée : 14 mars 2113",
-            "Motif d’admission : maladie inconnue évolutive nécessitant un traitement adaptatif",
-            "Conditions de sortie : maladie en rémission complète",
+            "Nom : Marchand - Prenom : Alex",
+            "Date d'entree : 14 mars 2113",
+            "Motif d'admission : maladie inconnue evolutive necessitant un traitement adaptatif",
+            "Conditions de sortie : maladie en remission complete",
             "Adresse de sortie : Alex Marchand, chez M. et Mme Marchand, 12 rue des Tilleuls",
-            "La porte vitrée de l’entrée se déverrouille.",
-        ], result.Messages);
-
-        // Repeter l'action reaffiche la fiche, sans le message de deverrouillage.
+        });
+        Assert.Equal(expectedRecord, result.Dialog.Content);
+        
+        // Repeter l'action reaffiche la fiche dans le dialogue, sans message de deverrouillage.
         var again = lobby.Execute("passe le badge sur la borne");
-        Assert.Equal("Adresse de sortie : Alex Marchand, chez M. et Mme Marchand, 12 rue des Tilleuls", again.Messages[^1]);
-        Assert.DoesNotContain("La porte vitrée de l’entrée se déverrouille.", again.Messages);
+        Assert.Equal(["Vous passez le badge devant la borne. La fiche patient s'affiche."], again.Messages);
+        Assert.NotNull(again.Dialog);
+        Assert.Equal(expectedRecord, again.Dialog.Content);
     }
 
     [Fact]
@@ -357,29 +369,29 @@ public class PocContentTests
         // 1. depart : message d'accueil, puis description courte ; fleche est bloquee.
         var start = engine.Start();
         Assert.Equal(2, start.Count);
-        Assert.Equal("Alors que vous ouvrez doucement les yeux, une voix de synthèse annonce : « Réveil terminé, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d’hôpital, la tenue standard des malades alités.", start[0]);
-        Assert.Equal("La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire.", start[1]);
+        Assert.Equal("Alors que vous ouvrez doucement les yeux, une voix de synthese annonce : « Reveil termine, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d'hopital, la tenue standard des malades alites.", start[0]);
+        Assert.Equal("La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire.", start[1]);
         Assert.Equal(ExitState.Blocked, engine.GetView().Exits[Direction.East]);
 
         // 2. « est » : message de porte fermee, sans indiquer comment debloquer.
         var east = engine.Execute("est");
         Assert.Equal(
-            ["La porte est solidement fermée et le lecteur de badge affiche un rouge fixe."],
+            ["La porte est solidement fermee et le lecteur de badge affiche un rouge fixe."],
             east.Messages);
         Assert.Equal(RoomId.Bedroom, engine.State.CurrentRoom);
 
         // 3. ouverture de l'armoire, puis prise du badge.
-        Assert.Equal(["Vous ouvrez l’armoire."], engine.Execute("ouvre armoire").Messages);
+        Assert.Equal(["Vous ouvrez l'armoire."], engine.Execute("ouvre armoire").Messages);
         Assert.Equal(["Pris."], engine.Execute("prends badge").Messages);
 
         // 4. badge sur le lecteur : la fleche est devient active.
         var unlocked = engine.Execute("utilise badge sur lecteur");
         Assert.Equal(
-            ["Vous passez le badge devant le lecteur. Le voyant passe au vert et la porte se déverrouille."],
+            ["Vous passez le badge devant le lecteur. Le voyant passe au vert et la porte se deverrouille."],
             unlocked.Messages);
         Assert.Equal(ExitState.Open, engine.GetView().Exits[Direction.East]);
 
-        // 5. couloir technique : fleches nord et est bloquees.
+// 5. couloir technique : fleches nord et est bloquees.
         var entered = engine.Execute("est");
         Assert.Equal(
             "Un couloir de service étroit, sans fenêtre. Quelques plafonniers sont faibles ou éteints ; une poussière légère recouvre le sol.",
@@ -389,31 +401,36 @@ public class PocContentTests
         Assert.Equal(ExitState.Blocked, engine.GetView().Exits[Direction.East]);
 
         // 6. « lecteur » seul est ambigu dans le couloir.
-        Assert.Contains("Précisez", engine.Execute("utilise badge sur lecteur").Messages[0]);
+        Assert.Contains("Precisez", engine.Execute("utilise badge sur lecteur").Messages[0]);
 
         // 7. lecteur de l'escalier, puis montee vers l'accueil.
         var stairs = engine.Execute("utilise badge sur lecteur escalier");
-        Assert.Equal(["Le voyant passe au vert : la porte de l’escalier se déverrouille."], stairs.Messages);
+        Assert.Equal(["Le voyant passe au vert : la porte de l'escalier se deverrouille."], stairs.Messages);
         Assert.Equal(ExitState.Open, engine.GetView().Exits[Direction.North]);
 
         var lobby = engine.Execute("nord");
-        Assert.Contains("hall d’accueil", lobby.Messages[0], StringComparison.Ordinal);
+        Assert.Contains("hall d'accueil", lobby.Messages[0], StringComparison.Ordinal);
         Assert.Equal(RoomId.HospitalLobby, engine.State.CurrentRoom);
 
         // 8. sortie ouest bloquee, puis reponse de l'androide.
         var west = engine.Execute("ouest");
-        Assert.Equal(["La porte vitrée de l’entrée reste fermée."], west.Messages);
+        Assert.Equal(["La porte vitree de l'entree est fermee. L'androide s'adresse alors a vous : « S'il vous plait ! » Il semble vous inviter a venir le voir."], west.Messages);
 
-        var talk = engine.Execute("parle à l’androïde");
+        var talk = engine.Execute("parle a l'androide");
         Assert.Equal(
-            ["L’androïde s’anime : « Veuillez passer votre badge sur la borne pour sortir. »"],
+            ["L'androide, qui semblait etre en pause, prend vie et s'adresse a vous : « La politique de l'etablissement nous empeche de laisser sortir des patients sans emargement precedent. Passez votre badge sur la borne du comptoir pour emarger, merci. »"],
             talk.Messages);
 
-        // 9. badge sur la borne : fiche patient, puis deverrouillage de la porte vitree.
+        // 9. badge sur la borne : fiche patient dans dialogue, puis deverrouillage via choix.
         var record = engine.Execute("passe le badge sur la borne");
-        Assert.Equal(7, record.Messages.Count);
-        Assert.Equal("FICHE PATIENT", record.Messages[0]);
-        Assert.Equal("La porte vitrée de l’entrée se déverrouille.", record.Messages[^1]);
+        Assert.Equal(["Vous passez le badge devant la borne. La fiche patient s'affiche."], record.Messages);
+        Assert.NotNull(record.Dialog);
+        Assert.Equal(DialogKind.Text, record.Dialog.Kind);
+        
+        // Choisir d'accepter la sortie
+        var accept = engine.ResolveDialog(DialogIds.PatientAccept);
+        Assert.Equal(["Vous validez la sortie. La porte vitree de l'entree se deverrouille."], accept.Messages);
+        Assert.True(accept.StateChanged);
         Assert.Equal(ExitState.Open, engine.GetView().Exits[Direction.West]);
 
         // 10. rue provisoire : fin du PoC.
@@ -442,6 +459,7 @@ public class PocContentTests
             engine.Execute("utilise badge sur lecteur escalier");
             engine.Execute("nord");
             engine.Execute("passe le badge sur la borne");
+            engine.ResolveDialog(DialogIds.PatientAccept); // Accepter la sortie
             engine.Execute("ouest");
 
             store.Save(engine.State);
@@ -476,5 +494,60 @@ public class PocContentTests
             {
             }
         }
+    }
+
+    [Fact]
+    public void Move_East_From_Bedroom_Unlocked_Returns_MovedTo_East_And_StateChanged()
+    {
+        var engine = CreateEngine();
+        engine.Start();
+        engine.Execute("ouvre armoire");
+        engine.Execute("prends badge");
+        engine.Execute("utilise badge sur lecteur");
+
+        var result = engine.Execute("est");
+
+        Assert.True(result.StateChanged);
+        Assert.Equal(Direction.East, result.MovedTo);
+    }
+
+    [Fact]
+    public void Move_East_From_Bedroom_Locked_Returns_MovedTo_Null()
+    {
+        var engine = CreateEngine();
+        engine.Start();
+        // Ne pas ouvrir l'armoire -> lecteur verrouille
+
+        var result = engine.Execute("est");
+
+        Assert.False(result.StateChanged);
+        Assert.Null(result.MovedTo);
+    }
+
+    [Fact]
+    public void Move_Sors_Exit_Word_From_Bedroom_Unlocked_Returns_MovedTo_East()
+    {
+        var engine = CreateEngine();
+        engine.Start();
+        engine.Execute("ouvre armoire");
+        engine.Execute("prends badge");
+        engine.Execute("utilise badge sur lecteur");
+
+        var result = engine.Execute("sors"); // mot de sortie vers l'est
+
+        Assert.True(result.StateChanged);
+        Assert.Equal(Direction.East, result.MovedTo);
+    }
+
+    [Fact]
+    public void Non_Move_Command_Returns_MovedTo_Null()
+    {
+        var engine = CreateEngine();
+        engine.Start();
+
+        var result = engine.Execute("regarde");
+
+        Assert.False(result.StateChanged);
+        Assert.Null(result.MovedTo);
     }
 }

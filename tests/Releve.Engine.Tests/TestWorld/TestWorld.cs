@@ -31,12 +31,12 @@ public static class TestObjects
     {
         [ObjectId.TestKey] = new ObjectDef(
             Id: ObjectId.TestKey,
-            Name: "petite clé",
+            Name: "petite cle",
             Aliases: new[] { "clef", "cle", "petite clef" },
             Portable: true,
             InitialLocation: Location.InRoom(RoomId.TestRoomStart),
             InitialState: ObjectState.None,
-            Describe: _ => "Une petite clé de fer, à panse ronde."),
+            Describe: _ => "Une petite cle de fer, a panse ronde."),
 
         [ObjectId.TestCabinet] = new ObjectDef(
             Id: ObjectId.TestCabinet,
@@ -46,8 +46,8 @@ public static class TestObjects
             InitialLocation: Location.InRoom(RoomId.TestRoomStart),
             InitialState: ObjectState.Locked,
             Describe: s => s.StateOf(ObjectId.TestCabinet) == ObjectState.Locked
-                ? "L’armoire est fermée à clé. Sa serrure est en métal clair."
-                : "L’armoire est déverrouillée. Le battant reste clos."),
+                ? "L'armoire est fermee a cle. Sa serrure est en metal clair."
+                : "L'armoire est deverrouillee. Le battant reste clos."),
 
         [ObjectId.TestChest] = new ObjectDef(
             Id: ObjectId.TestChest,
@@ -76,7 +76,7 @@ public static class TestObjects
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.TestRoomStart),
             InitialState: ObjectState.None,
-            Describe: _ => "Un registre relié, couvert d’une écriture fine."),
+            Describe: _ => "Un registre relie, couvert d'une ecriture fine."),
 
         [ObjectId.TestHiddenNote] = new ObjectDef(
             Id: ObjectId.TestHiddenNote,
@@ -95,13 +95,13 @@ public sealed class TestRoomStart : RoomBase
 {
     private const string TitleText = "Salle de départ";
     private const string DescriptionText =
-        "Une salle carrée. Une armoire est posée contre le mur nord, un coffre repose au pied d’un banc. À l’est, un couloir effondré.";
+        "Une salle carree. Une armoire est posee contre le mur nord, un coffre repose au pied d'un banc. A l'est, un couloir effondre.";
     private const string NorthBlockedMessage =
-        "Une porte de pierre bloque le passage nord. Sa serrure est bien fermée.";
+        "Une porte de pierre bloque le passage nord. Sa serrure est bien fermee.";
     private const string EastBlockedMessage =
         "Le couloir est bouché par un éboulis.";
-    private const string KeyUsedOnCabinet = "La clé tourne : la serrure de l’armoire cède.";
-    private const string KeyUsedOnOpenCabinet = "La serrure est déjà ouverte.";
+    private const string KeyUsedOnCabinet = "La cle tourne : la serrure de l'armoire cede.";
+    private const string KeyUsedOnOpenCabinet = "La serrure est deja ouverte.";
     private const string OtherUsedOnCabinet = "Rien ne se produit.";
 
     public override RoomId Id => RoomId.TestRoomStart;
@@ -168,7 +168,7 @@ public sealed class TestRoomVault : RoomBase
 public sealed class TestRoomWall : RoomBase
 {
     private const string TitleText = "Cul-de-sac";
-    private const string DescriptionText = "Un cul-de-sac. Le béton reprend des deux côtés.";
+    private const string DescriptionText = "Un cul-de-sac. Le beton reprend des deux cotes.";
 
     public override RoomId Id => RoomId.TestRoomWall;
 

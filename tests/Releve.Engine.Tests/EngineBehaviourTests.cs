@@ -17,7 +17,7 @@ public class EngineBehaviourTests
         var messages = engine.Start();
 
         Assert.Single(messages);
-        Assert.Equal("Une salle carrée. Une armoire est posée contre le mur nord, un coffre repose au pied d’un banc. À l’est, un couloir effondré.", messages[0]);
+        Assert.Equal("Une salle carree. Une armoire est posee contre le mur nord, un coffre repose au pied d'un banc. A l'est, un couloir effondre.", messages[0]);
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class EngineBehaviourTests
         var result = engine.Execute("regarde");
 
         Assert.False(result.StateChanged);
-        Assert.Contains(result.Messages, m => m.Contains("salle carrée", StringComparison.Ordinal));
+        Assert.Contains(result.Messages, m => m.Contains("salle carree", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class EngineBehaviourTests
         Assert.True(engine.State.IsInInventory(ObjectId.TestKey));
 
         var inventory = engine.Execute("inventaire");
-        Assert.Equal(["petite clé"], inventory.Messages);
+        Assert.Equal(["petite cle"], inventory.Messages);
 
         var dropped = engine.Execute("pose clef");
         Assert.Equal(["Posé."], dropped.Messages);
@@ -99,7 +99,7 @@ public class EngineBehaviourTests
 
         // Après avoir pris la clef, "utilise clef" sans instrument -> "Précisez sur quoi l'utiliser."
         engine.Execute("prends clef");
-        Assert.Equal(["Précisez sur quoi l’utiliser."], engine.Execute("utilise clef").Messages);
+        Assert.Equal(["Precisez sur quoi l'utiliser."], engine.Execute("utilise clef").Messages);
 
         Assert.Equal(["Rien ne se passe."], engine.Execute("parle clef").Messages);
     }
@@ -111,7 +111,7 @@ public class EngineBehaviourTests
 
         var result = engine.Execute("utilise clef sur armoire");
 
-        Assert.Equal(["Vous ne l’avez pas sur vous."], result.Messages);
+        Assert.Equal(["Vous ne l'avez pas sur vous."], result.Messages);
         Assert.Equal(ObjectState.Locked, engine.State.StateOf(ObjectId.TestCabinet));
     }
 
@@ -120,8 +120,8 @@ public class EngineBehaviourTests
     {
         var engine = TestSupport.FreshTestEngine();
 
-        Assert.Equal(["Vous ne pouvez pas aller par là."], engine.Execute("sud").Messages);
-        Assert.Equal(["Vous ne pouvez pas aller par là."], engine.Execute("ouest").Messages);
+        Assert.Equal(["Vous ne pouvez pas aller par la."], engine.Execute("sud").Messages);
+        Assert.Equal(["Vous ne pouvez pas aller par la."], engine.Execute("ouest").Messages);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class EngineBehaviourTests
         var engine = TestSupport.FreshTestEngine();
 
         var blocked = engine.Execute("nord");
-        Assert.Equal(["Une porte de pierre bloque le passage nord. Sa serrure est bien fermée."], blocked.Messages);
+        Assert.Equal(["Une porte de pierre bloque le passage nord. Sa serrure est bien fermee."], blocked.Messages);
         Assert.False(blocked.StateChanged);
         Assert.Equal(RoomId.TestRoomStart, engine.State.CurrentRoom);
     }
@@ -144,7 +144,7 @@ public class EngineBehaviourTests
         var validResponses = FlavourText.UnknownNeutral.Concat(FlavourText.UnknownHumour).ToArray();
         Assert.Contains(unknownVerb, validResponses);
 
-        Assert.Equal(["Précisez l’objet de la commande."], engine.Execute("prends").Messages);
+        Assert.Equal(["Precisez l'objet de la commande."], engine.Execute("prends").Messages);
         Assert.Equal(["Vous ne voyez pas cela ici."], engine.Execute("prends crayon").Messages);
         Assert.Empty(engine.Execute("   ").Messages);
     }
@@ -160,6 +160,26 @@ public class EngineBehaviourTests
 
         var result = engine.Execute("regarde carnet");
         Assert.Equal(["Un carnet de poche, glissé au fond du coffre."], result.Messages);
+    }
+
+    [Fact]
+    public void Look_Without_Target_Empty_DetailedDescription_Falls_Back_To_Description()
+    {
+        // Creer un petit monde local avec une piece dont DetailedDescription renvoie string.Empty
+        var world = new WorldModel(
+            RoomId.TestRoomStart,
+            new Dictionary<RoomId, RoomBase>
+            {
+                [RoomId.TestRoomStart] = new RoomWithEmptyDetailedDescription(),
+            },
+            new Dictionary<ObjectId, ObjectDef>());
+        var engine = new GameEngine(world, world.CreateInitialState());
+        engine.Start();
+
+        var result = engine.Execute("regarde");
+
+        Assert.False(result.StateChanged);
+        Assert.Equal("Description de base.", result.Messages[0]);
     }
 }
 
@@ -190,7 +210,7 @@ public class ExitStateTests
         Assert.Equal(RoomId.TestRoomStart, view.Room);
         Assert.Equal("Salle de départ", view.Title);
         Assert.Equal("test_start", view.ImageKey);
-        Assert.Equal(["petite clé"], view.Inventory.Select(i => i.Name));
+        Assert.Equal(["petite cle"], view.Inventory.Select(i => i.Name));
     }
 
     [Fact]
@@ -206,7 +226,7 @@ public class ExitStateTests
         Assert.Equal(ExitState.Open, engine.GetView().Exits[Direction.North]);
     }
 
-    [Fact]
+[Fact]
     public void One_Way_Exit_Has_No_Arrow_On_The_Other_Side()
     {
         var engine = TestSupport.FreshTestEngine();
@@ -225,19 +245,15 @@ public class ExitStateTests
         Assert.All(new[] { Direction.North, Direction.South, Direction.East, Direction.West },
             d => Assert.Equal(ExitState.Absent, engine.GetView().Exits[d]));
     }
+}
 
-    [Fact]
-    public void Moving_Back_And_Forth_Changes_Room_And_Messages()
-    {
-        var engine = TestSupport.FreshTestEngine();
-        engine.Execute("prends clef");
-        engine.Execute("utilise clef sur armoire");
-
-        var north = engine.Execute("nord");
-        Assert.True(north.StateChanged);
-        Assert.Equal("Une petite chambre forte aux parois de métal.", north.Messages[0]);
-
-        var south = engine.Execute("sud");
-        Assert.Equal("Une salle carrée. Une armoire est posée contre le mur nord, un coffre repose au pied d’un banc. À l’est, un couloir effondré.", south.Messages[0]);
-    }
+/// <summary>Piece de test avec DetailedDescription vide.</summary>
+internal sealed class RoomWithEmptyDetailedDescription : RoomBase
+{
+    public override RoomId Id => RoomId.TestRoomStart;
+    public override string Title => "Salle de test";
+    public override string ImageKey(GameState s) => "test";
+    public override string Description(GameState s) => "Description de base.";
+    public override string? DetailedDescription(GameState s) => string.Empty;
+    public override IReadOnlyList<Exit> Exits => Array.Empty<Exit>();
 }

@@ -59,10 +59,13 @@ public sealed record Exit(
     IReadOnlyList<string>? Words = null);
 
 /// <summary>Resultat d'une commande : messages a afficher, avec indication de changement d'etat.</summary>
-public sealed record CommandResult(IReadOnlyList<string> Messages, bool StateChanged = false)
+public sealed record CommandResult(IReadOnlyList<string> Messages, bool StateChanged = false, Direction? MovedTo = null, DialogRequest? Dialog = null)
 {
     public static CommandResult Say(params string[] m) => new(m);
     public static CommandResult Changed(params string[] m) => new(m, true);
+    
+    /// <summary>Retourne un nouveau CommandResult avec la demande de dialogue ajoutee.</summary>
+    public CommandResult WithDialog(DialogRequest d) => this with { Dialog = d };
 }
 
 /// <summary>Ligne d'inventaire.</summary>
@@ -73,6 +76,21 @@ public sealed record ImagePatch(int X1, int Y1, int X2, int Y2, Func<GameState, 
 
 /// <summary>Rectangle d'image (coordonnées source).</summary>
 public readonly record struct ImageRect(int X1, int Y1, int X2, int Y2);
+
+/// <summary>Type de dialogue modal demandé par le moteur (J8).</summary>
+public enum DialogKind { Text, Image }
+
+/// <summary>Choix dans un dialogue (J8).</summary>
+public sealed record DialogChoice(string Id, string Label);
+
+/// <summary>Demande de dialogue modal (J8).</summary>
+public sealed record DialogRequest(
+    DialogKind Kind,
+    string? Title,
+    string Content,
+    IReadOnlyList<DialogChoice> Choices,
+    string DefaultChoiceId,
+    string CancelChoiceId);
 
 /// <summary>Instantane de l'etat a afficher, relu par la couche Game a chaque image.</summary>
 public sealed record RoomView(

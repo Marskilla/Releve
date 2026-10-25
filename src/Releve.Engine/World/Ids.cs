@@ -78,3 +78,11 @@ public static class Directions
         _ => throw new ArgumentOutOfRangeException(nameof(dir)),
     };
 }
+
+/// <summary>Identifiants des choix de dialogue (J8).</summary>
+public static class DialogIds
+{
+    public const string Close = "Close";
+    public const string PatientAccept = "PatientAccept";
+    public const string PatientRefuse = "PatientRefuse";
+}

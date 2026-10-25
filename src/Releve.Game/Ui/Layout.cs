@@ -40,4 +40,10 @@ public static class Layout
     public static Rectangle ArrowsBounds => new(SidebarX, 0, SidebarWidth, ArrowsHeight);
     public static Rectangle InventoryBounds => new(SidebarX, ArrowsHeight, SidebarWidth, TopHeight - ArrowsHeight);
     public static Rectangle ConsoleBounds => new(ConsoleX, ConsoleY, ConsoleWidth, ConsoleHeight);
+
+    // J9-4: Modales
+    // DialogBounds : 60% de 1280x720 = 768x432, centre = (256, 144)
+    public static Rectangle DialogBounds => new(256, 144, 768, 432);
+    // ImageDialogBounds : carre de 60% de ScreenHeight = 432x432, centre = (424, 144)
+    public static Rectangle ImageDialogBounds => new(424, 144, 432, 432);
 }

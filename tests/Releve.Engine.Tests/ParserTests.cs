@@ -29,7 +29,7 @@ public class ParserTests
     [InlineData("appuie sur armoire", GameAction.Use, ObjectId.TestCabinet, null)]
     [InlineData("saisis le livre ancien", GameAction.Take, ObjectId.TestBook, null)]
     [InlineData("utilise clef sur armoire", GameAction.Use, ObjectId.TestCabinet, ObjectId.TestKey)]
-    [InlineData("utilise la clef sur l’armoire", GameAction.Use, ObjectId.TestCabinet, ObjectId.TestKey)]
+    [InlineData("utilise la clef sur l'armoire", GameAction.Use, ObjectId.TestCabinet, ObjectId.TestKey)]
     [InlineData("utilise clef au placard", GameAction.Use, ObjectId.TestCabinet, ObjectId.TestKey)]
     public void Parse_Verb_Variants(string input, GameAction expected, ObjectId target, ObjectId? instrument)
     {
@@ -83,7 +83,7 @@ public class ParserTests
         Assert.Equal(ParseError.Ambiguous, result.Error);
         Assert.Contains("livre ancien", result.CandidateNames!);
         Assert.Contains("livre de comptes", result.CandidateNames!);
-        Assert.Equal("Précisez : livre ancien ou livre de comptes.", result.ErrorMessage);
+        Assert.Equal("Precisez : livre ancien ou livre de comptes.", result.ErrorMessage);
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public class ParserTests
 
         var verb = Parse(World.CreateInitialState(), "saute");
         Assert.Equal(ParseError.UnknownVerb, verb.Error);
-        Assert.Equal("Cette commande n’est pas comprise.", verb.ErrorMessage);
+        Assert.Equal("Cette commande n'est pas comprise.", verb.ErrorMessage);
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class ParserTests
 
         var missing = Parse(World.CreateInitialState(), "prends");
         Assert.Equal(ParseError.MissingObject, missing.Error);
-        Assert.Equal("Précisez l’objet de la commande.", missing.ErrorMessage);
+        Assert.Equal("Precisez l'objet de la commande.", missing.ErrorMessage);
     }
 
     /// <summary>Mots de sortie : passages directs et rejet quand aucun mot ne correspond.</summary>

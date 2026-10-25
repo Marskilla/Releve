@@ -11,22 +11,22 @@ public sealed class Bedroom : RoomBase
 
     // Textes constants (J3.4)
     private const string IntroMessage =
-        "Alors que vous ouvrez doucement les yeux, une voix de synthèse annonce : « Réveil terminé, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d’hôpital, la tenue standard des malades alités.";
+        "Alors que vous ouvrez doucement les yeux, une voix de synthese annonce : « Reveil termine, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d'hopital, la tenue standard des malades alites.";
 
     private const string DescriptionText =
-        "La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire.";
+        "La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire.";
 
     private const string DetailedDescriptionWithBag =
-        "La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire. Dans un coin se trouve une corbeille et son sac vide. Une porte contrôlée par un lecteur de badge constitue la seule sortie.";
+        "La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire. Dans un coin se trouve une corbeille et son sac vide. Une porte controlee par un lecteur de badge constitue la seule sortie.";
 
     private const string DetailedDescriptionWithoutBag =
-        "La pièce est propre, éclairée et sans fenêtre. Du matériel médical autonome est présent, ainsi qu’une armoire. Dans un coin se trouve une corbeille. Une porte contrôlée par un lecteur de badge constitue la seule sortie.";
+        "La piece est propre, eclairee et sans fenetre. Du materiel medical autonome est present, ainsi qu'une armoire. Dans un coin se trouve une corbeille. Une porte controlee par un lecteur de badge constitue la seule sortie.";
 
     private const string EastBlockedMessage =
-        "La porte est solidement fermée et le lecteur de badge affiche un rouge fixe.";
+        "La porte est solidement fermee et le lecteur de badge affiche un rouge fixe.";
     private const string BadgeUsedOnReader =
-        "Vous passez le badge devant le lecteur. Le voyant passe au vert et la porte se déverrouille.";
-    private const string ReaderAlreadyUnlocked = "Le lecteur est déjà déverrouillé.";
+        "Vous passez le badge devant le lecteur. Le voyant passe au vert et la porte se deverrouille.";
+    private const string ReaderAlreadyUnlocked = "Le lecteur est deja deverrouille.";
 
     // Coordonnées zones d'image (J5) - image 1774x887
     private const int WardrobeX1 = 679, WardrobeY1 = 115, WardrobeX2 = 1108, WardrobeY2 = 635;

@@ -16,6 +16,7 @@ public sealed class ScreenFade
 
     private State _state = State.Idle;
     private float _timer;
+    private bool _ignoreFirstUpdate;
 
     public State CurrentState => _state;
     public bool IsActive => _state != State.Idle;
@@ -25,6 +26,7 @@ public sealed class ScreenFade
     {
         _state = State.Out;
         _timer = 0f;
+        _ignoreFirstUpdate = false;
     }
 
     /// <summary>Démarre le fondu d'entrée (depuis le noir).</summary>
@@ -32,6 +34,7 @@ public sealed class ScreenFade
     {
         _state = State.In;
         _timer = 0f;
+        _ignoreFirstUpdate = true;
     }
 
     /// <summary>Met à jour le fondu. Renvoie l'événement de fin si applicable.</summary>
@@ -39,6 +42,12 @@ public sealed class ScreenFade
     {
         if (_state == State.Idle)
         {
+            return FadeEvent.None;
+        }
+
+        if (_ignoreFirstUpdate)
+        {
+            _ignoreFirstUpdate = false;
             return FadeEvent.None;
         }
 

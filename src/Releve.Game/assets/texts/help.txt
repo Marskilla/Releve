@@ -2,9 +2,11 @@ AIDE
 
 PRINCIPE DU JEU
 
-Relève est un jeu d'aventure à vue fixe. L'écran vous montre le lieu où vous vous trouvez. Vous explorez en observant, en ramassant des objets et en les utilisant, en écrivant vos actions sous forme de courtes phrases dans la zone de texte, en bas de l'écran.
+Relève est un jeu d'aventure à vue fixe. L'écran vous montre le lieu où vous vous trouvez. 
+Vous explorez en observant, en ramassant des objets et en les utilisant, en écrivant vos actions sous forme de courtes phrases dans la zone de texte, en bas de l'écran.
 
-Il n'y a pas de menu d'actions : c'est à vous de deviner ce qui est possible, de tenter des choses et d'observer comment le monde réagit. Une commande qui échoue ne coûte rien.
+Il n'y a pas de menu d'actions : c'est à vous de deviner ce qui est possible, de tenter des choses et d'observer comment le monde réagit. 
+Une commande qui échoue ne coûte rien.
 
 L'ÉCRAN
 
@@ -31,11 +33,13 @@ Quelques exemples de ce que le jeu comprend :
 
 Écrire simplement « regarde » ou « observe » décrit le lieu dans lequel vous êtes.
 
-Si deux objets portent un nom proche, le jeu vous demande de préciser lequel. Si une commande n'est pas comprise, essayez une autre formulation ou un autre verbe : découvrir ce que le jeu comprend fait partie de l'aventure.
+Si deux objets portent un nom proche, le jeu vous demande de préciser lequel. 
+Si une commande n'est pas comprise, essayez une autre formulation ou un autre verbe : découvrir ce que le jeu comprend fait partie de l'aventure.
 
 SE DÉPLACER
 
-Écrivez une direction : nord, sud, est ou ouest (ou n, s, e, o), ou une phrase comme « va vers l'est ». Selon les lieux, d'autres expressions sont comprises : à vous de les découvrir.
+Écrivez une direction : nord, sud, est ou ouest (ou n, s, e, o), ou une phrase comme « va vers l'est ». 
+Selon les lieux, d'autres expressions sont comprises : à vous de les découvrir.
 
 Quand la ligne de saisie est vide, vous pouvez aussi vous déplacer avec les quatre flèches du clavier.
 
@@ -55,30 +59,66 @@ Dans une fenêtre de texte, vous pouvez aussi utiliser les flèches haut / bas, 
 
 LA SOURIS
 
-Le jeu se joue entièrement au clavier. La souris est facultative : elle permet de choisir une entrée du menu, de faire défiler la console ou un texte avec les petits boutons, de cocher les options et de fermer les fenêtres.
+Le jeu se joue entièrement au clavier. 
+La souris est facultative : elle permet de choisir une entrée du menu, de faire défiler la console ou un texte avec les petits boutons, de cocher les options et de fermer les fenêtres.
 
 SAUVEGARDE ET FIN DE PARTIE
 
-Le jeu se sauvegarde automatiquement à chaque changement important et à la fermeture. Pour reprendre, choisissez « Continuer » dans le menu.
+Le jeu se sauvegarde automatiquement à chaque changement important et à la fermeture. 
+Pour reprendre, choisissez « Continuer » dans le menu.
 
 Pour quitter le jeu, écrivez : quitter
 
-LE PETIT MOT DE L'AUTEUR
+LE PETIT MOT DE L’AUTEUR
 
-Ce jeu est issu de l'envie de créer quelque chose qui me prend de temps en temps et m'occupe en général pendant quelques mois.
-J'ai déjà produit pas mal de trucs par le passé : une demo windows par ci, un jeu atari st par là, une rom megadrive, un site web, etc.
-Toujours pour produire des trucs gratuits. Je ne veux pas gagner d'argent avec ce genre de trucs.
+Ce jeu est né de cette envie bien particulière qui me prend de temps en temps : celle de créer quelque chose. 
+Cela se transforme parfois en un projet qui m’occupe en général pendant quelques mois.
 
-Je suis developpeur et malheureusement je n'ai aucun talent pour la musique ou les graphismes. Et donc jusqu'ici je faisais de la bricole dans ces domaines ou je devais rechercher des talents qui acceptaient de travailler bénévolement.
+J’ai déjà produit pas mal de trucs sur ce mode par le passé : une démo Windows par-ci, un jeu Atari ST par-là, tiens, une ROM Mega Drive, et pourquoi pas un site web ? Et puis voilà un jeu Amiga, un mod pour un jeu PC, etc.
 
-Mais depuis quelques mois, la donne change. Les graphistes, les musiciens et les développeurs sont en train d'être assistés/remplacés par des IA.
-Selon les points de vue, c'est regrettable ou c'est formidable, mais c'est comme ça.
+Toujours avec la même volonté : produire des trucs gratuits, qui m'amusent à les faire et qui peuvent éventuellement plaire à d'autres.
+Et des fois, c'est le cas ! Certaines de ces productions ont connu un petit succès : PicrossST, le frontend pour l’émulateur Amiga FS-UAE, Escape, le jeu d’atout sur les vieilles machines, etc.
+Mais hors de question de gagner de l’argent avec ça.
 
-Toutefois, au stade où nous en sommes, je reste persuadé que l'humain peut encore impulser quelque chose, ou tout du moins doit diriger, verifier, ou garder quelques gestes techniques.
-Et cela doit s'apprendre : comment utiliser ces outils, tant du point de vue opérationnel que 
+Je suis développeur et, malheureusement, je n’ai aucun talent artistique, que ce soit en musique ou en graphisme.
 
+Jusqu’ici, je bricolais donc dans ces domaines ou je devais rechercher des talents qui acceptaient de travailler bénévolement. Et des codeurs qui acceptaient de me suivre dans mes idées (big up, Shadow !).
 
+Mais depuis quelques mois, la donne change. Les graphistes, les musiciens et les développeurs sont en train d’être assistés, voire remplacés, à tout-va par des IA chez les bricoleurs, les indépendants ou les professionnels dans les grandes boîtes.
+Selon les points de vue, c’est regrettable ou formidable, c’est le début de la fin ou celui d’une nouvelle ère. 
+Mais ce qui est sûr, c’est que c’est comme ça et qu’on ne fera pas machine arrière.
 
+Toutefois, au stade où nous en sommes, je reste persuadé que l’humain peut encore impulser quelque chose, ou tout du moins qu’il doit diriger, vérifier, ou garder quelques gestes techniques pour lui.
+
+Et cela doit s’apprendre : comment utiliser ces outils, dompter et comprendre ces modèles, tant du point de vue opérationnel que dans la détermination de leur périmètre et de leurs possibilités.
+
+C’est donc avec la volonté de créer quelque chose et de perfectionner ma maîtrise de ces outils que j’ai décidé de me lancer dans ce jeu.
+
+Il y a quelque temps, j’avais commencé le développement, en AMOS, d’un jeu sur Amiga qui devait être la suite d’un jeu d’aventure en 3D : Escape II.
+C’était un jeu en hommage aux jeux d’aventure textuels et graphiques de la seconde moitié des années 80 qu’on trouvait sur CPC et qui m’ont marqué.
+Citons-les ! Rendons-leur hommage ! Ils m’ont tant apporté quand j’étais gosse :
+
+- Oxphar, version CPC. 1987. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1587))
+- Sram. 1986. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=2044))
+- Sram 2. 1987. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=2045))
+- Le Passager du temps. 1987. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1607))
+
+C’est vraiment à ceux-là que j’ai voulu rendre hommage.
+Mais il n’y a pas que les productions d’Ere Informatique. On pourrait (et on va le faire) également citer :
+
+- Conspiration de l’An III. 1988. Loriciels ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=605))
+- La Secte noire. 1990. Lankhor ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1900))
+- La Crypte des maudits. 1991. Lankhor ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=640))
+- Pépé Béquilles. 1987. Softhawk ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1617))
+
+Enfin, je mets de côté — mais ils ne sont jamais bien loin — les jeux d’aventure auxquels j’ai joué sur CPC, sur ST ou sous DOS, mais qui avaient soit des interfaces entièrement graphiques, soit une interface entièrement textuelle, soit des graphismes escamotables ou réservés à certaines zones :
+A320, Zombi, Le Manoir de Mortevielle, SDAW, les formidables point’n click de LucasArts (Monkey Island, Loom, Indiana Jones…), les jeux de Cocktel Vision (Ween, Gobliins, Bargon Attack), les jeux de Magnetic Scrolls (Wonderland, Myth, etc.), la série Zork...
+
+Je les mets de côté parce qu’ils n’ont pas tout à fait le feeling que je recherchais.
+Et à une époque où nous promptons à destination de chatbots adossés à des IA, je trouvais intéressant de reproduire cette mécanique de jeu des années 80, avec un parseur de prompts rudimentaire et parfois frustrant.
+Voilà, ce sont donc des partis pris assumés : un gameplay suranné, du développement assisté par IA et du contenu généré par IA.
+
+Espérons que le jeu vous plaise quand même.
 
 LICENCES
 
@@ -89,7 +129,7 @@ Ce jeu utilise les composants suivants :
 - Raylib-cs (liaison C# pour raylib, Chris Dill et contributeurs), licence zlib/libpng.
 - Police DejaVu Sans, licence libre de la famille Bitstream Vera / DejaVu.
 
-Les textes complets de ces licences sont fournis avec le jeu ou disponibles auprès de leurs auteurs.
+Les textes complets des licences associées sont disponibles auprès de leurs auteurs.
 
 OUTILS UTILISÉS POUR LE DÉVELOPPEMENT
 
@@ -109,7 +149,7 @@ Ce jeu a été développé sous Windows avec les outils suivants :
 - Pngout (https://www.advsys.net/ken/util/pngout.htm)
 - Optipng (https://optipng.sourceforge.net/)
 
-Ces IA ont également été grandement mises à contribution :
+Et ces IA ont également été grandement mises à contribution :
 
 - Claude (https://claude.ai/)
 - ChatGPT (https://chat.openai.com/)

@@ -34,6 +34,9 @@ public abstract class RoomBase
 
     /// <summary>Resultat propre a la piece, ou null = comportements par defaut.</summary>
     public virtual CommandResult? Handle(Command c, GameState s) => null;
+
+    /// <summary>Reaction a un choix de dialogue modal (J8). Renvoie un resultat ou null (inconnu/sans effet).</summary>
+    public virtual CommandResult? OnDialogChoice(string choiceId, GameState s) => null;
 }
 
 /// <summary>Point de construction unique : assemble toutes les pieces et tous les objets.</summary>

@@ -17,8 +17,9 @@ public sealed class MusicPlayer : IDisposable
     private readonly Dictionary<string, Music> _tracks = new(StringComparer.Ordinal);
     private bool _audioReady;
     private string? _current;
+    private bool _enabled = true; // J10-5
 
-    public bool Enabled => _audioReady;
+    public bool Enabled => _audioReady && _enabled;
 
     public MusicPlayer()
     {
@@ -145,6 +146,40 @@ public sealed class MusicPlayer : IDisposable
             {
                 // fermeture best-effort
             }
+        }
+    }
+
+    /// <summary>J10-5: Active ou desactive la musique.</summary>
+    /// <param name="enabled">True = audible, false = muet.</param>
+    public void SetEnabled(bool enabled)
+    {
+        if (_enabled == enabled)
+        {
+            return;
+        }
+
+        _enabled = enabled;
+
+        if (!_audioReady || _current is null)
+        {
+            return;
+        }
+
+        if (!_tracks.TryGetValue(_current, out var music))
+        {
+            return;
+        }
+
+        if (enabled)
+        {
+            // Reprendre : volume normal
+            Raylib.SetMusicVolume(music, 1f);
+            Raylib.ResumeMusicStream(music);
+        }
+        else
+        {
+            // Muet : volume a 0
+            Raylib.SetMusicVolume(music, 0f);
         }
     }
 }

@@ -10,7 +10,7 @@ Repo-specific notes for working in **Relève** (C# text/graphic adventure). Read
 
 - `tests/Releve.Engine.Tests/` — the only test project. Includes its own world (`TestWorld/TestWorld.cs`) independent of the real content.
 
-- Docs: `ArchitectureTechnique.md` (V0.6) is the spec and mirrors the shipped code; `NoteIntentionJeuAventure.md` (V6) governs UI/behaviour and **wins on conflicts** there. `CompteRenduPOCV0.1.md` records what was built and verified (shipped world: 4 rooms, 22 objects, 83 tests); `ImplementationPOCV0.1.md` (that plan) is now implemented — later phases come from `UniversScenarioLoreJeuAventure.md` (v0.8), do not implement them yet. PoC V2 documents live under `Docs/POC_V2/`; PoC V1 under `Docs/POC_V1/`; **PoC V3 under `Docs/POC_V3/`** (implementation plan, compte rendu).
+- Docs: `ArchitectureTechnique.md` (V0.6) is the spec and mirrors the shipped code; `NoteIntentionJeuAventure.md` (V6) governs UI/behaviour and **wins on conflicts** there. `CompteRenduPOCV0.1.md` records what was built and verified (shipped world: 4 rooms, 22 objects, 83 tests); `ImplementationPOCV0.1.md` (that plan) is now implemented — later phases come from `UniversScenarioLoreJeuAventure.md` (v0.8), do not implement them yet. PoC V2 documents live under `Docs/POC_V2/`; PoC V1 under `Docs/POC_V1/`; **PoC V3 under `Docs/POC_V3/`** (implementation plan, compte rendu); **PoC V4 under `Docs/POC_V4/`** (implementation plan, compte rendu, version v0.4).
 
 ## Commands
 
@@ -62,7 +62,7 @@ dotnet test --filter "FullyQualifiedName~NormalizationTests"   # focused run
 
 ## Conventions that differ from defaults
 
-- **Player-facing text is French and must be written with precomposed characters and the typographic apostrophe `’`** (e.g. `"Vous l’avez pas sur vous."`, not `n'est`, not decomposed `é`). raylib renders each codepoint independently, so decomposed accents (`e` + U+0301) display garbage. Verify with a regex scan for `[\u0300-\u036f]` after editing text. Identifiers stay English; room text lives in `private const` fields at the top of the class.
+- **Player-facing text is French and must be written with precomposed characters and the typographic apostrophe `'`** (e.g. `"Vous l'avez pas sur vous."`, not `n'est`, not decomposed `é`). raylib renders each codepoint independently, so decomposed accents (`e` + U+0301) display garbage. Verify with a regex scan for `[\u0300-\u036f]` after editing text. Identifiers stay English; room text lives in `private const` fields at the top of the class.
 
 - Errors are neutral, present-tense, and never attribute thoughts to the player (see `Core/Messages.cs` and §6.7 of the architecture doc).
 
@@ -100,11 +100,15 @@ dotnet test --filter "FullyQualifiedName~NormalizationTests"   # focused run
 
 - `assets/rooms/Bedroom.png`, `HospitalLobby.png`, `TechCorridor.png` are the PoC world's live room images (keys `Bedroom`, `HospitalLobby`, `TechCorridor` from `Content/Rooms/`). The street (key `Street`) has **no** image and shows the replacement rectangle with its title — intended, the old `sandbox_a`/`sandbox_b` bootstrap world is gone. Do not treat the missing `Street.png` as a bug.
 
+- `assets/views/<key>.png` (PoC V4) : images pour le visualiseur modal carré (`ImageViewer`), étirées sur tout le carré 432×432. Clé `"technicalRoom"` pour le hublot de la porte du local technique. Fichier manquant → fond uni + « Image introuvable. » (pas d'erreur).
+
+- `assets/icons/releve.ico` (PoC V4, optionnel) : icône de l'exécutable, utilisée via `<ApplicationIcon Condition="Exists(...)">` dans `Releve.Game.csproj`. Absente → icône par défaut, pas d'erreur.
+
 ## Agent limitations
 
 - The agent **cannot observe the screen** nor send keystrokes/clicks to the real game window. Visual and interactive elements (fade transitions, image patch rendering, mouse hover/click on menu/console/text viewer, key repeat) are **"not visually verified by the agent"** and require human validation.
 
-- `agentTools/` automation (keyboard injection, screenshots) works only for agents that can use it; the current agent cannot. Mouse interactions and fade timing are explicitly **not automatable** — classify as "human validation".
+- `agentTools/` automation (keyboard injection, screenshots) works only for agents that can use it; the current agent cannot. Mouse interactions, fade timing, fullscreen toggling (Alt+Entrée), image scrolling (transitions), and modal dialogs (text viewer, image viewer, options) are explicitly **not automatable** — classify as "human validation".
 
 ## Git — forbidden actions
 

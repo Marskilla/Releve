@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text;
 using Raylib_cs;
+using Releve.Engine.Core;
 
 namespace Releve.Game.Ui;
 
@@ -32,6 +33,9 @@ public sealed class ConsolePanel
     {
         _fonts = fonts;
     }
+
+    /// <summary>Vrai si la ligne de saisie ne contient aucun caractere.</summary>
+    public bool InputIsEmpty => _current.Length == 0;
 
     /// <summary>Une ligne d'historique avec son type (saisie du joueur ou reponse du jeu).</summary>
     private sealed record LineEntry(string Text, bool IsInput);
@@ -72,7 +76,10 @@ public sealed class ConsolePanel
         ReadCharacters();
 
         command = string.Empty;
-        if (!Raylib.IsKeyPressed(KeyboardKey.Enter) && !Raylib.IsKeyPressed(KeyboardKey.KpEnter))
+
+        // J6-7: ne pas valider la ligne si Alt est enfonce (Alt+Entree = plein ecran)
+        bool altDown = Raylib.IsKeyDown(KeyboardKey.LeftAlt) || Raylib.IsKeyDown(KeyboardKey.RightAlt);
+        if (altDown || (!Raylib.IsKeyPressed(KeyboardKey.Enter) && !Raylib.IsKeyPressed(KeyboardKey.KpEnter)))
         {
             return false;
         }
@@ -142,7 +149,7 @@ public sealed class ConsolePanel
         // Si le curseur sort de la zone visible, la ligne est decalee vers la gauche.
         var offset = caretX > x + maxWidth ? x + maxWidth - caretX : 0f;
 
-        _fonts.Draw(Prompt, new Vector2(x + offset, y), Palette.Prompt);
+        _fonts.Draw(Prompt, new Vector2(x + offset, y), Palette.ConsoleInput);
         _fonts.Draw(_current, new Vector2(x + offset + promptWidth, y), Palette.ConsoleInput);
 
         // Curseur clignotant.
@@ -158,7 +165,7 @@ public sealed class ConsolePanel
         var buttonYTop = bounds.Y + Layout.Padding;
         var buttonYBottom = inputY - Layout.Padding - Fonts.LineHeight;
 
-        var canScrollUp = _scroll < Math.Max(0, _lines.Count - 1);
+        var canScrollUp = _scroll < Math.Max(0, _lines.Count - _visibleLines);
         var canScrollDown = _scroll > 0;
 
         // Bouton haut : defilement vers le haut = plus ancien (possible si _scroll < max).
@@ -226,7 +233,7 @@ public sealed class ConsolePanel
         var rectTop = new Rectangle(buttonX, buttonYTop, ScrollButtonWidth, ScrollButtonWidth);
         var rectBottom = new Rectangle(buttonX, buttonYBottom, ScrollButtonWidth, ScrollButtonWidth);
 
-        var canScrollUp = _scroll < Math.Max(0, _lines.Count - 1);
+        var canScrollUp = _scroll < Math.Max(0, _lines.Count - _visibleLines);
         var canScrollDown = _scroll > 0;
 
         var overTop = canScrollUp && Raylib.CheckCollisionPointRec(mouse, rectTop);
@@ -236,7 +243,7 @@ public sealed class ConsolePanel
         {
             if (overTop)
             {
-                _scroll = Math.Min(Math.Max(0, _lines.Count - 1), _scroll + ScrollLines);
+                _scroll = Math.Min(Math.Max(0, _lines.Count - _visibleLines), _scroll + ScrollLines);
                 _scrollUpPressed = true;
             }
             else if (overBottom)
@@ -262,7 +269,7 @@ private void ScrollWithKeyboard()
             // PageUp / PageDown (appui simple)
             if (Raylib.IsKeyPressed(KeyboardKey.PageUp))
             {
-                _scroll = Math.Min(_scroll + page, Math.Max(0, _lines.Count - 1));
+                _scroll = Math.Min(_scroll + page, Math.Max(0, _lines.Count - _visibleLines));
             }
 
             if (Raylib.IsKeyPressed(KeyboardKey.PageDown))
@@ -270,17 +277,7 @@ private void ScrollWithKeyboard()
                 _scroll = Math.Max(0, _scroll - page);
             }
 
-            // Home / End (appui simple)
-            if (Raylib.IsKeyPressed(KeyboardKey.Home))
-            {
-                _scroll = Math.Max(0, _lines.Count - 1);
-            }
-
-            if (Raylib.IsKeyPressed(KeyboardKey.End))
-            {
-                _scroll = 0;
-            }
-
+            // Home / End ne font plus défiler l'historique (J3-3) : ils déplacent seulement le curseur dans ReadCharacters.
             // Up / Down sont gérés par RecallHistory pour le rappel d'historique,
             // et par GameApp pour les déplacements. Ne pas les utiliser pour le scroll de vue.
         }
@@ -398,35 +395,6 @@ private void RecallHistory()
     private List<string> Wrap(string text)
     {
         var maxWidth = Layout.ConsoleWidth - 2 * Layout.Padding - ScrollButtonWidth;
-        var lines = new List<string>();
-
-        foreach (var paragraph in text.Split('\n'))
-        {
-            if (paragraph.Length == 0)
-            {
-                lines.Add(string.Empty);
-                continue;
-            }
-
-            var current = new StringBuilder();
-            foreach (var word in paragraph.Split(' '))
-            {
-                var candidate = current.Length == 0 ? word : current + " " + word;
-                if (_fonts.MeasureWidth(candidate) <= maxWidth || current.Length == 0)
-                {
-                    current.Clear();
-                    current.Append(candidate);
-                    continue;
-                }
-
-                lines.Add(current.ToString());
-                current.Clear();
-                current.Append(word);
-            }
-
-            lines.Add(current.ToString());
-        }
-
-        return lines;
+        return new List<string>(TextWrapper.Wrap(text, maxWidth, _fonts.MeasureWidth));
     }
 }

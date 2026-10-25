@@ -13,7 +13,6 @@ namespace Releve.Game.Ui;
 public sealed class ArrowsPanel
 {
     private const string TitleText = "Déplacements possibles :";
-    private const float CellWidth = 100f;
     private const float RowHeight = 34f;
     private const float ArrowSize = 18f;
 
@@ -38,33 +37,32 @@ public sealed class ArrowsPanel
         var rowY2 = rowY1 + RowHeight;                                   // ligne 2 : Ouest / Est
         var rowY3 = rowY2 + RowHeight;                                   // ligne 3 : Sud
 
-        // Rang 1 : fleche Nord puis libellé, ensemble centre.
-        DrawArrowRowCentered(exits[Direction.North], Direction.North, centreX, rowY1, centred: true);
+        // Rang 1 : fleche Nord + libellé, ensemble centre.
+        DrawArrowRowCentered(exits[Direction.North], Direction.North, centreX, rowY1);
 
         // Rang 2 : libellé Ouest + fleche (gauche), espace libre au centre, fleche Est + libellé (droite).
         DrawArrowRowSplit(exits[Direction.West], Direction.West, exits[Direction.East], Direction.East,
             textX, bounds.X + bounds.Width - Layout.Padding, rowY2);
 
-        // Rang 3 : fleche Sud puis libellé, ensemble centre.
-        DrawArrowRowCentered(exits[Direction.South], Direction.South, centreX, rowY3, centred: true);
+        // Rang 3 : fleche Sud + libellé, ensemble centre.
+        DrawArrowRowCentered(exits[Direction.South], Direction.South, centreX, rowY3);
     }
 
-    /// <summary>Dessine une ligne centree : fleche puis libellé.</summary>
-    private void DrawArrowRowCentered(ExitState state, Direction direction, float centreX, float y,
-        bool centred)
+    /// <summary>Dessine une ligne centree : fleche + libellé centres ensemble.</summary>
+    private void DrawArrowRowCentered(ExitState state, Direction direction, float centreX, float y)
     {
         if (state == ExitState.Absent)
         {
             return;
         }
 
-        var arrowX = centred ? centreX - ArrowSize / 2f : 0f;
-        DrawArrow(state, direction, arrowX, y);
+        var label = DirectionLabel(direction);
+        var labelWidth = _fonts.MeasureWidth(label);
+        var totalWidth = ArrowSize + Layout.Padding + labelWidth;
+        var arrowX = centreX - totalWidth / 2f;
 
-        if (centred)
-        {
-            DrawLabel(direction, arrowX + ArrowSize + Layout.Padding, y, state);
-        }
+        DrawArrow(state, direction, arrowX, y);
+        DrawLabel(direction, arrowX + ArrowSize + Layout.Padding, y, state);
     }
 
     /// <summary>Dessine une ligne divisee : Ouest a gauche, Est a droite.</summary>
