@@ -53,6 +53,17 @@ public sealed class GameApp
         Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
 #endif
         Raylib.InitWindow(Layout.ScreenWidth, Layout.ScreenHeight, "Relève");
+        // J5-3: icone de la fenetre (assets/icons/releve.png) — doit etre apres InitWindow
+        var iconPath = Assets.WindowIcon;
+        if (File.Exists(iconPath))
+        {
+            Image icon = Raylib.LoadImage(iconPath);
+            if (icon.Width > 0 && icon.Height > 0)
+            {
+                Raylib.SetWindowIcon(icon);
+            }
+            Raylib.UnloadImage(icon);
+        }
         Raylib.SetExitKey(KeyboardKey.Null); // fermeture uniquement par bouton ou commande « quitter »
         Raylib.SetTargetFPS(60);
 

@@ -21,6 +21,9 @@ public static class Assets
     /// <summary>J9-5: Image pour visualiseur modal (dossier assets/views).</summary>
     public static string ViewImage(string key) => Combine("views", key + ".png");
 
+    /// <summary>J5-3: Icône de la fenêtre (assets/icons/releve.png — raylib ne supporte pas .ico).</summary>
+    public static string WindowIcon => Combine("icons", "releve.png");
+
     private static string ResolveRoot()
     {
         // Les assets sont copies a cote de l'exe.

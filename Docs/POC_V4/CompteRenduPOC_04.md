@@ -381,3 +381,20 @@ Tous les éléments marqués "Relecture du code" dans le tableau de traçabilit�
 - La bordure est conservée après `EndScissorMode`
 
 **Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
+
+---
+
+### Bug corrigé : icône de la fenêtre absente en mode fenêtré
+
+**Symptôme** : l'exécutable possède bien l'icône `releve.ico` (via `<ApplicationIcon>` dans le csproj), mais la fenêtre raylib en mode fenêtré affiche l'icône .NET par défaut en haut à gauche.
+
+**Cause** : raylib utilise `LoadImage` (stb_image) qui ne supporte pas le format `.ico`. L'icône de l'exécutable est définie au niveau Windows, mais l'icône de la fenêtre raylib doit être définie explicitement via `SetWindowIcon()` avec un format supporté (PNG, BMP, etc.).
+
+**Fichiers modifiés** :
+- `src/Releve.Game/Ui/Assets.cs` : ajout de `WindowIcon => Combine("icons", "releve.png")`
+- `src/Releve.Game/GameApp.cs` : après `InitWindow`, charge le PNG, vérifie validité, appelle `SetWindowIcon(icon)`
+- `src/Releve.Game/assets/icons/releve.png` : créé par conversion du `.ico` (via `System.Drawing`)
+
+**Correctif** : conversion de l'icône `.ico` en `.png`, chargement après `InitWindow`, définition via `Raylib.SetWindowIcon()`.
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
