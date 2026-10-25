@@ -1,39 +1,120 @@
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+AIDE
 
-Lorém îpsum dolor sit amét çonsectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+PRINCIPE DU JEU
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Relève est un jeu d'aventure à vue fixe. L'écran vous montre le lieu où vous vous trouvez. Vous explorez en observant, en ramassant des objets et en les utilisant, en écrivant vos actions sous forme de courtes phrases dans la zone de texte, en bas de l'écran.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Il n'y a pas de menu d'actions : c'est à vous de deviner ce qui est possible, de tenter des choses et d'observer comment le monde réagit. Une commande qui échoue ne coûte rien.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+L'ÉCRAN
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+- La vue du lieu (en haut à gauche) montre ce qui vous entoure. Certains éléments de l'image changent quand vous agissez sur le monde.
+- Les déplacements possibles (en haut à droite) indiquent les quatre directions. Une flèche pleine et claire signale un passage praticable. Une flèche creuse et sombre signale qu'une sortie existe, mais qu'elle est bloquée pour le moment : à vous de comprendre pourquoi. Pas de flèche : pas de sortie dans cette direction.
+- L'inventaire (à droite) liste les objets que vous portez.
+- La console (en bas) affiche les descriptions, vos commandes et les réponses du jeu, dans deux couleurs différentes.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+COMMENT ÉCRIRE UNE COMMANDE
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Écrivez en français, avec des phrases courtes : un verbe, puis l'objet concerné. Les majuscules, les accents et les articles (le, la, l', un...) sont facultatifs. Validez avec la touche Entrée.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Quelques exemples de ce que le jeu comprend :
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+  regarde la lampe
+  prends la clé
+  ouvre la porte
+  ferme le coffre
+  utilise la clé sur la porte
+  parle au gardien
+  lis le panneau
+  pose la clé
+  inventaire
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Écrire simplement « regarde » ou « observe » décrit le lieu dans lequel vous êtes.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Si deux objets portent un nom proche, le jeu vous demande de préciser lequel. Si une commande n'est pas comprise, essayez une autre formulation ou un autre verbe : découvrir ce que le jeu comprend fait partie de l'aventure.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+SE DÉPLACER
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Écrivez une direction : nord, sud, est ou ouest (ou n, s, e, o), ou une phrase comme « va vers l'est ». Selon les lieux, d'autres expressions sont comprises : à vous de les découvrir.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Quand la ligne de saisie est vide, vous pouvez aussi vous déplacer avec les quatre flèches du clavier.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+LES TOUCHES
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+  Entrée ........................... valider la commande
+  Retour arrière / Suppr ........... effacer des caractères
+  Flèches gauche / droite .......... déplacer le curseur dans la ligne de saisie (si elle contient du texte)
+  Début / Fin ...................... aller au début ou à la fin de la ligne de saisie
+  Maj + flèche haut / bas .......... rappeler les commandes précédentes
+  Ctrl + flèche haut / bas ......... faire défiler l'inventaire
+  Page haut / Page bas ............. faire défiler l'historique de la console
+  Alt + Entrée ..................... basculer entre fenêtre et plein écran
+  Échap ou Entrée .................. fermer une fenêtre de texte ou d'image
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Dans une fenêtre de texte, vous pouvez aussi utiliser les flèches haut / bas, Page haut / Page bas, Début et Fin pour faire défiler.
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+LA SOURIS
 
-Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapien vitae pellentesque sem placerat. In id cursus mi pretium tellus duis convallis. Tempus leo eu aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia integer nunc posuere. Ut hendrerit semper vel class aptent taciti sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.
+Le jeu se joue entièrement au clavier. La souris est facultative : elle permet de choisir une entrée du menu, de faire défiler la console ou un texte avec les petits boutons, de cocher les options et de fermer les fenêtres.
+
+SAUVEGARDE ET FIN DE PARTIE
+
+Le jeu se sauvegarde automatiquement à chaque changement important et à la fermeture. Pour reprendre, choisissez « Continuer » dans le menu.
+
+Pour quitter le jeu, écrivez : quitter
+
+LE PETIT MOT DE L'AUTEUR
+
+Ce jeu est issu de l'envie de créer quelque chose qui me prend de temps en temps et m'occupe en général pendant quelques mois.
+J'ai déjà produit pas mal de trucs par le passé : une demo windows par ci, un jeu atari st par là, une rom megadrive, un site web, etc.
+Toujours pour produire des trucs gratuits. Je ne veux pas gagner d'argent avec ce genre de trucs.
+
+Je suis developpeur et malheureusement je n'ai aucun talent pour la musique ou les graphismes. Et donc jusqu'ici je faisais de la bricole dans ces domaines ou je devais rechercher des talents qui acceptaient de travailler bénévolement.
+
+Mais depuis quelques mois, la donne change. Les graphistes, les musiciens et les développeurs sont en train d'être assistés/remplacés par des IA.
+Selon les points de vue, c'est regrettable ou c'est formidable, mais c'est comme ça.
+
+Toutefois, au stade où nous en sommes, je reste persuadé que l'humain peut encore impulser quelque chose, ou tout du moins doit diriger, verifier, ou garder quelques gestes techniques.
+Et cela doit s'apprendre : comment utiliser ces outils, tant du point de vue opérationnel que 
+
+
+
+
+LICENCES
+
+Ce jeu utilise les composants suivants :
+
+- .NET 8 (Microsoft), licence MIT.
+- raylib (Ramon Santamaria et contributeurs), licence zlib/libpng.
+- Raylib-cs (liaison C# pour raylib, Chris Dill et contributeurs), licence zlib/libpng.
+- Police DejaVu Sans, licence libre de la famille Bitstream Vera / DejaVu.
+
+Les textes complets de ces licences sont fournis avec le jeu ou disponibles auprès de leurs auteurs.
+
+OUTILS UTILISÉS POUR LE DÉVELOPPEMENT
+
+Ce jeu a été développé sous Windows avec les outils suivants :
+
+- Visual Studio Code (Microsoft) ( https://code.visualstudio.com/), licence MIT.
+- Git (Software Freedom Conservancy) ( https://git-scm.com/ ), licence GNU GPL v2.
+- GitHub (Microsoft) ( https://github.com/), licence MIT.
+- Fork (https://fork.dev/)
+- Kilo Code (https://kilo.ai/)
+- XNview (https://www.xnview.com/)
+- Paint.NET (https://www.getpaint.net/)
+- Audacity (https://www.audacityteam.org/)
+- InnoSetup (https://jrsoftware.org/isinfo.php)
+- Greenfish Icon Editor Pro (https://greenfishsoftware.org/)
+- Notepad++ (https://notepad-plus-plus.org/)
+- Pngout (https://www.advsys.net/ken/util/pngout.htm)
+- Optipng (https://optipng.sourceforge.net/)
+
+Ces IA ont également été grandement mises à contribution :
+
+- Claude (https://claude.ai/)
+- ChatGPT (https://chat.openai.com/)
+- Step 5 Preview (https://www.stepfun.com/)
+- Nemotron 3 Ultra (https://research.nvidia.com/labs/nemotron/Nemotron-3-Ultra/)
+- Suno (https://suno.com/)
+- Mistral (https://mistral.ai/)
+- Duck AI (https://duck.ai/)
