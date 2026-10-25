@@ -30,26 +30,29 @@ public sealed class RoomViewPanel
         _fonts = fonts;
     }
 
-    public void Draw(RoomView view)
-    {
-        if (IsTransitioning)
+public void Draw(RoomView view)
         {
-            DrawTransition();
+            if (IsTransitioning)
+            {
+                DrawTransition();
+            }
+            else
+            {
+                DrawView(view, 0f, 0f, true);
+            }
         }
-        else
-        {
-            DrawView(view, 0f, 0f);
-        }
-    }
 
     /// <summary>J7-3: Dessine une vue decalee de dx, dy.</summary>
-    private void DrawView(RoomView view, float dx, float dy)
+    private void DrawView(RoomView view, float dx, float dy, bool drawBackground = true)
     {
         var bounds = Layout.ViewBounds;
         var shiftedBounds = new Rectangle(bounds.X + dx, bounds.Y + dy, bounds.Width, bounds.Height);
 
-        Raylib.DrawRectangle((int)bounds.X - Layout.Padding, (int)bounds.Y - Layout.Padding,
-            (int)bounds.Width + 2 * Layout.Padding, (int)bounds.Height + 2 * Layout.Padding, Palette.Panel);
+        if (drawBackground)
+        {
+            Raylib.DrawRectangle((int)bounds.X - Layout.Padding, (int)bounds.Y - Layout.Padding,
+                (int)bounds.Width + 2 * Layout.Padding, (int)bounds.Height + 2 * Layout.Padding, Palette.Panel);
+        }
 
         if (TryGetTexture(view.ImageKey, out var texture))
         {
@@ -66,7 +69,10 @@ public sealed class RoomViewPanel
             DrawReplacement(view.Title, shiftedBounds);
         }
 
-        Raylib.DrawRectangleLinesEx(bounds, 1, Palette.Border);
+        if (drawBackground)
+        {
+            Raylib.DrawRectangleLinesEx(bounds, 1, Palette.Border);
+        }
     }
 
     /// <summary>J7-6: Dessin pendant une transition.</summary>
@@ -95,12 +101,16 @@ public sealed class RoomViewPanel
             _ => (0f, 0f, 0f, 0f)
         };
 
+        // Fond du panneau (une seule fois)
+        Raylib.DrawRectangle((int)bounds.X - Layout.Padding, (int)bounds.Y - Layout.Padding,
+            (int)bounds.Width + 2 * Layout.Padding, (int)bounds.Height + 2 * Layout.Padding, Palette.Panel);
+
         // J7-6: BeginScissorMode sur ViewBounds
         Raylib.BeginScissorMode((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
 
-        // Dessiner la vue sortante puis l'entrante
-        DrawView(_fromView, fromDx, fromDy);
-        DrawView(_toView, toDx, toDy);
+        // Dessiner la vue sortante puis l'entrante SANS fond (deja dessine)
+        DrawView(_fromView, fromDx, fromDy, false);
+        DrawView(_toView, toDx, toDy, false);
 
         Raylib.EndScissorMode();
 

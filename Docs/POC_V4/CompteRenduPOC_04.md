@@ -363,3 +363,21 @@ Tous les éléments marqués "Relecture du code" dans le tableau de traçabilit�
 **Tests mis à jour** : `BedroomV3Tests.cs`, `ContentV4Tests.cs`, `DialogTests.cs`, `PocContentTests.cs` — chaînes attendues passées avec accents, `rouge fixe` au lieu de `rouge fixé`, fiche patient accentuée.
 
 **Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
+
+---
+
+### Bug corrigé : scrolling des images de lieux — image actuelle effacée
+
+**Symptôme** : pendant la transition (0,4 s), l'image du lieu de départ était effacée dès le début (fond bleu `Palette.Panel`), seule l'image d'arrivée scrollait. Le résultat était un fond bleu + l'image d'arrivée, au lieu d'un scroll simultané des deux images.
+
+**Cause** : `DrawTransition` appelait `DrawView` deux fois, et `DrawView` dessinait systématiquement le fond `Palette.Panel` + la bordure. Le deuxième appel effaçait donc la première image.
+
+**Fichier modifié** : `src/Releve.Game/Ui/RoomViewPanel.cs`
+
+**Correctif** :
+- `DrawView` prend un paramètre `drawBackground` (défaut `true`)
+- `DrawTransition` dessine le fond **une seule fois** avant `BeginScissorMode`
+- Dessine `_fromView` et `_toView` avec `drawBackground = false`
+- La bordure est conservée après `EndScissorMode`
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
