@@ -3,7 +3,7 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Objects;
 
-/// <summary>Objets de l'accueil de l'hopital (PoC §3.3). Aucun n'est portable.</summary>
+/// <summary>Objets de l'accueil de l'hôpital (PoC §3.3). Aucun n'est portable.</summary>
 public static class HospitalLobbyObjects
 {
     // Textes partagés pour éviter la duplication (J2.4)
@@ -13,13 +13,13 @@ public static class HospitalLobbyObjects
     {
         [ObjectId.Android] = new ObjectDef(
             Id: ObjectId.Android,
-            Name: "l'androide",
+            Name: "l'androïde",
             Aliases: new[] { "androide", "android", "robot" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
             Describe: _ =>
-                "Un androide a l'allure humanoide sobre, immobile derriere le comptoir, en position d'attente."),
+                "Un androïde à l'allure humanoïde sobre, immobile derrière le comptoir, en position d'attente."),
 
         [ObjectId.Terminal] = new ObjectDef(
             Id: ObjectId.Terminal,
@@ -77,7 +77,7 @@ public static class HospitalLobbyObjects
             InitialLocation: Location.InRoom(RoomId.HospitalLobby),
             InitialState: ObjectState.None,
             Describe: _ =>
-                "Les portes metalliques d'un ascenseur, avec un lecteur de badge et un unique bouton."),
+                "Les portes métalliques d'un ascenseur, avec un lecteur de badge et un unique bouton."),
 
         [ObjectId.ElevatorReader] = new ObjectDef(
             Id: ObjectId.ElevatorReader,

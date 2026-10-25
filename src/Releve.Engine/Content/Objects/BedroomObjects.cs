@@ -25,7 +25,7 @@ public static class BedroomObjects
         [ObjectId.BedroomMachines] = new ObjectDef(
             Id: ObjectId.BedroomMachines,
             Name: "les machines",
-            Aliases: new[] { "machine", "machines", "moniteur", "appareil", "appareils", "materiel", "materiel medical" },
+            Aliases: new[] { "machine", "machines", "moniteur", "appareil", "appareils", "matériel", "matériel médical" },
             Portable: false,
             InitialLocation: Location.InRoom(RoomId.Bedroom),
             InitialState: ObjectState.None,

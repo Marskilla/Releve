@@ -37,7 +37,7 @@ public enum ObjectId
     TechDoor,
     TechReader,
 
-    // Accueil de l'hopital (PoC §3.3)
+    // Accueil de l'hôpital (PoC §3.3)
     Android,
     Terminal,
     Display,

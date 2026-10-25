@@ -46,10 +46,10 @@ public class DialogTests
         var expectedRecord = string.Join("\n", new[]
         {
             "FICHE PATIENT",
-            "Nom : Marchand - Prenom : Alex",
-            "Date d'entree : 14 mars 2113",
-            "Motif d'admission : maladie inconnue evolutive necessitant un traitement adaptatif",
-            "Conditions de sortie : maladie en remission complete",
+            "Nom : Marchand - Prénom : Alex",
+            "Date d'entrée : 14 mars 2113",
+            "Motif d'admission : maladie inconnue évolutive nécessitant un traitement adaptatif",
+            "Conditions de sortie : maladie en rémission complète",
             "Adresse de sortie : Alex Marchand, chez M. et Mme Marchand, 12 rue des Tilleuls",
         });
         Assert.Equal(expectedRecord, result.Dialog.Content);
@@ -59,7 +59,7 @@ public class DialogTests
         Assert.Equal(DialogIds.PatientAccept, result.Dialog.Choices[0].Id);
         Assert.Equal("J'accepte de sortir", result.Dialog.Choices[0].Label);
         Assert.Equal(DialogIds.PatientRefuse, result.Dialog.Choices[1].Id);
-        Assert.Equal("Je ne suis pas pret a sortir", result.Dialog.Choices[1].Label);
+        Assert.Equal("Je ne suis pas prêt à sortir", result.Dialog.Choices[1].Label);
         
         // Defaut et annulation = PatientRefuse
         Assert.Equal(DialogIds.PatientRefuse, result.Dialog.DefaultChoiceId);
@@ -89,14 +89,14 @@ public class DialogTests
         var result = lobby.ResolveDialog(DialogIds.PatientAccept);
 
         Assert.True(result.StateChanged);
-        Assert.Equal(["Vous validez la sortie. La porte vitree de l'entree se deverrouille."], result.Messages);
+        Assert.Equal(["Vous validez la sortie. La porte vitrée de l'entrée se déverrouille."], result.Messages);
         Assert.Equal(ObjectState.Activated, lobby.State.StateOf(ObjectId.Terminal)); // Terminal active
         Assert.Equal(ExitState.Open, lobby.GetView().Exits[Direction.West]); // sortie ouest ouverte
         
         // Androide donne la replique de conge
         var talk = lobby.Execute("parle androide");
         Assert.Contains("Merci d'avoir fait appel", talk.Messages[0]);
-        Assert.Contains("ne pas vous revoir bientot", talk.Messages[0]);
+        Assert.Contains("ne pas vous revoir bientôt", talk.Messages[0]);
     }
 
     [Fact]

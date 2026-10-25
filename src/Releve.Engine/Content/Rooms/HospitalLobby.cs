@@ -4,28 +4,28 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Rooms;
 
-/// <summary>Accueil de l'hopital (lore §5.3, PoC §3.3).</summary>
+/// <summary>Accueil de l'hôpital (lore §5.3, PoC §3.3).</summary>
 public sealed class HospitalLobby : RoomBase
 {
-    private const string RoomTitle = "Accueil de l'hopital";
+    private const string RoomTitle = "Accueil de l'hôpital";
     private const string RoomDescription =
-        "Le hall d'accueil est vaste, lumineux et parfaitement entretenu. Derriere le comptoir, un androide se tient immobile. Un afficheur lumineux est fixe au-dessus du comptoir.";
+        "Le hall d'accueil est vaste, lumineux et parfaitement entretenu. Derrière le comptoir, un androïde se tient immobile. Un afficheur lumineux est fixé au-dessus du comptoir.";
     private const string WestBlockedMessage =
-        "La porte vitree de l'entree est fermee. L'androide s'adresse alors a vous : « S'il vous plait ! » Il semble vous inviter a venir le voir.";
+        "La porte vitrée de l'entrée est fermée. L'androïde s'adresse alors à vous : « S'il vous plaît ! » Il semble vous inviter à venir le voir.";
     private const string NorthBlockedMessage =
         "Les portes de l'ascenseur restent closes. Le lecteur de badge affiche un rouge fixe.";
     private const string AndroidAnswerBeforeActivation =
-        "L'androide, qui semblait etre en pause, prend vie et s'adresse a vous : « La politique de l'etablissement nous empeche de laisser sortir des patients sans emargement precedent. Passez votre badge sur la borne du comptoir pour emarger, merci. »";
+        "L'androïde, qui semblait être en pause, prend vie et s'adresse à vous : « La politique de l'établissement nous empêche de laisser sortir des patients sans émargement précédent. Passez votre badge sur la borne du comptoir pour émarger, merci. »";
     private const string AndroidAnswerAfterActivation =
-        "L'androide s'anime : « Merci d'avoir fait appel a nos services, et j'espere, pour vous, ne pas vous revoir bientot. Ah ah ah ! »";
-    private const string TerminalUnlockedMessage = "La porte vitree de l'entree se deverrouille.";
+        "L'androïde s'anime : « Merci d'avoir fait appel à nos services, et j'espère, pour vous, ne pas vous revoir bientôt. Ah ah ah ! »";
+    private const string TerminalUnlockedMessage = "La porte vitrée de l'entrée se déverrouille.";
     private const string ElevatorReaderRefuses = "Le lecteur refuse le badge.";
     private const string ButtonDoesNothing = "Le bouton ne produit aucun effet.";
     // J8-6: messages pour le dialogue de la borne
     private const string BadgeOnTerminalMessage =
         "Vous passez le badge devant la borne. La fiche patient s'affiche.";
     private const string AcceptMessage =
-        "Vous validez la sortie. La porte vitree de l'entree se deverrouille.";
+        "Vous validez la sortie. La porte vitrée de l'entrée se déverrouille.";
     private const string RefuseMessage =
         "Vous ne validez pas la sortie.";
     // OpenGlassDoorLocked réutilise WestBlockedMessage (J1.2)
@@ -35,14 +35,14 @@ public sealed class HospitalLobby : RoomBase
     // Coordonnées zones d'image (J5) - image 1774x887
     private const int GlassDoorX1 = 88, GlassDoorY1 = 150, GlassDoorX2 = 272, GlassDoorY2 = 668;
 
-    // Fiche patient : texte du lore, repris a l'identique (PoC §3.3).
+// Fiche patient : texte du lore, repris à l'identique (PoC §3.3).
     private static readonly string[] PatientRecord =
     {
         "FICHE PATIENT",
-        "Nom : Marchand - Prenom : Alex",        
-        "Date d'entree : 14 mars 2113",
-        "Motif d'admission : maladie inconnue evolutive necessitant un traitement adaptatif",
-        "Conditions de sortie : maladie en remission complete",
+        "Nom : Marchand - Prénom : Alex",
+        "Date d'entrée : 14 mars 2113",
+        "Motif d'admission : maladie inconnue évolutive nécessitant un traitement adaptatif",
+        "Conditions de sortie : maladie en rémission complète",
         "Adresse de sortie : Alex Marchand, chez M. et Mme Marchand, 12 rue des Tilleuls",
     };
 
@@ -54,7 +54,7 @@ public sealed class HospitalLobby : RoomBase
 
     public override string Description(GameState s) => RoomDescription;
 
-    /// <summary>Zones d'image actives selon l'etat (J5).</summary>
+    /// <summary>Zones d'image actives selon l'état (J5).</summary>
     public override IReadOnlyList<ImagePatch> ImagePatches => new[]
     {
         // Porte vitrée de sortie ouverte
@@ -112,7 +112,7 @@ public sealed class HospitalLobby : RoomBase
                         new[]
                         {
                             new DialogChoice(DialogIds.PatientAccept, "J'accepte de sortir"),
-                            new DialogChoice(DialogIds.PatientRefuse, "Je ne suis pas pret a sortir")
+                            new DialogChoice(DialogIds.PatientRefuse, "Je ne suis pas prêt à sortir")
                         },
                         DialogIds.PatientRefuse,
                         DialogIds.PatientRefuse);
@@ -134,7 +134,7 @@ public sealed class HospitalLobby : RoomBase
             }
         }
 
-        // « ouvre porte vitree » : meme message que la sortie bloquee si borne non activee.
+        // « ouvre porte vitrée » : même message que la sortie bloquée si borne non activée.
         if (c.Action == GameAction.Open && c.Target == ObjectId.GlassDoor)
         {
             if (s.StateOf(ObjectId.Terminal) != ObjectState.Activated)
@@ -169,7 +169,7 @@ public sealed class HospitalLobby : RoomBase
         {
             DialogIds.PatientAccept => s.StateOf(ObjectId.Terminal) != ObjectState.Activated
                 ? (s.States[ObjectId.Terminal] = ObjectState.Activated, CommandResult.Changed(AcceptMessage)).Item2
-                : CommandResult.Say(), // deja active : aucun effet
+                : CommandResult.Say(), // déjà activé : aucun effet
             DialogIds.PatientRefuse => CommandResult.Say(RefuseMessage),
             DialogIds.Close => CommandResult.Say(),
             _ => null,

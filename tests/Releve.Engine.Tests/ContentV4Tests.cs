@@ -97,7 +97,7 @@ public class ContentV4Tests
         var lobby = EngineInLobby();
 
         var ouest = lobby.Execute("ouest");
-        Assert.Equal(["La porte vitree de l'entree est fermee. L'androide s'adresse alors a vous : « S'il vous plait ! » Il semble vous inviter a venir le voir."], ouest.Messages);
+        Assert.Equal(["La porte vitrée de l'entrée est fermée. L'androïde s'adresse alors à vous : « S'il vous plaît ! » Il semble vous inviter à venir le voir."], ouest.Messages);
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class ContentV4Tests
         var lobby = EngineInLobby();
 
         var ouvre = lobby.Execute("ouvre porte vitree");
-        Assert.Equal(["La porte vitree de l'entree est fermee. L'androide s'adresse alors a vous : « S'il vous plait ! » Il semble vous inviter a venir le voir."], ouvre.Messages);
+        Assert.Equal(["La porte vitrée de l'entrée est fermée. L'androïde s'adresse alors à vous : « S'il vous plaît ! » Il semble vous inviter à venir le voir."], ouvre.Messages);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class ContentV4Tests
 
         // Avant activation : reponse d'emargement
         var talkBefore = lobby.Execute("parle androide");
-        Assert.Contains("emargement", talkBefore.Messages[0]);
+        Assert.Contains("émargement", talkBefore.Messages[0]);
         Assert.Contains("borne du comptoir", talkBefore.Messages[0]);
 
         // Forcer l'activation de la borne
@@ -125,6 +125,6 @@ public class ContentV4Tests
         // Apres activation : reponse de conge
         var talkAfter = lobby.Execute("parle androide");
         Assert.Contains("Merci d'avoir fait appel", talkAfter.Messages[0]);
-        Assert.Contains("ne pas vous revoir bientot", talkAfter.Messages[0]);
+        Assert.Contains("ne pas vous revoir bientôt", talkAfter.Messages[0]);
     }
 }

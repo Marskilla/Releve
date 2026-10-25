@@ -10,25 +10,25 @@ public sealed class TechCorridor : RoomBase
     private const string RoomDescription =
         "Un couloir de service étroit, sans fenêtre. Quelques plafonniers sont faibles ou éteints ; une poussière légère recouvre le sol.";
     private const string NorthBlockedMessage =
-        "La porte de l'escalier est fermee. Le lecteur de badge affiche un rouge fixe.";
+        "La porte de l'escalier est fermée. Le lecteur de badge affiche un rouge fixe.";
     private const string EastBlockedMessage =
         "La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe.";
     private const string BadgeUsedOnStairsReader =
-        "Le voyant passe au vert : la porte de l'escalier se deverrouille.";
+        "Le voyant passe au vert : la porte de l'escalier se déverrouille.";
     private const string StairsReaderAlreadyUnlocked =
-        "Le lecteur de l'escalier est deja deverrouille.";
+        "Le lecteur de l'escalier est déjà déverrouillé.";
     private const string BadgeUsedOnTechReader =
         "Le lecteur refuse le badge. Son voyant clignote en rouge.";
     private const string OpenStairsDoorLocked =
-        "La porte de l'escalier est fermee. Le lecteur de badge affiche un rouge fixe.";
-    private const string OpenStairsDoorUnlocked = "La porte de l'escalier est deverrouillee.";
+        "La porte de l'escalier est fermée. Le lecteur de badge affiche un rouge fixe.";
+    private const string OpenStairsDoorUnlocked = "La porte de l'escalier est déverrouillée.";
     private const string OpenTechDoor =
-        "La porte du local technique est fermee. Le lecteur de badge affiche un rouge fixe.";
+        "La porte du local technique est fermée. Le lecteur de badge affiche un rouge fixe.";
 
     // Description de la porte du local technique (reutilisee pour le dialogue Image)
     private const string TechDoorDescription =
-        "Une porte pleine a hublot. A travers, on distingue les elements d'une chaufferie, "
-        + "une rangee de lave-linge a l'arret depuis longtemps et des compteurs electriques.";
+        "Une porte pleine à hublot. À travers, on distingue les éléments d'une chaufferie, "
+        + "une rangée de lave-linge à l'arrêt depuis longtemps et des compteurs électriques.";
 
     // Coordonnées zones d'image (J5) - image 1774x887
     private const int StairsDoorX1 = 796, StairsDoorY1 = 205, StairsDoorX2 = 990, StairsDoorY2 = 566;
@@ -42,7 +42,7 @@ public sealed class TechCorridor : RoomBase
 
     public override string Description(GameState s) => RoomDescription;
 
-    /// <summary>Zones d'image actives selon l'etat (J5).</summary>
+    /// <summary>Zones d'image actives selon l'état (J5).</summary>
     public override IReadOnlyList<ImagePatch> ImagePatches => new[]
     {
         // Porte de l'escalier ouverte, panneau de sortie et lecteur associé
@@ -68,7 +68,7 @@ public sealed class TechCorridor : RoomBase
         {
             if (c.Instrument != ObjectId.Badge)
             {
-                return null; // autre instrument : comportement par defaut
+                return null; // autre instrument : comportement par défaut
             }
 
             if (s.StateOf(ObjectId.StairsReader) == ObjectState.Unlocked)

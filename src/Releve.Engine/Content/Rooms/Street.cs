@@ -21,6 +21,6 @@ public sealed class Street : RoomBase
     public override IReadOnlyList<Exit> Exits { get; } = new[]
     {
         new Exit(Direction.East, RoomId.HospitalLobby,
-            Words: new[] { "entre", "entrer", "rentre", "rentrer", "hopital" }),
+            Words: new[] { "entre", "entrer", "rentre", "rentrer", "hôpital" }),
     };
 }

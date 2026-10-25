@@ -340,3 +340,26 @@ Tous les éléments marqués "Relecture du code" dans le tableau de traçabilit�
 **Correctif** : `GetCheckboxRects()` utilise maintenant le même calcul de Y que `DrawCheckboxRow()` (`startY + (Fonts.Size - CheckboxSize) / 2f` pour chaque rangée), alignant parfaitement la zone de clic sur la case dessinée.
 
 **Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161). Validé par l'utilisateur.
+
+---
+
+### Correction : restauration des accents dans les textes du jeu + correction « rouge fixe »
+
+**Symptôme** : les accents avaient été supprimés de tous les textes joueurs lors du remplacement des apostrophes typographiques par des apostrophes droites (J1). Exemples : `hopital` au lieu de `hôpital`, `androide` au lieu de `androïde`, `synthese` au lieu de `synthèse`, etc. Par ailleurs, « rouge fixe » (terme correct : un rouge qui ne vacille pas) avait été incorrectement remplacé par « rouge fixé » dans 5 messages de porte. La fiche patient de l'accueil manquait aussi d'accents (`Prénom`, `évolutive`, `nécessitant`, `rémission`, `complète`).
+
+**Cause** : lors du remplacement `’` → `'` (J1), les accents ont également été retirés des littéraux texte. Correction erronée de `fixe` → `fixé` par sur-correction.
+
+**Fichiers modifiés** :
+- `src/Releve.Engine/Content/Rooms/HospitalLobby.cs` — titres, descriptions, messages, commentaires, **fiche patient**
+- `src/Releve.Engine/Content/Rooms/Bedroom.cs` — messages d'intro, descriptions, messages d'état
+- `src/Releve.Engine/Content/Rooms/Street.cs` — alias `hôpital`
+- `src/Releve.Engine/Content/Rooms/TechCorridor.cs` — messages de porte, description du hublot
+- `src/Releve.Engine/Content/Objects/HospitalLobbyObjects.cs` — nom d'affichage `l'androïde`, descriptions, commentaires
+- `src/Releve.Engine/Content/Objects/BedroomObjects.cs` — alias `matériel`, `matériel médical`
+- `src/Releve.Engine/World/Ids.cs` — commentaire
+
+**Règle appliquée** : accents restaurés (caractères précomposés), apostrophes droites `'` (U+0027) conservées. Identifiants de code inchangés. « rouge fixe » conservé comme terme technique correct.
+
+**Tests mis à jour** : `BedroomV3Tests.cs`, `ContentV4Tests.cs`, `DialogTests.cs`, `PocContentTests.cs` — chaînes attendues passées avec accents, `rouge fixe` au lieu de `rouge fixé`, fiche patient accentuée.
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
