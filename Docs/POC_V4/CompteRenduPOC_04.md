@@ -312,3 +312,31 @@ Tous les éléments marqués "Relecture du code" dans le tableau de traçabilit�
 ---
 
 **Note finale** : La section « vérifié dans le jeu réel » **n'est pas présente** car l'agent n'a aucun moyen d'observer l'écran ni d'envoyer des touches ou des clics. Toutes les validations visuelles et interactives attendent l'utilisateur.
+
+## 10. Corrections demandées par l'utilisateur et effectuées après le test par l'utilisateur
+
+### Bug corrigé : crash « Options » au clic sur le menu Options
+
+**Symptôme** : sélectionner « Options » dans le menu principal provoque un `NullReferenceException` à `OptionsDialog.Open()` (ligne 69, `_settingsStore.Load()`). Le jeu plante immédiatement.
+
+**Cause** : dans `GameApp.cs`, `_optionsDialog` était instancié avant `_settingsStore`. Le constructeur `OptionsDialog` recevait une référence `null` sur `_settingsStore`, et `Open()` plantait sur l'appel `_settingsStore.Load()`.
+
+**Fichier modifié** : `src/Releve.Game/GameApp.cs`
+
+**Correctif** : déplacement de l'instanciation `_settingsStore = new SettingsStore()` avant celle de `_optionsDialog = new OptionsDialog(...)`. Le dialogue reçoit maintenant une instance valide.
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
+
+---
+
+### Bug corrigé : cases à cocher du menu Options non cliquables à la souris
+
+**Symptôme** : les cases à cocher « Musique » et « Plein écran » du menu Options fonctionnent au clavier mais ne peuvent pas être cochées/décochées à la souris.
+
+**Cause** : `GetCheckboxRects()` calculait les rectangles de collision à une position Y différente de celle où `DrawCheckboxRow()` dessine réellement les cases (décalage vertical `(Fonts.Size - CheckboxSize) / 2f` non pris en compte, et `startY` différent). La zone de clic ne se superposait donc pas à la case dessinée.
+
+**Fichier modifié** : `src/Releve.Game/Ui/OptionsDialog.cs`
+
+**Correctif** : `GetCheckboxRects()` utilise maintenant le même calcul de Y que `DrawCheckboxRow()` (`startY + (Fonts.Size - CheckboxSize) / 2f` pour chaque rangée), alignant parfaitement la zone de clic sur la case dessinée.
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161). Validé par l'utilisateur.

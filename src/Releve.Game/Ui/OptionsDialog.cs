@@ -265,14 +265,14 @@ public sealed class OptionsDialog
 
     private Rectangle[] GetCheckboxRects()
     {
-        var startY = _bounds.Y + Layout.Padding * 3 + Fonts.TitleSize + Fonts.TitleSpacing + Layout.Padding * 2;
+        var titleY = _bounds.Y + Layout.Padding;
+        var startY = titleY + Fonts.TitleSize + Fonts.TitleSpacing + Layout.Padding * 2;
         var leftX = _bounds.X + Layout.Padding * 3;
-        var rowY = startY;
 
         return new[]
         {
-            new Rectangle(leftX, rowY, CheckboxSize, CheckboxSize),
-            new Rectangle(leftX, rowY + RowSpacing, CheckboxSize, CheckboxSize)
+            new Rectangle(leftX, startY + (Fonts.Size - CheckboxSize) / 2f, CheckboxSize, CheckboxSize),
+            new Rectangle(leftX, startY + RowSpacing + (Fonts.Size - CheckboxSize) / 2f, CheckboxSize, CheckboxSize)
         };
     }
 

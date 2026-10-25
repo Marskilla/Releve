@@ -74,11 +74,12 @@ public sealed class GameApp
         _menu = new MenuScreen(_fonts);
         _textViewer = new TextViewer(_fonts);
         _imageViewer = new ImageViewer(_fonts);
-        _optionsDialog = new OptionsDialog(_fonts, _settingsStore, _music, this);
-        _fade = new ScreenFade();
 
         _saveStore = new EncryptedFileSaveStore();
         _settingsStore = new SettingsStore();
+
+        _optionsDialog = new OptionsDialog(_fonts, _settingsStore, _music, this);
+        _fade = new ScreenFade();
 
         // J10-5: appliquer le reglage Musique au demarrage
         var settings = _settingsStore.Load();
