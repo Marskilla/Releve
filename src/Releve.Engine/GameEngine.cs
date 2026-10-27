@@ -234,7 +234,7 @@ public sealed class GameEngine
         .Select(kv => new InventoryItem(kv.Key, _world.Objects[kv.Key].Name))
         .ToList();
 
-    /// <summary>Objets accessibles : piece courante ou inventaire, et visibles (§6.6).</summary>
+    /// <summary>Objets accessibles : pièce courante ou inventaire, et visibles.</summary>
     private List<ObjectDef> Scope() => _world.Objects.Values
         .Where(def =>
         {
@@ -268,7 +268,7 @@ public sealed class GameEngine
         return words;
     }
 
-    /// <summary>J8-4: Resout un choix de dialogue modal.</summary>
+    /// <summary>Résout un choix de dialogue modal.</summary>
     public CommandResult ResolveDialog(string choiceId)
     {
         var currentRoom = _world.Rooms[State.CurrentRoom];

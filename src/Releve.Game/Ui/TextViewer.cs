@@ -6,10 +6,10 @@ using Releve.Engine.World;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Visualiseur de texte modal et superpose (lot C3, J9).
+/// Visualiseur de texte modal et superposé.
 /// Opaque : remplit son rectangle d'une couleur pleine et masque ce qu'il recouvre.
-/// Texte avec retour a la ligne automatique, defilement Page/Haut/Bas, fermeture par
-/// Echap, Entree ou bouton « Fermer » / boutons de dialogue.
+/// Texte avec retour à la ligne automatique, défilement Page/Haut/Bas, fermeture par
+/// Échap, Entrée ou bouton « Fermer » / boutons de dialogue.
 /// </summary>
 public sealed class TextViewer
 {
@@ -30,7 +30,7 @@ public sealed class TextViewer
     private bool _upIndicatorHover;
     private bool _downIndicatorHover;
 
-    // J9-2: Boutons de dialogue
+    // Boutons de dialogue
     private DialogButtons? _dialogButtons;
     private string? _cancelChoiceId;
     private string? _chosenId;
@@ -46,7 +46,7 @@ public sealed class TextViewer
     /// <summary>Identifiant du choix valide (rempli a la validation).</summary>
     public string? ChosenId => _chosenId;
 
-    /// <summary>J9-2: Ouvre le visualiseur avec boutons de dialogue.</summary>
+    /// <summary>Ouvre le visualiseur avec boutons de dialogue.</summary>
     public void Open(Rectangle rectangle, string? title, string text,
         IReadOnlyList<DialogChoice> choices, string defaultChoiceId, string cancelChoiceId)
     {
@@ -61,7 +61,7 @@ public sealed class TextViewer
         _cancelChoiceId = cancelChoiceId;
         _chosenId = null;
 
-        // Creer les boutons de dialogue (J9-1)
+        // Créer les boutons de dialogue
         // Les boutons sont places en bas du rectangle, centres
         float buttonsY = rectangle.Y + rectangle.Height - Layout.Padding - 50f;
         _dialogButtons = new DialogButtons(choices, _fonts, buttonsY);
@@ -79,7 +79,7 @@ public sealed class TextViewer
         _dialogButtons.SetDefaultIndex(defaultIndex);
     }
 
-    /// <summary>Signature originale conservee (J9-2) : equivalentes a un seul bouton « Fermer » (Close).</summary>
+    /// <summary>Signature originale conservée : équivalente à un seul bouton « Fermer » (Close).</summary>
     public void Open(Rectangle rectangle, string? title, string text)
     {
         Open(rectangle, title, text,
@@ -105,7 +105,7 @@ public sealed class TextViewer
             return false;
         }
 
-        // J9-3: Si on a des boutons de dialogue, les gerer en priorite
+        // Si on a des boutons de dialogue, les gérer en priorité
         if (_dialogButtons is not null)
         {
             int chosenIndex = _dialogButtons.Update();
@@ -242,7 +242,7 @@ public sealed class TextViewer
             y += Fonts.LineHeight;
         }
 
-        // J9-2: Dessiner les boutons de dialogue (remplace le bouton « Fermer »)
+        // Dessiner les boutons de dialogue (remplace le bouton « Fermer »)
         if (_dialogButtons is not null)
         {
             _dialogButtons.Draw();

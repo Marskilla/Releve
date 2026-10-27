@@ -3,7 +3,7 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Objects;
 
-/// <summary>Objets du couloir technique (PoC §3.2).</summary>
+/// <summary>Objets du couloir technique.</summary>
 public static class TechCorridorObjects
 {
     public static IReadOnlyDictionary<ObjectId, ObjectDef> Create() => new Dictionary<ObjectId, ObjectDef>

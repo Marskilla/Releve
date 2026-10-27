@@ -1,6 +1,6 @@
 namespace Releve.Engine.Core;
 
-/// <summary>Textes de saveur pour les réponses variées (J4).</summary>
+/// <summary>Textes de saveur pour les réponses variées.</summary>
 public static class FlavourText
 {
     /// <summary>Réponses neutres à une commande incomprise (8).</summary>

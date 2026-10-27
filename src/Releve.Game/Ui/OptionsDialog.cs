@@ -8,15 +8,15 @@ using Releve.Game.Audio;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Dialogue modal « Options » (J10-3).
-/// Modale centree (~480x260), opaque, titre « Options »,
-/// deux cases a cocher « Musique » et « Plein ecran », un bouton « Fermer ».
-/// Cases dessinees en geometrie (carre de contour, repere plein quand coche).
-/// Clavier : Haut/Bas et Tab/Maj+Tab = focus cyclique (3 controles).
-/// Espace/Entree = active le controle (bascule case ou ferme).
-/// Echap = ferme.
+/// Dialogue modal « Options ».
+/// Modale centrée (~480x260), opaque, titre « Options »,
+/// deux cases à cocher « Musique » et « Plein écran », un bouton « Fermer ».
+/// Cases dessinées en géométrie (carré de contour, repère plein quand coché).
+/// Clavier : Haut/Bas et Tab/Maj+Tab = focus cyclique (3 contrôles).
+/// Espace/Entrée = active le contrôle (bascule case ou ferme).
+/// Échap = ferme.
 /// Souris : survol = focus, clic gauche = bascule case ou ferme.
-/// Mêmes regles de modalite et anti-clic fantome.
+/// Mêmes règles de modalité et anti-clic fantôme.
 /// </summary>
 public sealed class OptionsDialog
 {
@@ -90,7 +90,7 @@ public sealed class OptionsDialog
             return false;
         }
 
-        // La case « Plein ecran » reflète _fullscreen a chaque image (J10-4)
+        // La case « Plein écran » reflète _fullscreen à chaque image
         _fullscreenEnabled = _gameApp.IsFullscreen;
 
         // Clavier : navigation focus

@@ -6,9 +6,9 @@ using Releve.Engine.World;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Croix des déplacements (§9.3, lot B3) : indicateurs d'etat, sans interaction souris.
-/// Disposition en croise, centred horizontalement.
-/// Absent : rien. Ouverte : fleche pleine, couleur vive. Bloquee : fleche creuse, gris sombre.
+/// Croix des déplacements : indicateurs d'état, sans interaction souris.
+/// Disposition en croix, centrée horizontalement.
+/// Absent : rien. Ouverte : flèche pleine, couleur vive. Bloquée : flèche creuse, gris sombre.
 /// </summary>
 public sealed class ArrowsPanel
 {

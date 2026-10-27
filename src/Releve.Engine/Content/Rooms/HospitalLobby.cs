@@ -4,7 +4,7 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Rooms;
 
-/// <summary>Accueil de l'hôpital (lore §5.3, PoC §3.3).</summary>
+/// <summary>Accueil de l'hôpital.</summary>
 public sealed class HospitalLobby : RoomBase
 {
     private const string RoomTitle = "Accueil de l'hôpital";
@@ -21,21 +21,21 @@ public sealed class HospitalLobby : RoomBase
     private const string TerminalUnlockedMessage = "La porte vitrée de l'entrée se déverrouille.";
     private const string ElevatorReaderRefuses = "Le lecteur refuse le badge.";
     private const string ButtonDoesNothing = "Le bouton ne produit aucun effet.";
-    // J8-6: messages pour le dialogue de la borne
+    // Messages pour le dialogue de la borne (dialogue modal fiche patient)
     private const string BadgeOnTerminalMessage =
         "Vous passez le badge devant la borne. La fiche patient s'affiche.";
     private const string AcceptMessage =
         "Vous validez la sortie. La porte vitrée de l'entrée se déverrouille.";
     private const string RefuseMessage =
         "Vous ne validez pas la sortie.";
-    // OpenGlassDoorLocked réutilise WestBlockedMessage (J1.2)
-    // OpenGlassDoorUnlocked réutilise TerminalUnlockedMessage (J1.2)
-    private const string OpenElevator = NorthBlockedMessage; // réutilise la constante (J1.2)
+// OpenGlassDoorLocked réutilise WestBlockedMessage (optimisation)
+// OpenGlassDoorUnlocked réutilise TerminalUnlockedMessage (optimisation)
+    private const string OpenElevator = NorthBlockedMessage; // réutilise la constante (optimisation)
 
-    // Coordonnées zones d'image (J5) - image 1774x887
+    // Coordonnées zones d'image (patches d'état — image 1774x887)
     private const int GlassDoorX1 = 88, GlassDoorY1 = 150, GlassDoorX2 = 272, GlassDoorY2 = 668;
 
-// Fiche patient : texte du lore, repris à l'identique (PoC §3.3).
+// Fiche patient : texte du lore, repris à l'identique (contenu PoC).
     private static readonly string[] PatientRecord =
     {
         "FICHE PATIENT",
@@ -54,7 +54,7 @@ public sealed class HospitalLobby : RoomBase
 
     public override string Description(GameState s) => RoomDescription;
 
-    /// <summary>Zones d'image actives selon l'état (J5).</summary>
+    /// <summary>Zones d'image actives selon l'état (patches AltState).</summary>
     public override IReadOnlyList<ImagePatch> ImagePatches => new[]
     {
         // Porte vitrée de sortie ouverte
@@ -118,7 +118,7 @@ public sealed class HospitalLobby : RoomBase
                         DialogIds.PatientRefuse);
                 }
 
-                // J8-6: Say (pas Changed) + dialog. La fiche n'est plus dans la console.
+                // Say (pas Changed) + dialog. La fiche n'est plus dans la console.
                 // L'etat de Terminal n'est PAS modifie ici.
                 return CommandResult.Say(BadgeOnTerminalMessage).WithDialog(dialog);
             }
@@ -162,7 +162,7 @@ public sealed class HospitalLobby : RoomBase
     private static bool IsWestOpen(GameState s) =>
         s.StateOf(ObjectId.Terminal) == ObjectState.Activated;
     
-    /// <summary>J8-7: Reaction aux choix du dialogue de la borne.</summary>
+    /// <summary>Réaction aux choix du dialogue de la borne.</summary>
     public override CommandResult? OnDialogChoice(string choiceId, GameState s)
     {
         return choiceId switch

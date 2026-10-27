@@ -5,7 +5,7 @@ using Releve.Engine.Core;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Inventaire : liste verticale de libellés (§9.3), défilement Ctrl+Haut/Ctrl+Bas (sans Shift).
+/// Inventaire : liste verticale de libellés, défilement Ctrl+Haut/Ctrl+Bas (sans Shift).
 /// </summary>
 public sealed class InventoryPanel
 {
@@ -52,7 +52,7 @@ public sealed class InventoryPanel
         }
     }
 
-    /// <summary>Défilement Ctrl+Haut / Ctrl+Bas (sans Shift) (§9.4).</summary>
+    /// <summary>Défilement Ctrl+Haut / Ctrl+Bas (sans Shift).</summary>
     public void Update(int itemCount)
     {
         var visible = VisibleRows();

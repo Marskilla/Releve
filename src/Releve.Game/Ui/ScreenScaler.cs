@@ -4,8 +4,8 @@ using Releve.Game.Ui;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Calcul d'echelle et de placement pour le rendu logique 1280x720 dans une fenetre redimensionnee (J6-2).
-/// Applique SetMouseOffset et SetMouseScale pour que GetMousePosition renvoie des coordonnees logiques.
+/// Calcul d'échelle et de placement pour le rendu logique 1280x720 dans une fenêtre redimensionnée.
+/// Applique SetMouseOffset et SetMouseScale pour que GetMousePosition renvoie des coordonnées logiques.
 /// </summary>
 public sealed class ScreenScaler
 {

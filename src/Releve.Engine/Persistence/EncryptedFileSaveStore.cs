@@ -4,8 +4,8 @@ using Releve.Engine.World;
 namespace Releve.Engine.Persistence;
 
 /// <summary>
-/// Sauvegarde chiffree dans un fichier unique sous Documents/Releve/save.dat.
-/// Ecriture atomique : fichier temporaire puis remplacement (§8).
+/// Sauvegarde chiffrée dans un fichier unique sous Documents/Releve/save.dat.
+/// Écriture atomique : fichier temporaire puis remplacement.
 /// </summary>
 public sealed class EncryptedFileSaveStore : ISaveStore
 {

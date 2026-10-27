@@ -3,8 +3,8 @@ using Releve.Engine.Core;
 namespace Releve.Engine.Parsing;
 
 /// <summary>
-/// Analyseur de commandes a vocabulaire controle (§6) : normalisation puis resolution des noms
-/// dans la portee courante.
+/// Analyseur de commandes à vocabulaire contrôlé : normalisation puis résolution des noms
+/// dans la portée courante.
 /// </summary>
 public static class CommandParser
 {
@@ -59,8 +59,8 @@ public static class CommandParser
             }
         }
 
-        // J3.5 : pour Look seulement, si tous les mots restants (hors prepositions) sont dans RoomWords
-        // et qu'au moins un n'est pas "moi" -> Look sans cible.
+// Pour Look seulement : si tous les mots restants (hors prépositions) sont dans RoomWords
+// et qu'au moins un n'est pas "moi" -> Look sans cible.
         if (action == GameAction.Look)
         {
             var nonPrepWords = rest.Where(w => !TextNormalizer.IsPreposition(w)).ToList();

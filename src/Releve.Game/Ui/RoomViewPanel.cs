@@ -6,10 +6,10 @@ using Releve.Engine.World;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Vue du lieu (§9.3) : image mise en cache et mise a l'echelle,
-/// ou rectangle de remplacement portant le titre si l'image est introuvable (§9.2).
-/// Zones d'image actives (AltState) superposees selon l'etat du jeu (J5, J6.3).
-/// Transitions de changement de piece (J7).
+/// Vue du lieu : image mise en cache et mise à l'échelle,
+/// ou rectangle de remplacement portant le titre si l'image est introuvable.
+/// Zones d'image actives (AltState) superposées selon l'état du jeu (patches d'état, transitions).
+/// Transitions de changement de pièce (défilement 0,4s).
 /// </summary>
 public sealed class RoomViewPanel
 {
@@ -17,7 +17,7 @@ public sealed class RoomViewPanel
     private readonly Dictionary<string, Texture2D> _altTextures = new(StringComparer.Ordinal);
     private readonly Fonts _fonts;
 
-    // J7-4: Transition
+    // Transition de pièce (défilement 0,4s)
     private const float TransitionDuration = 0.4f;
     private RoomView? _fromView;
     private RoomView? _toView;
@@ -42,7 +42,7 @@ public void Draw(RoomView view)
             }
         }
 
-    /// <summary>J7-3: Dessine une vue decalee de dx, dy.</summary>
+    /// <summary>Dessine une vue décalée de dx, dy.</summary>
     private void DrawView(RoomView view, float dx, float dy, bool drawBackground = true)
     {
         var bounds = Layout.ViewBounds;
@@ -58,7 +58,7 @@ public void Draw(RoomView view)
         {
             DrawStretched(texture, shiftedBounds);
 
-            // Dessiner les zones AltState actives (J7-2)
+            // Dessiner les zones AltState actives (patches d'état)
             if (view.ActivePatches.Count > 0)
             {
                 DrawActivePatches(texture, view.ActivePatches, shiftedBounds);
@@ -75,7 +75,7 @@ public void Draw(RoomView view)
         }
     }
 
-    /// <summary>J7-6: Dessin pendant une transition.</summary>
+    /// <summary>Dessin pendant une transition.</summary>
     private void DrawTransition()
     {
         if (_fromView is null || _toView is null)
@@ -84,14 +84,14 @@ public void Draw(RoomView view)
         }
 
         float p = MathF.Min(_transitionTimer / TransitionDuration, 1f);
-        // J7-4: progression adoucie (smoothstep)
+        // Progression adoucie (smoothstep)
         float e = p * p * (3f - 2f * p);
 
         var bounds = Layout.ViewBounds;
         float W = bounds.Width;
         float H = bounds.Height;
 
-        // J7-5: calcul des decalages selon la direction
+        // Calcul des décalages selon la direction
         (float fromDx, float fromDy, float toDx, float toDy) = _transitionDir switch
         {
             Direction.East  => (-e * W, 0f,  W - e * W, 0f),
@@ -105,7 +105,7 @@ public void Draw(RoomView view)
         Raylib.DrawRectangle((int)bounds.X - Layout.Padding, (int)bounds.Y - Layout.Padding,
             (int)bounds.Width + 2 * Layout.Padding, (int)bounds.Height + 2 * Layout.Padding, Palette.Panel);
 
-        // J7-6: BeginScissorMode sur ViewBounds
+        // BeginScissorMode sur ViewBounds
         Raylib.BeginScissorMode((int)bounds.X, (int)bounds.Y, (int)bounds.Width, (int)bounds.Height);
 
         // Dessiner la vue sortante puis l'entrante SANS fond (deja dessine)
@@ -136,7 +136,7 @@ public void Draw(RoomView view)
         _fonts.Draw(title, position, Palette.DimText);
     }
 
-    /// <summary>J7-2: Dessine les zones d'image active avec arrondi separe de chaque bord.</summary>
+    /// <summary>Dessine les zones d'image active avec arrondi séparé de chaque bord.</summary>
     private void DrawActivePatches(Texture2D baseTexture, IReadOnlyList<ImageRect> patches, Rectangle destBounds)
     {
         var altKey = GetAltKeyForTexture(baseTexture);
@@ -145,7 +145,7 @@ public void Draw(RoomView view)
             return; // pas d'image alternative, on ne dessine rien
         }
 
-        // J7-2: dimensions de reference lues dans la texture de base chargee
+        // Dimensions de référence lues dans la texture de base chargée
         float sourceWidth = baseTexture.Width;
         float sourceHeight = baseTexture.Height;
 
@@ -157,7 +157,7 @@ public void Draw(RoomView view)
             // Rectangle source dans l'image _AltState
             var srcRect = new Rectangle(patch.X1, patch.Y1, patch.X2 - patch.X1, patch.Y2 - patch.Y1);
 
-            // J7-2: arrondi separe de chaque bord
+            // Arrondi séparé de chaque bord
             float left = destBounds.X + MathF.Round(patch.X1 * scaleX);
             float right = destBounds.X + MathF.Round(patch.X2 * scaleX);
             float top = destBounds.Y + MathF.Round(patch.Y1 * scaleY);
@@ -235,7 +235,7 @@ public void Draw(RoomView view)
         return true;
     }
 
-    /// <summary>J7-4: Debute une transition de piece.</summary>
+    /// <summary>Démarre une transition de pièce.</summary>
     /// <param name="from">Vue d'origine.</param>
     /// <param name="to">Vue de destination.</param>
     /// <param name="dir">Direction du deplacement (Est, Ouest, Nord, Sud).</param>
@@ -262,7 +262,7 @@ public void Draw(RoomView view)
         }
     }
 
-    /// <summary>J7-4: Met a jour la transition. Renvoie vrai si la transition est terminee.</summary>
+    /// <summary>Met à jour la transition. Renvoie vrai si la transition est terminée.</summary>
     public void Update(float dt)
     {
         if (!IsTransitioning)
@@ -284,10 +284,10 @@ public void Draw(RoomView view)
         }
     }
 
-    /// <summary>J7-4: Vrai si une transition est en cours.</summary>
+    /// <summary>Vrai si une transition est en cours.</summary>
     public bool IsTransitioning => _fromView != null && _toView != null && _transitionTimer < TransitionDuration;
 
-    /// <summary>J7-4: Termine instantanement la transition en cours.</summary>
+    /// <summary>Termine instantanément la transition en cours.</summary>
     public void CompleteTransition()
     {
         _fromView = null;

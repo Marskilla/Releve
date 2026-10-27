@@ -67,54 +67,54 @@ Pour reprendre, choisissez « Continuer » dans le menu.
 
 Pour quitter le jeu, écrivez : quitter
 
-LE PETIT MOT DE L’AUTEUR
+LE MOT DE L'AUTEUR
 
 Ce jeu est né de cette envie bien particulière qui me prend de temps en temps : celle de créer quelque chose. 
-Cela se transforme parfois en un projet qui m’occupe en général pendant quelques mois.
+Cela se transforme parfois en un projet qui m'occupe en général pendant quelques mois.
 
-J’ai déjà produit pas mal de trucs sur ce mode par le passé : une démo Windows par-ci, un jeu Atari ST par-là, tiens, une ROM Mega Drive, et pourquoi pas un site web ? Et puis voilà un jeu Amiga, un mod pour un jeu PC, etc.
+J'ai déjà produit pas mal de trucs sur ce mode par le passé : une démo Windows par-ci, un jeu Atari ST par-là, tiens, une ROM Mega Drive, et pourquoi pas un site web ? Et puis voilà un jeu Amiga, un mod pour un jeu PC, etc.
 
-Toujours avec la même volonté : produire des trucs gratuits, qui m'amusent à les faire et qui peuvent éventuellement plaire à d'autres.
-Et des fois, c'est le cas ! Certaines de ces productions ont connu un petit succès : PicrossST, le frontend pour l’émulateur Amiga FS-UAE, Escape, le jeu d’atout sur les vieilles machines, etc.
-Mais hors de question de gagner de l’argent avec ça.
+Toujours avec la même volonté : produire des trucs gratuits, que je prends plaisir à créer et qui peuvent éventuellement plaire à d'autres.
+Et vous savez quoi ? Parfois, ça arrive ! Certaines de ces productions ont connu un petit succès : PicrossST, le frontend pour l'émulateur Amiga FS-UAE, Escape, le jeu d'atout sur les vieilles machines, etc.
+Mais hors de question de gagner de l'argent avec ça.
 
-Je suis développeur et, malheureusement, je n’ai aucun talent artistique, que ce soit en musique ou en graphisme.
+Je suis développeur et, malheureusement, je n'ai aucun talent artistique, que ce soit en musique ou en graphisme.
 
-Jusqu’ici, je bricolais donc dans ces domaines ou je devais rechercher des talents qui acceptaient de travailler bénévolement. Et des codeurs qui acceptaient de me suivre dans mes idées (big up, Shadow !).
+Jusqu'ici, je bricolais donc dans ces domaines ou je devais rechercher des talents qui acceptaient de travailler bénévolement. Et des codeurs qui acceptaient de me suivre dans mes idées (big up, Shadow272 !).
 
-Mais depuis quelques mois, la donne change. Les graphistes, les musiciens et les développeurs sont en train d’être assistés, voire remplacés, à tout-va par des IA chez les bricoleurs, les indépendants ou les professionnels dans les grandes boîtes.
-Selon les points de vue, c’est regrettable ou formidable, c’est le début de la fin ou celui d’une nouvelle ère. 
-Mais ce qui est sûr, c’est que c’est comme ça et qu’on ne fera pas machine arrière.
+Mais depuis quelques mois, la donne change. Les IA sont en train d'assister, voire de remplacer, les graphistes, les musiciens et les développeurs, aussi bien chez les bricoleurs et les indépendants que dans les boîtes.
+Selon les points de vue, c'est regrettable ou formidable, c'est le début de la fin ou celui d'une nouvelle ère. 
+Mais ce qui est sûr, c'est que c'est comme ça et qu'on ne fera pas machine arrière.
 
-Toutefois, au stade où nous en sommes, je reste persuadé que l’humain peut encore impulser quelque chose, ou tout du moins qu’il doit diriger, vérifier, ou garder quelques gestes techniques pour lui.
+Toutefois, au stade où nous en sommes, je reste persuadé que l'humain peut encore impulser quelque chose, ou tout du moins qu'il doit diriger, vérifier, ou garder quelques gestes techniques pour lui.
 
-Et cela doit s’apprendre : comment utiliser ces outils, dompter et comprendre ces modèles, tant du point de vue opérationnel que dans la détermination de leur périmètre et de leurs possibilités.
+Et cela doit s'apprendre : savoir utiliser ces outils, dompter et comprendre ces modèles, mais aussi connaître leurs limites et décider de la place qu'on veut leur laisser.
 
-C’est donc avec la volonté de créer quelque chose et de perfectionner ma maîtrise de ces outils que j’ai décidé de me lancer dans ce jeu.
+C'est donc avec la volonté de créer quelque chose, et celle de perfectionner ma maîtrise de ces outils, que j'ai décidé de me lancer dans ce jeu.
 
-Il y a quelque temps, j’avais commencé le développement, en AMOS, d’un jeu sur Amiga qui devait être la suite d’un jeu d’aventure en 3D : Escape II. C’était un jeu en hommage aux jeux d’aventure textuels et graphiques de la seconde moitié des années 80 qu’on trouvait sur CPC et qui m’ont marqué.
-Citons-les ! Rendons-leur hommage ! Ils m’ont tant apporté quand j’étais gosse :
+Il y a quelque temps, j'avais commencé le développement, en AMOS, d'un jeu sur Amiga qui devait être la suite d'un jeu d'aventure en 3D : Escape II. C'était un jeu en hommage aux jeux d'aventure textuels et graphiques de la seconde moitié des années 80 qu'on trouvait sur CPC et qui m'ont marqué.
+Citons-les ! Rendons-leur hommage ! Ils m'ont tant apporté quand j'étais gosse :
 
-* Oxphar, version CPC. 1987. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1587))
-* Sram. 1986. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=2044))
-* Sram 2. 1987. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=2045))
-* Le Passager du temps. 1987. Ere Informatique ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1607))
+* Oxphar, version CPC. 1987. Ere Informatique (https://www.cpc-power.com//index.php?page=detail&num=1587)
+* Sram. 1986. Ere Informatique (https://www.mobygames.com/game/151015/sram/)
+* Sram 2. 1987. Ere Informatique (https://www.mobygames.com/game/151016/sram-2/)
+* Le Passager du temps. 1987. Ere Informatique (https://www.cpc-power.com//index.php?page=detail&num=1607)
 
-C’est vraiment à ceux-là que j’ai voulu rendre hommage.
-Mais il n’y a pas que les productions d’Ere Informatique. On pourrait (et on va le faire) également citer :
+C'est vraiment à ceux-là que j'ai voulu rendre hommage.
+Mais il n'y a pas que les productions d'Ere Informatique. On pourrait (et on va le faire) également citer :
 
-* Conspiration de l’An III. 1988. Loriciels ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=605))
-* La Secte noire. 1990. Lankhor ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1900))
-* La Crypte des maudits. 1991. Lankhor ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=640))
-* Pépé Béquilles. 1987. Softhawk ([CPC-Power](https://www.cpc-power.com//index.php?page=detail&num=1617))
+* Conspiration de l'An III. 1988. Loriciels (https://www.cpc-power.com//index.php?page=detail&num=605)
+* La Secte noire. 1990. Lankhor (https://www.cpc-power.com//index.php?page=detail&num=1900)
+* La Crypte des maudits. 1991. Lankhor (https://www.cpc-power.com//index.php?page=detail&num=640)
+* Pépé Béquilles. 1987. Softhawk (https://www.cpc-power.com//index.php?page=detail&num=1617)
 
-Enfin, je mets de côté — mais ils ne sont jamais bien loin — les jeux d’aventure auxquels j’ai joué sur CPC, sur ST ou sous DOS, qui avaient soit des interfaces entièrement graphiques, soit une interface entièrement textuelle, soit des graphismes escamotables ou réservés à certaines zones : A320, Zombi, Le Manoir de Mortevielle, SDAW, les formidables point’n click de LucasArts (Monkey Island, Loom, Indiana Jones…), les jeux de Cocktel Vision (Ween, Gobliins, Bargon Attack), les jeux de Magnetic Scrolls (Wonderland, Myth, etc.), la série Zork...
+Enfin, je mets de côté — mais ils ne sont jamais bien loin — les jeux d'aventure auxquels j'ai joué sur CPC, sur ST ou sous DOS, qui avaient soit des interfaces entièrement graphiques, soit une interface entièrement textuelle, soit des graphismes escamotables ou réservés à certaines zones : A320, Zombi, Le Manoir de Mortevielle, SDAW, les formidables point'n click de LucasArts (Monkey Island, Loom, Indiana Jones…), les jeux de Cocktel Vision (Ween, Gobliins, Bargon Attack), les jeux de Magnetic Scrolls (Wonderland, Myth, etc.), la série Zork...
 
-Ce ne sont que des influences indirectes car ils n’ont pas tout à fait le feeling que je recherchais.
+Ce ne sont que des influences indirectes car ils n'ont pas tout à fait le feeling que je recherchais.
 A une époque où nous promptons à destination de chatbots adossés à des IA, je trouvais intéressant de reproduire cette mécanique de jeu des années 80, avec un parseur de prompts rudimentaire et parfois frustrant.
 
 Voilà, ce sont donc des partis pris assumés : un gameplay suranné, du développement assisté par IA et du contenu généré par IA.
-Espérons que le jeu vous plaise quand même.
+Espérons que le jeu vous plaise quand même, j'y ai mis du coeur à défaut d'y mettre tout le talent nécessaire à sa réalisation.
 
 LICENCES
 

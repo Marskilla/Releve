@@ -115,7 +115,7 @@ public static class Vocabulary
         "quittes",
     };
 
-    /// <summary>Mots designant la piece (formes normalisees) pour « regarde piece » etc. (J3.5).</summary>
+    /// <summary>Mots designant la pièce (formes normalisées) pour « regarde pièce » etc.</summary>
     public static readonly IReadOnlySet<string> RoomWords = new HashSet<string>(StringComparer.Ordinal)
     {
         "piece", "salle", "endroit", "lieu", "autour", "alentours", "alentour", "ici", "environnement", "partout", "moi"

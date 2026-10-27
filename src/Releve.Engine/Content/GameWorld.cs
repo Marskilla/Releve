@@ -6,8 +6,8 @@ using Releve.Engine.World;
 namespace Releve.Engine.Content;
 
 /// <summary>
-/// Assemblage du monde de jeu : quatre pieces du PoC, la chambre de reveil comme depart.
-/// Point de construction unique (§10 de l'architecture).
+/// Assemblage du monde de jeu : quatre pièces du PoC, la chambre de réveil comme départ.
+/// Point de construction unique.
 /// </summary>
 public static class GameWorld
 {

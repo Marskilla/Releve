@@ -3,7 +3,7 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Rooms;
 
-/// <summary>Couloir technique (lore §5.2, PoC §3.2).</summary>
+/// <summary>Couloir technique.</summary>
 public sealed class TechCorridor : RoomBase
 {
     private const string RoomTitle = "Couloir technique";
@@ -30,7 +30,7 @@ public sealed class TechCorridor : RoomBase
         "Une porte pleine à hublot. À travers, on distingue les éléments d'une chaufferie, "
         + "une rangée de lave-linge à l'arrêt depuis longtemps et des compteurs électriques.";
 
-    // Coordonnées zones d'image (J5) - image 1774x887
+    // Coordonnées zones d'image (patches d'état — image 1774x887)
     private const int StairsDoorX1 = 796, StairsDoorY1 = 205, StairsDoorX2 = 990, StairsDoorY2 = 566;
     private const int StairsReflectionX1 = 830, StairsReflectionY1 = 566, StairsReflectionX2 = 975, StairsReflectionY2 = 775;
 
@@ -42,7 +42,7 @@ public sealed class TechCorridor : RoomBase
 
     public override string Description(GameState s) => RoomDescription;
 
-    /// <summary>Zones d'image actives selon l'état (J5).</summary>
+    /// <summary>Zones d'image actives selon l'état (patches AltState).</summary>
     public override IReadOnlyList<ImagePatch> ImagePatches => new[]
     {
         // Porte de l'escalier ouverte, panneau de sortie et lecteur associé
@@ -101,7 +101,7 @@ public sealed class TechCorridor : RoomBase
             return CommandResult.Say(OpenTechDoor);
         }
 
-        // J8-5: « regarde porte du local technique » / « regarde hublot » -> description + dialogue Image
+        // Dialogue image pour la porte du local technique / hublot (fonctionnalité dialogues modaux)
         if (c.Action == GameAction.Look && (c.Target == ObjectId.TechDoor || c.Target == ObjectId.TechReader))
         {
             var dialog = new DialogRequest(

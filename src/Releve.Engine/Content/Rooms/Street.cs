@@ -3,7 +3,7 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Rooms;
 
-/// <summary>Rue provisoire : fin du PoC (PoC §3.4, aucune valeur de lore).</summary>
+/// <summary>Rue provisoire : fin du PoC (aucune valeur de lore).</summary>
 public sealed class Street : RoomBase
 {
     private const string RoomTitle = "La rue (provisoire)";

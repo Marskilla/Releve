@@ -2,10 +2,10 @@ using Releve.Engine.Core;
 
 namespace Releve.Engine.World;
 
-/// <summary>Pieces du monde. Les membres marques « test » servent uniquement aux tests (§11).</summary>
+/// <summary>Pièces du monde. Les membres marqués « test » servent uniquement aux tests.</summary>
 public enum RoomId
 {
-    // Contenu reel (document PoC §2) :
+    // Contenu réel :
     Bedroom,
     TechCorridor,
     HospitalLobby,
@@ -17,10 +17,10 @@ public enum RoomId
     TestRoomWall,
 }
 
-/// <summary>Objets du monde. Les membres marques « test » servent uniquement aux tests (§11).</summary>
+/// <summary>Objets du monde. Les membres marqués « test » servent uniquement aux tests.</summary>
 public enum ObjectId
 {
-    // Chambre de reveil (PoC §3.1)
+    // Chambre de réveil
     BedroomBed,
     BedroomMachines,
     BedroomWardrobe,
@@ -31,13 +31,13 @@ public enum ObjectId
     BedroomBin,
     GarbageBag,
 
-    // Couloir technique (PoC §3.2)
+    // Couloir technique
     StairsDoor,
     StairsReader,
     TechDoor,
     TechReader,
 
-    // Accueil de l'hôpital (PoC §3.3)
+    // Accueil de l'hôpital
     Android,
     Terminal,
     Display,
@@ -60,7 +60,7 @@ public enum ObjectId
 /// <summary>Evenements uniques (annonce deja jouee, mecanisme deja actionne...).</summary>
 public enum GameEvent
 {
-    // Contenu reel (PoC §2)
+    // Contenu réel
     WakeAnnouncementDone,
 
     TestAnnouncePlayed,
@@ -79,7 +79,7 @@ public static class Directions
     };
 }
 
-/// <summary>Identifiants des choix de dialogue (J8).</summary>
+/// <summary>Identifiants des choix de dialogue.</summary>
 public static class DialogIds
 {
     public const string Close = "Close";

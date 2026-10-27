@@ -3,7 +3,7 @@ using Raylib_cs;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Fondu à l'écran (écran noir) pour les transitions (§9.1, J7).
+/// Fondu à l'écran (écran noir) pour les transitions.
 /// États : Idle (inactif), Out (sortie vers le noir), In (entrée depuis le noir).
 /// </summary>
 public sealed class ScreenFade

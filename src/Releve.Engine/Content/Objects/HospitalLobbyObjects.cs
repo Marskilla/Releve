@@ -3,10 +3,10 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Objects;
 
-/// <summary>Objets de l'accueil de l'hôpital (PoC §3.3). Aucun n'est portable.</summary>
+/// <summary>Objets de l'accueil de l'hôpital. Aucun n'est portable.</summary>
 public static class HospitalLobbyObjects
 {
-    // Textes partagés pour éviter la duplication (J2.4)
+    // Textes partagés pour éviter la duplication (factorisation descriptions)
     public const string DisplayDescription = "L'afficheur indique : 9 octobre 2173.";
 
     public static IReadOnlyDictionary<ObjectId, ObjectDef> Create() => new Dictionary<ObjectId, ObjectDef>

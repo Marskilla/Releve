@@ -5,9 +5,9 @@ using Releve.Engine.World;
 namespace Releve.Engine.Persistence;
 
 /// <summary>
-/// Stockage des reglages utilisateur (J5-6).
-/// Fichier JSON non chiffre, ecriture atomique, dossier cree au besoin.
-/// Exceptions d'E/S avalees.
+/// Stockage des réglages utilisateur.
+/// Fichier JSON non chiffré, écriture atomique, dossier créé au besoin.
+/// Exceptions d'E/S avalées.
 /// </summary>
 public sealed class SettingsStore
 {

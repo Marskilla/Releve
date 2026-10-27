@@ -6,8 +6,8 @@ using Releve.Engine.World;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Visualiseur d'image modal carre (J9-6).
-/// Image etiree sur tout le carre, bouton « Fermer » dessine par-dessus.
+/// Visualiseur d'image modal carré.
+/// Image étirée sur tout le carré, bouton « Fermer » dessiné par-dessus.
 /// Mêmes règles de modalité et anti-clic fantôme que TextViewer.
 /// </summary>
 public sealed class ImageViewer
@@ -32,7 +32,7 @@ public sealed class ImageViewer
     /// <summary>Vrai tant que le visualiseur est ouvert.</summary>
     public bool IsOpen => _isOpen;
 
-    /// <summary>J9-6: Ouvre le visualiseur d'image.</summary>
+    /// <summary>Ouvre le visualiseur d'image.</summary>
     public void Open(string imageKey)
     {
         _imageKey = imageKey;
@@ -52,8 +52,10 @@ public sealed class ImageViewer
             }
         }
 
-        // Bouton « Fermer » unique
-        float buttonsY = _bounds.Y + _bounds.Height - Layout.Padding - 50f;
+        // Bouton « Fermer » unique — aligné en bas avec marge (DialogButtons centre sur _centerY)
+        float marginBottom = Layout.Padding; // marge bas dans la modale
+        // _centerY = bas_bouton - ButtonHeight/2 = (bounds.Bottom - marginBottom) - CloseButtonHeight/2
+        float buttonsY = _bounds.Y + _bounds.Height - marginBottom - CloseButtonHeight / 2f;
         _dialogButtons = new DialogButtons(
             new[] { new DialogChoice(DialogIds.Close, CloseLabel) },
             _fonts,
@@ -110,12 +112,15 @@ public sealed class ImageViewer
         Raylib.DrawRectangleRec(_bounds, Palette.Panel);
         Raylib.DrawRectangleLinesEx(_bounds, 1, Palette.Border);
 
-        // Image etiree sur tout le carre (marge interieure pour la bordure)
+        // Image etiree sur tout le carre (marge interieure pour la bordure + bouton en bas)
+        float marginBottom = Layout.Padding; // marge bas dans la modale
+        // Laisser de l'espace pour le bouton (hauteur bouton + marge bas) + petite marge visuelle
+        float imageBottomMargin = CloseButtonHeight + marginBottom + 4f;
         var innerBounds = new Rectangle(
             _bounds.X + 1,
             _bounds.Y + 1,
             _bounds.Width - 2,
-            _bounds.Height - 2 - CloseButtonHeight - Layout.Padding * 2); // Laisser place pour le bouton
+            _bounds.Height - 2 - imageBottomMargin);
 
         if (_texture is { } tex && Raylib.IsTextureValid(tex))
         {

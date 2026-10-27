@@ -4,15 +4,15 @@ using Raylib_cs;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Police du jeu (§9.5). Police TTF libre de droits couvrant le francais, chargee avec
-/// une liste explicite de codepoints ; la police par defaut de raylib n'est utilisee qu'en repli.
+/// Police du jeu. Police TTF libre de droits couvrant le français, chargée avec
+/// une liste explicite de codepoints ; la police par défaut de raylib n'est utilisée qu'en repli.
 /// </summary>
 public sealed class Fonts : IDisposable
 {
     public const int Size = 20;
     public const float Spacing = 1f;
 
-    /// <summary>Taille de la police pour le titre du menu (lot C2).</summary>
+    /// <summary>Taille de la police pour le titre du menu.</summary>
     public const int TitleSize = 64;
     public const float TitleSpacing = 2f;
 

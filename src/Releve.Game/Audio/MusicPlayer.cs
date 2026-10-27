@@ -5,9 +5,9 @@ using Releve.Game.Ui;
 namespace Releve.Game.Audio;
 
 /// <summary>
-/// Bandes son du jeu : une pour le menu/aide, une pour le jeu (§10 de la note d'intention).
+/// Bandes son du jeu : une pour le menu/aide, une pour le jeu.
 /// Chaque flux est en boucle et mis à jour à chaque image. Fichier absent ou périphérique
-/// indisponible : le jeu continue sans son (§9.6).
+/// indisponible : le jeu continue sans son.
 /// </summary>
 public sealed class MusicPlayer : IDisposable
 {
@@ -17,7 +17,7 @@ public sealed class MusicPlayer : IDisposable
     private readonly Dictionary<string, Music> _tracks = new(StringComparer.Ordinal);
     private bool _audioReady;
     private string? _current;
-    private bool _enabled = true; // J10-5
+    private bool _enabled = true; // état musique : true = actif, false = muet (menu Options)
 
     public bool Enabled => _audioReady && _enabled;
 
@@ -149,7 +149,7 @@ public sealed class MusicPlayer : IDisposable
         }
     }
 
-    /// <summary>J10-5: Active ou desactive la musique.</summary>
+    /// <summary>Active ou desactive la musique (menu Options).</summary>
     /// <param name="enabled">True = audible, false = muet.</param>
     public void SetEnabled(bool enabled)
     {

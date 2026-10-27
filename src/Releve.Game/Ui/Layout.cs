@@ -2,7 +2,7 @@ using Raylib_cs;
 
 namespace Releve.Game.Ui;
 
-/// <summary>Disposition de l'ecran (§9.2), valeurs initiales en 1280x720.</summary>
+/// <summary>Disposition de l'écran, valeurs initiales en 1280x720.</summary>
 public static class Layout
 {
     public const int ScreenWidth = 1280;
@@ -41,7 +41,7 @@ public static class Layout
     public static Rectangle InventoryBounds => new(SidebarX, ArrowsHeight, SidebarWidth, TopHeight - ArrowsHeight);
     public static Rectangle ConsoleBounds => new(ConsoleX, ConsoleY, ConsoleWidth, ConsoleHeight);
 
-    // J9-4: Modales
+    // Modales (dialogues texte, image, options)
     // DialogBounds : 60% de 1280x720 = 768x432, centre = (256, 144)
     public static Rectangle DialogBounds => new(256, 144, 768, 432);
     // ImageDialogBounds : carre de 60% de ScreenHeight = 432x432, centre = (424, 144)

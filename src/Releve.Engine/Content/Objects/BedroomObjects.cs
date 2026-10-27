@@ -3,10 +3,10 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Objects;
 
-/// <summary>Objets de la chambre de réveil (PoC §3.1).</summary>
+/// <summary>Objets de la chambre de réveil.</summary>
 public static class BedroomObjects
 {
-    // Textes partagés pour éviter la duplication (J2.4)
+    // Textes partagés pour éviter la duplication (factorisation descriptions)
     public const string BedroomMachinesDescription =
         "Dossier partiel affiché : maladie inconnue évolutive, traitement adaptatif expérimental. "
         + "Statut : réveil terminé, constantes stables. Le reste du dossier est indisponible.";

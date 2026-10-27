@@ -4,8 +4,8 @@ using System.Text;
 namespace Releve.Engine.Persistence;
 
 /// <summary>
-/// Chiffrement AES-256-GCM de la sauvegarde : nonce aleatoire de 12 octets et tag de 16 octets
-/// stockes avec le contenu. Obfuscation contre l'edition manuelle, pas une protection (§8).
+/// Chiffrement AES-256-GCM de la sauvegarde : nonce aléatoire de 12 octets et tag de 16 octets
+/// stockés avec le contenu. Obfuscation contre l'édition manuelle, pas une protection cryptographique.
 /// </summary>
 public static class SaveCrypto
 {

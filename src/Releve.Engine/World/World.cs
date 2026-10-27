@@ -35,7 +35,7 @@ public abstract class RoomBase
     /// <summary>Resultat propre a la piece, ou null = comportements par defaut.</summary>
     public virtual CommandResult? Handle(Command c, GameState s) => null;
 
-    /// <summary>Reaction a un choix de dialogue modal (J8). Renvoie un resultat ou null (inconnu/sans effet).</summary>
+    /// <summary>Réaction à un choix de dialogue modal. Renvoie un résultat ou null (inconnu/sans effet).</summary>
     public virtual CommandResult? OnDialogChoice(string choiceId, GameState s) => null;
 }
 

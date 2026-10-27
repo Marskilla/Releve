@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Releve.Engine.Core;
 
-/// <summary>Sélecteur de réponses : tire au hasard sans répéter le même message deux fois de suite pour une même liste (J4).</summary>
+/// <summary>Sélecteur de réponses : tire au hasard sans répéter le même message deux fois de suite pour une même liste.</summary>
 public sealed class ReplyPicker
 {
     private readonly Random _random;

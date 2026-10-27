@@ -13,7 +13,7 @@ using Releve.Game.Ui;
 namespace Releve.Game;
 
 /// <summary>
-/// Boucle principale (§9.1) : entrees, mise a jour, dessin, sans liaison de donnees.
+/// Boucle principale : entrées, mise à jour, dessin, sans liaison de données.
 /// </summary>
 public sealed class GameApp
 {
@@ -39,12 +39,12 @@ public sealed class GameApp
     private bool _menuEntered;
     private ScreenFade _fade = null!;
 
-    // J6: rendu logique 1280x720 dans texture
+    // Rendu logique 1280x720 dans texture (fullscreen/windowed)
     private RenderTexture2D _renderTexture;
     private ScreenScaler _screenScaler = null!;
     private bool _fullscreen;
 
-    /// <summary>J10-4: Acces lecture a l'etat plein ecran pour OptionsDialog.</summary>
+    /// <summary>Accès lecture à l'état plein écran pour OptionsDialog.</summary>
     public bool IsFullscreen => _fullscreen;
 
     public void Run()
@@ -53,7 +53,7 @@ public sealed class GameApp
         Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
 #endif
         Raylib.InitWindow(Layout.ScreenWidth, Layout.ScreenHeight, "Relève");
-        // J5-3: icone de la fenetre (assets/icons/releve.png) — doit etre apres InitWindow
+        // Icône de la fenêtre (assets/icons/releve.png) — doit être après InitWindow
         var iconPath = Assets.WindowIcon;
         if (File.Exists(iconPath))
         {
@@ -67,7 +67,7 @@ public sealed class GameApp
         Raylib.SetExitKey(KeyboardKey.Null); // fermeture uniquement par bouton ou commande « quitter »
         Raylib.SetTargetFPS(60);
 
-        // J6: creer la texture de rendu logique
+        // Créer la texture de rendu logique
         _renderTexture = Raylib.LoadRenderTexture(Layout.ScreenWidth, Layout.ScreenHeight);
         Raylib.SetTextureFilter(_renderTexture.Texture, TextureFilter.Bilinear);
 
@@ -92,18 +92,18 @@ public sealed class GameApp
         _optionsDialog = new OptionsDialog(_fonts, _settingsStore, _music, this);
         _fade = new ScreenFade();
 
-        // J10-5: appliquer le reglage Musique au demarrage
+        // Appliquer le réglage Musique au démarrage
         var settings = _settingsStore.Load();
         _music.SetEnabled(settings.Music);
 
-        // J6-8: charger reglages, appliquer plein ecran
-        _fullscreen = settings.Fullscreen;
-        if (_fullscreen)
+        // Charger réglages, appliquer plein écran
+        // Ne PAS setter _fullscreen ici : SetFullscreen le fait et evite le early-return
+        if (settings.Fullscreen)
         {
             SetFullscreen(true);
         }
 
-        // Image de fond du menu (lot C2) : chargee après InitWindow, absente = fond uni sans erreur.
+        // Image de fond du menu (menu background) : chargée après InitWindow, absente = fond uni sans erreur.
         var menuBackgroundPath = Assets.MenuBackground;
         if (File.Exists(menuBackgroundPath))
         {
@@ -118,17 +118,17 @@ public sealed class GameApp
             }
         }
 
-        // La sauvegarde est lue une seule fois au demarrage : le menu la relit a chaque image sinon (§15).
+        // La sauvegarde est lue une seule fois au démarrage : le menu la relit à chaque image sinon.
         _canContinue = _saveStore.Exists() && _saveStore.Load() is not null;
 
         try
         {
             while (!Raylib.WindowShouldClose() && !_quitRequested)
             {
-                // J6-6: Alt+Entree en tout debut de frame (avant menu, jeu, visualiseur, fondu, options)
+                // Alt+Entrée en tout début de frame (avant menu, jeu, visualiseur, fondu, options)
                 HandleFullscreenToggle();
 
-                // J6-2: mettre a jour l'echelle et l'offset souris AVANT les mises a jour
+                // Mettre à jour l'échelle et l'offset souris AVANT les mises à jour
                 _screenScaler.Update(Raylib.GetScreenWidth(), Raylib.GetScreenHeight());
 
                 // Calcul du dt borné (pour éviter les à-coups).
@@ -153,9 +153,9 @@ public sealed class GameApp
                 }
                 else
                 {
-                    // Les visualiseurs modaux (texte, image, options) sont mis a jour en priorite,
-                    // que l'on soit dans le menu ou en partie (J9-7, J10-4).
-                    // Ils bloquent UpdateMenu et UpdateGame.
+// Les visualiseurs modaux (texte, image, options) sont mis à jour en priorité,
+// que l'on soit dans le menu ou en partie (dialogues modaux, plein écran).
+// Ils bloquent UpdateMenu et UpdateGame.
                     bool modalOpen = _textViewer.IsOpen || _imageViewer.IsOpen || _optionsDialog.IsOpen;
 
                     if (modalOpen)
@@ -170,7 +170,7 @@ public sealed class GameApp
                         {
                             if (_textViewer.Update())
                             {
-                                // J9-8: a la fermeture d'un modal ouvert depuis le moteur
+                                // À la fermeture d'un modal texte ouvert depuis le moteur
                                 if (_playing)
                                 {
                                     var chosenId = _textViewer.ChosenId;
@@ -197,7 +197,7 @@ public sealed class GameApp
                         {
                             if (_imageViewer.Update())
                             {
-                                // J9-8: a la fermeture d'un modal Image ouvert depuis le moteur
+                                // À la fermeture d'un modal image ouvert depuis le moteur
                                 if (_playing)
                                 {
                                     var chosenId = DialogIds.Close; // ImageViewer n'a qu'un bouton Close
@@ -216,14 +216,14 @@ public sealed class GameApp
                         {
                             if (_optionsDialog.Update())
                             {
-                                // J10-6: a la fermeture, retour au menu avec selection sur « Options »
+                                // À la fermeture, retour au menu avec sélection sur « Options »
                                 _menuEntered = false; // force Reset au prochain UpdateMenu
                             }
                         }
                     }
                     else if (_playing)
                     {
-                        // J7-7: mettre a jour la transition de piece a chaque image
+                        // Mettre à jour la transition de pièce à chaque image
                         _roomView.Update(dt);
                         UpdateGame();
                     }
@@ -265,14 +265,14 @@ public sealed class GameApp
         }
     }
 
-    /// <summary>J6-6: Bascule plein ecran sur Alt+Entree. Fonctionne dans tous les etats.</summary>
+    /// <summary>Bascule plein écran sur Alt+Entrée. Fonctionne dans tous les états.</summary>
     private void HandleFullscreenToggle()
     {
         bool altDown = Raylib.IsKeyDown(KeyboardKey.LeftAlt) || Raylib.IsKeyDown(KeyboardKey.RightAlt);
         if (altDown && Raylib.IsKeyPressed(KeyboardKey.Enter))
         {
             SetFullscreen(!_fullscreen);
-            // J6-6: vider la file de caracteres et sauter les mises a jour de cette frame
+            // Vider la file de caractères et sauter les mises à jour de cette frame
             while (Raylib.GetCharPressed() > 0)
             {
             }
@@ -281,7 +281,7 @@ public sealed class GameApp
         }
     }
 
-    /// <summary>J6-5, J10-4: Source de verite _fullscreen. N'appelle l'API raylib que si l'etat change.</summary>
+    /// <summary>Source de vérité _fullscreen. N'appelle l'API raylib que si l'état change.</summary>
     public void SetFullscreen(bool on)
     {
         if (_fullscreen == on)
@@ -311,7 +311,7 @@ public sealed class GameApp
 
 private void UpdateMenu(bool canContinue)
         {
-            // Tant que le visualiseur est ouvert, le menu ne progresse pas (modal, lot C3).
+            // Tant que le visualiseur est ouvert, le menu ne progresse pas (modal, texte/image/options).
             if (_textViewer.IsOpen)
             {
                 return;
@@ -370,7 +370,7 @@ private void OpenHelp()
 
 private void UpdateGame()
         {
-            // J3-2: memoriser l'état de la ligne de saisie au debut de la frame
+            // Mémoriser l'état de la ligne de saisie au début de la frame
             var inputEmptyAtFrameStart = _console.InputIsEmpty;
 
             _inventory.Update(_view.Inventory.Count);
@@ -380,7 +380,7 @@ private void UpdateGame()
             // Utilise IsKeyPressedRepeat pour permettre le maintien (repetition)
             // NE se declenche que si NI Shift NI Ctrl n'est enfonce (pour eviter les conflits
             // avec le rappel historique Shift+fleches).
-            // J3-2: ne deplace le joueur que si la ligne de saisie etait vide au debut de la frame.
+            // Ne déplace le joueur que si la ligne de saisie était vide au début de la frame.
             bool shiftDown = Raylib.IsKeyDown(KeyboardKey.LeftShift) || Raylib.IsKeyDown(KeyboardKey.RightShift);
             bool ctrlDown = Raylib.IsKeyDown(KeyboardKey.LeftControl) || Raylib.IsKeyDown(KeyboardKey.RightControl);
             bool modifierFree = !shiftDown && !ctrlDown;
@@ -410,7 +410,7 @@ private void UpdateGame()
 
 private void Submit(string command)
         {
-            // « quitter » est intercepte par la couche Game avant d'appeler le moteur (§6.3).
+            // « quitter » est intercepté par la couche Game avant d'appeler le moteur.
             var words = TextNormalizer.Normalize(command);
             if (words.Count > 0 && Vocabulary.QuitWords.Contains(words[0]))
             {
@@ -418,7 +418,7 @@ private void Submit(string command)
                 return;
             }
 
-            // J7-7: avant Execute, terminer toute transition en cours et memoriser la vue courante
+            // Avant Execute, terminer toute transition en cours et mémoriser la vue courante
             _roomView.CompleteTransition();
             var prevView = _view;
 
@@ -428,13 +428,13 @@ private void Submit(string command)
             _console.Append(result.Messages);
             _view = _engine.GetView();
 
-            // J7-7: apres Execute, si deplacement reussi vers une autre piece, demarrer la transition
+            // Après Execute, si déplacement réussi vers une autre pièce, démarrer la transition
             if (result.MovedTo.HasValue && _view.Room != prevView.Room)
             {
                 _roomView.BeginTransition(prevView, _view, result.MovedTo.Value);
             }
 
-            // J9-7: si le moteur demande un dialogue modal, l'ouvrir
+            // Si le moteur demande un dialogue modal, l'ouvrir
             if (result.Dialog is not null)
             {
                 if (result.Dialog.Kind == DialogKind.Text)
@@ -486,7 +486,7 @@ private void Submit(string command)
 
 private void Draw(bool canContinue)
         {
-            // J6-1: Tout le dessin passe dans la texture de rendu logique
+            // Tout le dessin passe dans la texture de rendu logique
             Raylib.BeginTextureMode(_renderTexture);
 
             if (_playing)
@@ -502,7 +502,7 @@ private void Draw(bool canContinue)
                 _menu.Draw(canContinue);
             }
 
-            // Le visualiseur est dessiné par-dessus la scène courante (lot C3, J9, J10).
+            // Le visualiseur est dessiné par-dessus la scène courante (modal texte/image/options).
             if (_textViewer.IsOpen)
             {
                 _textViewer.Draw();
@@ -521,7 +521,7 @@ private void Draw(bool canContinue)
 
             Raylib.EndTextureMode();
 
-            // J6-3: Présentation : fond noir, DrawTexturePro avec hauteur négative pour inversion verticale
+            // Présentation : fond noir, DrawTexturePro avec hauteur négative pour inversion verticale
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.Black);
 

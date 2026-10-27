@@ -4,7 +4,7 @@ using Raylib_cs;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Menu de lancement a trois entrees (lot C2) : « Continuer », « Nouvelle partie », « Aide ».
+/// Menu de lancement à quatre entrées : « Continuer », « Nouvelle partie », « Options », « Aide ».
 /// Retourne un choix typé. « Continuer » est grisé sans sauvegarde valide.
 /// Souris : survol = sélection, clic gauche = validation (doublon clavier).
 /// </summary>
@@ -91,7 +91,7 @@ public sealed class MenuScreen
                     _selected = i;
                 }
 
-                // J10-2: un appui du bouton gauche fixe la selection avant de renvoyer,
+                // Un appui du bouton gauche fixe la sélection avant de renvoyer, même si la souris n'a pas bougé.
                 // meme si la souris n'a pas bouge.
                 if (Raylib.IsMouseButtonPressed(MouseButton.Left))
                 {
@@ -154,7 +154,7 @@ public sealed class MenuScreen
             Raylib.ClearBackground(Palette.Background);
         }
 
-        // Titre en grand, centré en haut (police secondaire, lot C2).
+        // Titre en grand, centré en haut (police secondaire).
         var titleWidth = _fonts.MeasureTitleWidth(TitleText);
         var titleX = centre - titleWidth / 2f;
         var titleY = 100f;

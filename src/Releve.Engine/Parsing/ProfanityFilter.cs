@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Releve.Engine.Parsing;
 
-/// <summary>Filtre de grossièretés : mots isolés et expressions (suites contiguës) déjà normalisés (J4).</summary>
+/// <summary>Filtre de grossièretés : mots isolés et expressions (suites contiguës) déjà normalisés.</summary>
 public static class ProfanityFilter
 {
     private static readonly HashSet<string> _words = new(StringComparer.Ordinal)

@@ -1,7 +1,7 @@
 namespace Releve.Engine.Parsing;
 
 /// <summary>
-/// Normalisation identique pour la saisie et pour les alias (§6.2).
+/// Normalisation identique pour la saisie et pour les alias.
 /// </summary>
 public static class TextNormalizer
 {

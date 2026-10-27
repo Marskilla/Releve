@@ -313,7 +313,11 @@ Tous les éléments marqués "Relecture du code" dans le tableau de traçabilit�
 
 **Note finale** : La section « vérifié dans le jeu réel » **n'est pas présente** car l'agent n'a aucun moyen d'observer l'écran ni d'envoyer des touches ou des clics. Toutes les validations visuelles et interactives attendent l'utilisateur.
 
-## 10. Corrections demandées par l'utilisateur et effectuées après le test par l'utilisateur
+## 10. Corrections demandées par l'utilisateur et effectuées par l'agent après le test par l'utilisateur
+
+Ce paragraphe rend compte du niveau de qualité du code produit initialement par l'agent. Il est principalement destiné à
+la rédaction des futurs spécifications : cela illustre les capacités de l'agent de code à comprendre le niveau de
+scpécifications fournies en amont, les manques produits et les corrections nécessaires à apporter après réalisation initiale pour correspondre à la vision initiale du périmètre.
 
 ### Bug corrigé : crash « Options » au clic sur le menu Options
 
@@ -396,5 +400,53 @@ Tous les éléments marqués "Relecture du code" dans le tableau de traçabilit�
 - `src/Releve.Game/assets/icons/releve.png` : créé par conversion du `.ico` (via `System.Drawing`)
 
 **Correctif** : conversion de l'icône `.ico` en `.png`, chargement après `InitWindow`, définition via `Raylib.SetWindowIcon()`.
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
+
+---
+
+### Bug corrigé : bouton « Fermer » du visualisateur d'image trop haut
+
+**Symptôme** : dans la fenêtre modale carrée (`ImageViewer`), le bouton « Fermer » était centré horizontalement mais trop haut : il chevauchait l'image affichée, alors qu'il y a de la place pour le placer en dessous.
+
+**Cause** : `DialogButtons` centre verticalement le bouton sur `_centerY`. La valeur passée (`bounds.Bottom - margin - Height`) positionnait le **centre** du bouton au-dessus du bas de la modale, faisant déborder le haut du bouton sur l'image.
+
+**Fichier modifié** : `src/Releve.Game/Ui/ImageViewer.cs`
+
+**Correctif** :
+- `buttonsY` = `bounds.Bottom - marginBottom - CloseButtonHeight/2` (centre du bouton aligné pour que son bas soit à `marginBottom` du bord)
+- `innerBounds` de l'image réserve `CloseButtonHeight + marginBottom + 4px` en bas pour espace visuel
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
+
+---
+
+### Bug corrigé : plein écran non appliqué au démarrage malgré setting sauvegardé
+
+**Symptôme** : si le joueur a coché « Plein écran » dans les Options et relance le jeu, le jeu démarre en fenêtré alors que la case reste cochée dans le menu Options. Le réglage n'est pas appliqué.
+
+**Cause** : dans `GameApp.Run()`, `_fullscreen = settings.Fullscreen` était assigné **avant** d'appeler `SetFullscreen(true)`. Comme `SetFullscreen` fait un early-return `if (_fullscreen == on) return;`, il ne faisait rien.
+
+**Fichier modifié** : `src/Releve.Game/GameApp.cs`
+
+**Correctif** : suppression de l'assignation manuelle `_fullscreen = ...` ; appel direct `if (settings.Fullscreen) SetFullscreen(true)` qui gère l'état et la sauvegarde.
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
+
+---
+
+### Correction : nettoyage des commentaires avec références obscures
+
+**Symptôme** : de nombreux commentaires dans le code source contenaient des références à des jalons/documents (`J5`, `J6-2`, `J7-4`, `J8`, `J9-1`, `J10-3`, `lot C2`, `PoC §3.1`, `§8`, `§9.1`, `§9.6`, `§9.2`, `J3.4`, etc.) sans mentionner le document concerné, les rendant inexploitables sans recherche externe.
+
+**Fichiers modifiés** : tous les fichiers `.cs` sous `src/Releve.Engine/` et `src/Releve.Game/` (environ 60 fichiers).
+
+**Correctif** : chaque référence obscure a été remplacée par une explication autonome et claire. Exemples :
+- `// J5` → `// Coordonnées zones d'image (patches d'état — image 1774x887)`
+- `/// <summary>J8-4: Resout un choix de dialogue modal.</summary>` → `/// <summary>Résout un choix de dialogue modal.</summary>`
+- `// J6-7: ne pas valider la ligne si Alt est enfonce` → `// Ne pas valider la ligne si Alt est enfoncé (Alt+Entrée = plein écran)`
+- `private bool _enabled = true; // J10-5` → `private bool _enabled = true; // état musique : true = actif, false = muet (menu Options)`
+- `§8` dans SaveCrypto.cs → remplacé par « pas une protection cryptographique »
+- Toutes les références `lot C2`, `PoC §3.1`, `J3.4`, `J9-1`, `§9.1`, `§9.6`, `§9.2`, `J3.4`, etc. → remplacées par des explications autonomes
 
 **Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.

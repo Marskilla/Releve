@@ -6,8 +6,8 @@ using Releve.Engine.Core;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Console d'interaction : historique, retour a la ligne automatique, ancrage en bas,
-/// ligne de saisie editable, defilement vertical et boutons de defilement cliquables (§9.3, lot B2).
+/// Console d'interaction : historique, retour à la ligne automatique, ancrage en bas,
+/// ligne de saisie éditable, défilement vertical et boutons de défilement cliquables.
 /// </summary>
 public sealed class ConsolePanel
 {
@@ -77,7 +77,7 @@ public sealed class ConsolePanel
 
         command = string.Empty;
 
-        // J6-7: ne pas valider la ligne si Alt est enfonce (Alt+Entree = plein ecran)
+        // Ne pas valider la ligne si Alt est enfoncé (Alt+Entrée = plein écran)
         bool altDown = Raylib.IsKeyDown(KeyboardKey.LeftAlt) || Raylib.IsKeyDown(KeyboardKey.RightAlt);
         if (altDown || (!Raylib.IsKeyPressed(KeyboardKey.Enter) && !Raylib.IsKeyPressed(KeyboardKey.KpEnter)))
         {
@@ -89,7 +89,7 @@ public sealed class ConsolePanel
 
         if (string.IsNullOrWhiteSpace(line))
         {
-            return false; // saisie vide ignoree (§6.7)
+            return false; // saisie vide ignorée
         }
 
         command = line;
@@ -277,7 +277,7 @@ private void ScrollWithKeyboard()
                 _scroll = Math.Max(0, _scroll - page);
             }
 
-            // Home / End ne font plus défiler l'historique (J3-3) : ils déplacent seulement le curseur dans ReadCharacters.
+            // Home / End ne font plus défiler l'historique : ils déplacent seulement le curseur dans ReadCharacters.
             // Up / Down sont gérés par RecallHistory pour le rappel d'historique,
             // et par GameApp pour les déplacements. Ne pas les utiliser pour le scroll de vue.
         }

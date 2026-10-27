@@ -12,16 +12,16 @@ public static class Assets
 
     public static string Font => Path.Combine(Root, "fonts", "DejaVuSans.ttf");
 
-    /// <summary>Image de fond du menu (lot C2).</summary>
+    /// <summary>Image de fond du menu.</summary>
     public static string MenuBackground => Combine("menu", "menuBackground.png");
 
-    /// <summary>Texte d'aide (lot C4).</summary>
+    /// <summary>Texte d'aide.</summary>
     public static string HelpText => Combine("texts", "help.txt");
 
-    /// <summary>J9-5: Image pour visualiseur modal (dossier assets/views).</summary>
+    /// <summary>Image pour visualiseur modal (dossier assets/views).</summary>
     public static string ViewImage(string key) => Combine("views", key + ".png");
 
-    /// <summary>J5-3: Icône de la fenêtre (assets/icons/releve.png — raylib ne supporte pas .ico).</summary>
+    /// <summary>Icône de la fenêtre (assets/icons/releve.png — raylib ne supporte pas .ico).</summary>
     public static string WindowIcon => Combine("icons", "releve.png");
 
     private static string ResolveRoot()

@@ -77,13 +77,13 @@ public sealed record ImagePatch(int X1, int Y1, int X2, int Y2, Func<GameState, 
 /// <summary>Rectangle d'image (coordonnées source).</summary>
 public readonly record struct ImageRect(int X1, int Y1, int X2, int Y2);
 
-/// <summary>Type de dialogue modal demandé par le moteur (J8).</summary>
+/// <summary>Type de dialogue modal demandé par le moteur.</summary>
 public enum DialogKind { Text, Image }
 
-/// <summary>Choix dans un dialogue (J8).</summary>
+/// <summary>Choix dans un dialogue.</summary>
 public sealed record DialogChoice(string Id, string Label);
 
-/// <summary>Demande de dialogue modal (J8).</summary>
+/// <summary>Demande de dialogue modal.</summary>
 public sealed record DialogRequest(
     DialogKind Kind,
     string? Title,

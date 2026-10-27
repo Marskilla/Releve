@@ -5,9 +5,9 @@ using Releve.Engine.Core;
 namespace Releve.Game.Ui;
 
 /// <summary>
-/// Composant partage pour une rangee de boutons centree (J9-1).
-/// Largeur de chaque bouton = largeur du libelle + 2 * Layout.Padding, espacement 20 px.
-/// Gere l'indice selectionne, le survol, le clic et le dessin.
+/// Composant partagé pour une rangée de boutons centrée.
+/// Largeur de chaque bouton = largeur du libellé + 2 * Layout.Padding, espacement 20 px.
+/// Gère l'indice sélectionné, le survol, le clic et le dessin.
 /// </summary>
 public sealed class DialogButtons
 {

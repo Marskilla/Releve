@@ -4,12 +4,12 @@ using Releve.Engine.World;
 
 namespace Releve.Engine.Content.Rooms;
 
-/// <summary>Chambre de réveil : pièce de départ du jeu (lore §5.1, PoC §3.1).</summary>
+/// <summary>Chambre de réveil : pièce de départ du jeu.</summary>
 public sealed class Bedroom : RoomBase
 {
     private const string RoomTitle = "Chambre de réveil";
 
-    // Textes constants (J3.4)
+    // Textes constants
     private const string IntroMessage =
         "Alors que vous ouvrez doucement les yeux, une voix de synthèse annonce : « Réveil terminé, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d'hôpital, la tenue standard des malades alités.";
 
@@ -28,7 +28,7 @@ public sealed class Bedroom : RoomBase
         "Vous passez le badge devant le lecteur. Le voyant passe au vert et la porte se déverrouille.";
     private const string ReaderAlreadyUnlocked = "Le lecteur est déjà déverrouillé.";
 
-    // Coordonnées zones d'image (J5) - image 1774x887
+    // Coordonnées zones d'image (patches d'état — image 1774x887)
     private const int WardrobeX1 = 679, WardrobeY1 = 115, WardrobeX2 = 1108, WardrobeY2 = 635;
     private const int BinX1 = 1215, BinY1 = 405, BinX2 = 1340, BinY2 = 540;
     private const int ReaderX1 = 1670, ReaderY1 = 232, ReaderX2 = 1730, ReaderY2 = 325;
@@ -63,7 +63,7 @@ public sealed class Bedroom : RoomBase
         return bagInRoom ? DetailedDescriptionWithBag : DetailedDescriptionWithoutBag;
     }
 
-    /// <summary>Zones d'image actives selon l'etat (J5).</summary>
+    /// <summary>Zones d'image actives selon l'état (patches AltState).</summary>
     public override IReadOnlyList<ImagePatch> ImagePatches => new[]
     {
         // Armoire ouverte

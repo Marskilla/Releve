@@ -2,7 +2,7 @@ using Releve.Engine.Core;
 
 namespace Releve.Engine.Parsing;
 
-/// <summary>Erreurs de l'analyseur (§6.7).</summary>
+/// <summary>Erreurs de l'analyseur.</summary>
 public enum ParseError
 {
     None,
