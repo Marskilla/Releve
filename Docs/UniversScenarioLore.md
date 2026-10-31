@@ -1,10 +1,11 @@
 # Jeu "Relève" - Document de référence — Univers et scénario
 
-> Document de travail — version 0.8
+> Document de travail — version 0.9
+> Historique : 0.9 — chemise d'hôpital à la place de la blouse médicale ; alignement des §4.2, §4.3 et §5.1 à §5.3 sur le jeu tel que livré au POC V4 (message d'accueil, fenêtre de la fiche patient, répliques de l'androïde, vue du hublot) ; ajout du §4.7 (règles de jeu).
 
 ## But du document
 
-Ce document constitue la référence de travail pour définir l'univers et le scénario du jeu d'aventure. 
+Ce document constitue la référence de travail pour définir l'univers et le scénario du jeu d'aventure.
 
 Il ne cherche pas à décrire exhaustivement le monde. Les éléments sont définis uniquement lorsqu'ils sont utiles à l'ambiance, à la cohérence de l'univers, à la compréhension de l'histoire, à l'exploration ou à la progression du joueur.
 
@@ -199,7 +200,7 @@ Le jeu ne dicte jamais au joueur ses souvenirs, ses pensées ou ses émotions. I
 
 ### 4.2 La situation initiale
 
-Le jeu commence directement dans la pièce où le joueur se réveille. Une voix annonce : « Réveil terminé, constantes stables. » Le joueur porte une chemise d'hôpital, la tenue standard des malades alités.
+Le jeu commence directement dans la pièce où le joueur se réveille. Un message d'accueil, affiché une seule fois au début de la partie, décrit le réveil : le joueur ouvre doucement les yeux, une voix de synthèse annonce « Réveil terminé, constantes stables. », puis le joueur constate qu'il porte une chemise d'hôpital, la tenue standard des patients alités.
 
 Le traitement étant expérimental, le joueur n'est pas dans une chambre ordinaire au milieu d'un service : il se trouve dans une pièce isolée du sous-sol de l'hôpital, distincte des étages de soins. Hormis l'accès à la machinerie de l'hôpital, la seule sortie est l'escalier qui mène au rez-de-chaussée, fermé par une porte à lecteur de badge. Le protocole ayant été conduit en marge du circuit hospitalier habituel, le joueur a été oublié.
 
@@ -215,7 +216,7 @@ Chaque étape apporte un fragment du lore, porté par un objet, un lieu ou une m
 
 - le badge : la photo d'un enfant ;
 - le dossier et les installations : la maladie, le protocole ;
-- l'accueil de l'hôpital : les dates, l'état d'abandon et l'autorisation de sortie délivrée par une machine, qui indique l'adresse du patient (celle de ses parents) ;
+- l'accueil de l'hôpital : les dates, l'état d'abandon et la validation de sortie à la borne, qui délivre l'autorisation de sortie et indique l'adresse du patient (celle de ses parents) ;
 - la rue : la nature, les infrastructures qui fonctionnent encore ;
 - la maison des parents : la fin de la famille et une lettre posthume.
 
@@ -223,7 +224,7 @@ Chaque étape apporte un fragment du lore, porté par un objet, un lieu ou une m
 
 Le joueur se réveille seul, dans une pièce où rien ne se passe tant qu'il n'agit pas. Explorer est la réponse naturelle à cette situation, et la nature même du jeu invite le joueur à agir.
 
-L'exploration est ensuite relancée par des pistes posées dans le monde, jamais par une décision intérieure attribuée au joueur : la machine de l'accueil donne l'adresse de ses parents ; la lettre laissée dans la maison l'oriente vers la bibliothèque ; la bibliothèque lui donne accès à l'histoire de l'extinction de l'humanité et à ce qui permet de la relancer.
+L'exploration est ensuite relancée par des pistes posées dans le monde, jamais par une décision intérieure attribuée au joueur : la fiche patient de l'accueil donne l'adresse de ses parents ; la lettre laissée dans la maison l'oriente vers la bibliothèque ; la bibliothèque lui donne accès à l'histoire de l'extinction de l'humanité et à ce qui permet de la relancer.
 
 La lettre est celle de la mère du joueur, morte depuis longtemps. Elle s'adresse à son enfant, lui annonce la mort du père et sa propre fin proche, dit avoir espéré toute sa vie son réveil, et lui suggère de « faire comme dans l'ancien temps » pour rattraper son retard : aller à la bibliothèque et chercher de vieux journaux, la radio et la télévision ayant cessé depuis plusieurs années. La rédaction précise de la lettre sera définie ultérieurement.
 
@@ -252,6 +253,12 @@ Le jeu propose deux fins :
 
 Dans les deux cas, le jeu montre une image et ne dicte pas ce que le joueur ressent.
 
+### 4.7 Règles de jeu (posées, à préciser)
+
+- **Pas d'échec forcé** : le joueur ne peut pas mourir et ne peut pas être contraint de recommencer une partie. Aucune situation du jeu ne conduit à une défaite définitive.
+- **Pas d'impasse** : le monde est plutôt linéaire, sans boucle ; le joueur peut revenir en arrière mais ne peut pas se retrouver dans une situation où il serait bloqué sans issue.
+- **Les refus ne sont pas des échecs** : refuser une proposition (par exemple, à la borne de l'accueil, « Je ne suis pas prêt à sortir », ou le refus final du §4.6) laisse le monde dans son état et le joueur libre de poursuivre.
+
 ## 5. Les lieux et l'exploration
 
 ### Convention de représentation des lieux
@@ -262,31 +269,31 @@ La vue étant strictement subjective, le joueur n'apparaît jamais dans l'image 
 
 Cette convention vaut aussi pour les déplacements qui ne suivent pas une véritable direction (un ascenseur qui monte, un escalier) : ils sont ramenés à l'une des quatre directions cardinales.
 
+Certaines vues secondaires (par exemple l'aperçu d'une pièce à travers un hublot) peuvent être affichées dans une fenêtre d'image distincte, en complément de la description du lieu. Elles suivent le même style graphique et la même règle : le joueur n'y apparaît jamais.
+
 Chaque section de lieu suit la même structure : rôle narratif, description visuelle, éléments notables, fragment de lore et connexions cardinales. Les connexions cardinales, placées en fin de section, sont le seul lien entre les lieux.
 
 ### 5.1 La chambre de réveil
 
 **Rôle narratif**
 
-Point de départ du jeu. Ce lieu établit la situation du joueur — réveil, corps adulte, environnement médical encore fonctionnel — essentiellement par l'observation, complétée par un unique message d'accueil textuel au lancement de la partie. Le lieu reste volontairement simple, tant dans ses possibilités d'action que dans sa sortie, pour ne pas noyer le joueur dans ses premières commandes.
+Point de départ du jeu. Ce lieu établit la situation du joueur — réveil, corps adulte, environnement médical encore fonctionnel — essentiellement par l'observation, complétée par un unique message d'accueil au début de la partie. Le lieu reste volontairement simple, tant dans ses possibilités d'action que dans sa sortie, pour ne pas noyer le joueur dans ses premières commandes.
 
 **Description visuelle**
 
 Chambre médicale sans fenêtre, en sous-sol, vue depuis la position du joueur juste après s'être redressé et levé du lit. Le lit occupe une partie du champ de vision. Face à lui, une armoire en contreplaqué au style de mobilier hospitalier standard, sans aspect institutionnel glauque. Des machines de monitoring et de soins adaptatifs sont présentes dans la pièce. Une porte unique, située à droite de l'image et équipée d'un lecteur de badge, constitue la seule ouverture visible. L'éclairage est artificiel, propre, sans poussière ni dégradation : les systèmes automatisés continuent de maintenir les conditions sanitaires. L'ambiance est neutre et fonctionnelle plutôt qu'inquiétante. Aucune personne n'est visible dans le champ, la vue étant strictement subjective.
 
-**Texte d'introduction du lieu**
+**Textes du lieu (formulations provisoires)**
 
-Au lancement d'une nouvelle partie, le jeu s'ouvre sur un message d'accueil unique, plus long qu'une description de lieu ordinaire, qui précède la description de la pièce. Texte de référence (provisoire) :
-
-> Alors que vous ouvrez doucement les yeux, une voix de synthèse annonce : « Réveil terminé, constantes stables. » En vous examinant, vous constatez que vous portez une chemise d'hôpital, la tenue standard des malades alités.
-
-La voix de synthèse est féminine, neutre et sans chaleur. Aucun autre son n'accompagne le jeu, hormis la musique de fond : cette annonce constitue donc un événement marquant, propre à ce lieu.
+- *Message d'accueil* (une seule fois, au début de la partie) : le joueur ouvre doucement les yeux ; une voix de synthèse féminine, neutre et sans chaleur, annonce : « Réveil terminé, constantes stables. » ; en s'examinant, le joueur constate qu'il porte une chemise d'hôpital, la tenue standard des patients alités. Aucun autre son n'accompagne le jeu, hormis la musique de fond : cette annonce constitue donc un événement marquant, propre à ce lieu.
+- *Description d'entrée* (à chaque entrée dans la pièce) : une pièce propre, éclairée et sans fenêtre, avec du matériel médical autonome et une armoire.
+- *Description détaillée* (sur « regarde » ou « observe » sans objet) : complète la précédente avec une corbeille dans un coin (et son sac vide tant que le joueur ne l'a pas pris) et la porte à lecteur de badge qui constitue la seule sortie.
 
 **Éléments notables**
 
 - Le lit et les machines de monitoring et de soins adaptatifs, qui renseignent sur l'état du joueur et permettent d'accéder à un dossier médical partiel.
-- L'armoire en contreplaqué, contenant des vêtements d'enfant trop petits pour le joueur et un badge d'identification portant la photo d'un enfant de huit ans.
-- La chemise d'hôpital que porte le joueur, mentionnée une seule fois, dans le message d'accueil (hors champ en vue subjective).
+- L'armoire en contreplaqué, fermée au départ, contenant des vêtements d'enfant trop petits pour le joueur et un badge d'identification portant la photo d'un enfant de huit ans.
+- La chemise d'hôpital que porte le joueur, mentionnée une seule fois dans le message d'accueil (hors champ en vue subjective). Ce n'est pas un objet du jeu.
 - Le lecteur de badge, situé près de la porte, qui conditionne la sortie du lieu.
 - Une corbeille contenant un sac poubelle vide — les machines maintiennent l'hygiène de la pièce, qui ne contient donc aucun déchet. Ce sac sera récupéré par le joueur et trouvera un usage ultérieur, hors de ce lieu.
 
@@ -311,7 +318,7 @@ Couloir de service en sous-sol, étroit, droit et sans fenêtre, vu depuis le su
 **Éléments notables**
 
 - La porte de l'escalier, au fond du couloir. À travers son vitrage, on voit les premières marches monter vers une lumière plus claire que celle du couloir. Son lecteur de badge accepte celui du joueur. Tant que le joueur n'a pas passé son badge sur le lecteur, la sortie vers le nord reste indisponible. Une fois la porte ouverte, l'escalier monte vers le rez-de-chaussée.
-- La porte du local technique, verrouillée. Son lecteur de badge refuse celui du joueur. À travers le hublot, on distingue les éléments d'une chaufferie, une rangée de lave-linge à l'arrêt depuis longtemps et des compteurs électriques. Cette porte ne s'ouvrira pas de toute l'aventure : elle n'ouvre sur aucune zone de jeu et constitue une fausse piste dont le seul apport est le texte de description.
+- La porte du local technique, verrouillée. Son lecteur de badge refuse celui du joueur. À travers le hublot, on distingue les éléments d'une chaufferie, une rangée de lave-linge à l'arrêt depuis longtemps et des compteurs électriques. Lorsque le joueur examine cette porte, une image de ce que l'on voit à travers le hublot s'affiche dans une fenêtre, en plus de la description. Cette porte ne s'ouvrira pas de toute l'aventure : elle n'ouvre sur aucune zone de jeu et constitue une fausse piste dont l'apport est cette description et cette image.
 
 **Fragment de lore**
 
@@ -327,16 +334,20 @@ Pas de texte de lore dédié. Le lieu illustre les « installations » évoquée
 
 **Rôle narratif**
 
-Lieu de bascule entre le sous-sol technique et le monde extérieur. C'est ici que le joueur apprend les dates, la raison de son admission et sa destination de sortie (la maison de ses parents), par l'intermédiaire d'une borne d'accueil et d'un afficheur. C'est aussi le premier lieu où il s'adresse à un personnage et où une sortie ne s'ouvre qu'une fois une procédure suivie. L'absence prolongée de toute présence humaine est suggérée sans être expliquée.
+Lieu de bascule entre le sous-sol technique et le monde extérieur. C'est ici que le joueur apprend les dates, la raison de son admission et sa destination de sortie (la maison de ses parents), par l'intermédiaire d'une borne d'accueil et d'un afficheur. C'est aussi le premier lieu où il s'adresse à un personnage, où une décision lui est présentée sous forme de choix (valider sa sortie ou non) et où une sortie ne s'ouvre qu'une fois une procédure suivie. L'absence prolongée de toute présence humaine est suggérée sans être expliquée.
 
 **Description visuelle**
 
 Hall d'accueil d'hôpital, vu depuis le sud, face au nord. L'escalier par lequel le joueur est arrivé se trouve derrière lui, hors champ. Le hall est vaste, lumineux, propre et entièrement entretenu : sol net, éclairage régulier, quelques plantes en pot vertes et soignées. Rien n'y est dégradé. À droite de l'image, un bureau d'accueil avec son comptoir. Derrière le comptoir, un androïde à l'allure humanoïde sobre se tient immobile, en position d'attente. Sur le comptoir, côté joueur, une borne interactive équipée d'un lecteur de badge. Au-dessus du comptoir, un afficheur digital indique la date du jour. Au fond de l'image, au nord, les portes métalliques d'un ascenseur, avec un lecteur de badge et un unique bouton. À gauche de l'image, à l'ouest, une porte vitrée donne sur l'extérieur : à travers elle, on voit une rue sans aucun véhicule ni passant, dont les abords sont gagnés par une végétation spontanée. Le long d'un mur, des fauteuils roulants et des brancards sont alignés à leurs bornes de recharge, tous présents, comme prêts à accueillir des patients. Quelques sièges d'attente sont vides. Aucune personne n'est visible dans le champ, la vue étant strictement subjective.
 
+**Description d'entrée (formulation provisoire)**
+
+Le hall d'accueil est vaste, lumineux et parfaitement entretenu. Derrière le comptoir, un androïde se tient immobile. Un afficheur lumineux est fixé au-dessus du comptoir. (La mention de l'afficheur invite le joueur à le lire.)
+
 **Éléments notables**
 
-- **L'androïde.** Derrière le comptoir. Le joueur peut lui parler (androïde, robot) ; il ne répond qu'une seule chose : demander de passer le badge sur la borne pour pouvoir sortir.
-- **La borne interactive.** Munie d'un lecteur de badge. Lorsque le joueur y passe son badge, la fiche patient s'affiche sous forme de texte dans la console, avec des libellés neutres : Nom, Prénom, Date d'entrée, Motif d'admission, Conditions de sortie, Adresse de sortie. Contenu : Marchand ; Alex ; 14 mars 2113 ; maladie inconnue évolutive nécessitant un traitement adaptatif ; maladie en rémission complète ; Alex Marchand, chez M. et Mme Marchand, 12 rue des Tilleuls. La fiche ne comporte pas d'image : la photo figure déjà sur le badge. Une fois la procédure de sortie suivie, la sortie ouest devient praticable.
+- **L'androïde.** Derrière le comptoir. Le joueur peut lui parler (androïde, robot). Tant que la sortie n'est pas validée, il s'anime et explique que la politique de l'établissement l'empêche de laisser sortir des patients sans émargement préalable, et demande de passer le badge sur la borne du comptoir. Si le joueur tente de sortir avant d'avoir validé, l'androïde l'interpelle (« S'il vous plaît ! ») et semble l'inviter à venir le voir, sans que le jeu dise explicitement quoi faire. Une fois la sortie validée, il remercie le patient d'avoir fait appel aux services de l'établissement et dit espérer, avec une pointe d'humour absurde, ne pas le revoir bientôt.
+- **La borne interactive.** Munie d'un lecteur de badge. Lorsque le joueur y passe son badge, la fiche patient s'affiche dans une fenêtre de texte (et non dans la console), avec des libellés neutres : Nom, Prénom, Date d'entrée, Motif d'admission, Conditions de sortie, Adresse de sortie. Contenu : Marchand ; Alex ; 14 mars 2113 ; maladie inconnue évolutive nécessitant un traitement adaptatif ; maladie en rémission complète ; Alex Marchand, chez M. et Mme Marchand, 12 rue des Tilleuls. La fiche ne comporte pas d'image : la photo figure déjà sur le badge. Deux boutons sont proposés : « J'accepte de sortir », qui valide la sortie (la porte vitrée se déverrouille), et « Je ne suis pas prêt à sortir », qui referme la fiche sans rien changer (bouton sélectionné par défaut ; le refus n'est pas un échec : le joueur peut revenir plus tard). Une fois la sortie validée, la sortie ouest devient praticable.
 - **L'afficheur.** Placé au-dessus du comptoir, il donne la date du jour : 9 octobre 2173. Il ne diffuse rien d'autre.
 - **Les fauteuils roulants et les brancards.** Alignés à leurs bornes de recharge, au complet et prêts à servir. Ils servent d'indice visuel de l'absence prolongée de patients, indépendant de la propreté du lieu.
 - **La rue, vue à travers la porte vitrée.** Vide et gagnée par la végétation. Elle prépare le lieu suivant sans en dévoiler le contenu.
@@ -351,6 +362,6 @@ Le joueur lit lui-même l'écart de soixante ans en comparant la date d'entrée 
 **Connexions cardinales**
 
 - **Sud** : le couloir technique (§5.2), par l'escalier.
-- **Ouest** : la rue. Existante mais impossible tant que la procédure de sortie n'a pas été suivie.
+- **Ouest** : la rue. Existante mais impossible tant que le joueur n'a pas validé sa sortie à la borne.
 - **Nord** : l'ascenseur. Existante mais impossible pendant toute la durée du jeu (fausse piste, sans zone de jeu associée).
 - **Est** : aucune connexion.
