@@ -54,7 +54,9 @@ public sealed class MenuScreen
             _selected = (_selected + 1) % 4;
         }
 
-        if (Raylib.IsKeyPressed(KeyboardKey.Enter) || Raylib.IsKeyPressed(KeyboardKey.KpEnter))
+        // Entrée / Entrée pavé numérique = validation (mais pas si Alt enfoncé : Alt+Entrée = plein écran)
+        bool altDown = Raylib.IsKeyDown(KeyboardKey.LeftAlt) || Raylib.IsKeyDown(KeyboardKey.RightAlt);
+        if (!altDown && (Raylib.IsKeyPressed(KeyboardKey.Enter) || Raylib.IsKeyPressed(KeyboardKey.KpEnter)))
         {
             if (_selected == 0 && !canContinue)
             {

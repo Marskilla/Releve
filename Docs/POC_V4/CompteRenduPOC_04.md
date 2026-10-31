@@ -450,3 +450,17 @@ scpécifications fournies en amont, les manques produits et les corrections néc
 - Toutes les références `lot C2`, `PoC §3.1`, `J3.4`, `J9-1`, `§9.1`, `§9.6`, `§9.2`, `J3.4`, etc. → remplacées par des explications autonomes
 
 **Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
+
+---
+
+### Bug corrigé : Alt+Entrée valide l'option du menu en plus de basculer le plein écran
+
+**Symptôme** : dans le menu principal, Alt+Entrée bascule bien le plein écran mais valide *aussi* l'option du menu sur laquelle le curseur se trouve (ex. « Nouvelle partie » lance une nouvelle partie et efface la sauvegarde en cours).
+
+**Cause** : `HandleFullscreenToggle()` dans `GameApp.Run()` s'exécute en premier et détecte Alt+Enter pour basculer le plein écran. Mais `MenuScreen.Update()` voit aussi la touche Entrée pressée et valide l'option sélectionnée, sans vérifier si Alt est enfoncé.
+
+**Fichier modifié** : `src/Releve.Game/Ui/MenuScreen.cs`
+
+**Correctif** : ajout d'un test `!altDown` avant la validation sur Entrée dans `MenuScreen.Update()`. Maintenant Alt+Entrée ne fait que basculer le plein écran, sans valider l'option du menu.
+
+**Statut** : `dotnet build` OK (0 erreurs), `dotnet test` OK (161/161), `dotnet publish Release win-x64` OK. Validé par l'utilisateur.
