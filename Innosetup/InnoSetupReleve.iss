@@ -36,7 +36,7 @@ DisableProgramGroupPage=yes
 ; Remove the following line to run in administrative install mode (install for all users).
 PrivilegesRequired=lowest
 
-OutputBaseFilename=ReleveInstall
+OutputBaseFilename=Releve_Install_{#MyAppVersion}
 OutputDir={#SourcePath}\publish
 DiskSpanning=yes
 Compression=lzma2/ultra64
